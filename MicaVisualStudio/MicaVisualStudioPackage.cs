@@ -40,6 +40,9 @@ namespace MicaVisualStudio
 
         #region Package Members
 
+        IntPtr vshWnd;
+        const string VisualStudioProcessName = "devenv";
+
         WinEventHelper eventHelper;
         ThemeHelper themeHelper;
         VsEventsHelper listener;
@@ -55,7 +58,6 @@ namespace MicaVisualStudio
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            vshWnd = Process.GetCurrentProcess().MainWindowHandle;
             eventHelper = new WinEventHelper(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
             ApplyWindowAttributes(Process.GetCurrentProcess().MainWindowHandle, false);
 
@@ -82,8 +84,6 @@ namespace MicaVisualStudio
                 WindowHelper.SetImmersiveDarkMode(vshWnd, general.Theme == 2 ? e : (Theme)general.Theme);
             };
 
-            ApplyWindowAttributes(vshWnd);
-            General.Saved += (s) => ApplyWindowAttributes(vshWnd);
         }
 
         #endregion
@@ -101,7 +101,7 @@ namespace MicaVisualStudio
         {
             var general = General.Instance;
             WindowHelper.ExtendFrameIntoClientArea(hWnd);
-            
+
             if (toolWindow && general.ToolWindows)
             {
                 WindowHelper.SetImmersiveDarkMode(hWnd, (Theme)general.ToolTheme);
@@ -110,10 +110,10 @@ namespace MicaVisualStudio
             }
             else
             {
-            WindowHelper.SetImmersiveDarkMode(hWnd, general.Theme == 2 ? themeHelper.Theme : (Theme)general.Theme);
-            WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
-            WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
-        }
+                WindowHelper.SetImmersiveDarkMode(hWnd, general.Theme == 2 ? themeHelper.Theme : (Theme)general.Theme);
+                WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
+                WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
+            }
         }
 
         #endregion

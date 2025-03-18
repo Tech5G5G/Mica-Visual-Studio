@@ -94,17 +94,26 @@ namespace MicaVisualStudio
             if (hWnd != IntPtr.Zero && //Checks for null reference
                 ProcessHelper.GetWindowProcess(hWnd) is Process proc && proc.ProcessName == VisualStudioProcessName && //Only applies to windows under VS process
                 WindowHelper.GetWindowStyles(hWnd).HasFlag(WindowStyle.Caption)) //Checks window for a title bar
-                ApplyWindowAttributes(hWnd);
+                ApplyWindowAttributes(hWnd, hWnd != vshWnd);
         }
 
-        private void ApplyWindowAttributes(IntPtr hWnd)
+        private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow)
         {
             var general = General.Instance;
-            
             WindowHelper.ExtendFrameIntoClientArea(hWnd);
+            
+            if (toolWindow && general.ToolWindows)
+            {
+                WindowHelper.SetImmersiveDarkMode(hWnd, (Theme)general.ToolTheme);
+                WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
+                WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
+            }
+            else
+            {
             WindowHelper.SetImmersiveDarkMode(hWnd, general.Theme == 2 ? themeHelper.Theme : (Theme)general.Theme);
             WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
             WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
+        }
         }
 
         #endregion

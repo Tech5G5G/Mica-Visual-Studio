@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using MicaVisualStudio.Helpers;
 
 namespace MicaVisualStudio
@@ -41,7 +42,7 @@ namespace MicaVisualStudio
 
         WinEventHelper eventHelper;
         ThemeHelper themeHelper;
-        IntPtr vshWnd;
+        VsEventsHelper listener;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -52,20 +53,41 @@ namespace MicaVisualStudio
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-            await Command.InitializeAsync(this);
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             vshWnd = Process.GetCurrentProcess().MainWindowHandle;
             eventHelper = new WinEventHelper(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
+            ApplyWindowAttributes(Process.GetCurrentProcess().MainWindowHandle, false);
 
+            #region GetVsHandle
+
+            listener = new VsEventsHelper();
+            listener.MainWindowVisChanged += SetVsHandle;
+
+            IVsShell vsShell = (await GetServiceAsync(typeof(SVsShell))) as IVsShell;
+            vsShell.AdviseShellPropertyChanges(listener, out _);
+        }
+
+        private void SetVsHandle(object sender, MainWindowVisChangedEventArgs args)
+        {
+            if (args.MainWindowHandle == vshWnd)
+                return;
+            vshWnd = args.MainWindowHandle;
+
+            General.Saved += (s) => ApplyWindowAttributes(vshWnd, false);
             themeHelper = new ThemeHelper(vshWnd);
-            themeHelper.ThemeChanged += (e) => WindowHelper.SetImmersiveDarkMode(vshWnd, e);
+            themeHelper.ThemeChanged += (e) =>
+            {
+                var general = General.Instance;
+                WindowHelper.SetImmersiveDarkMode(vshWnd, general.Theme == 2 ? e : (Theme)general.Theme);
+            };
 
             ApplyWindowAttributes(vshWnd);
             General.Saved += (s) => ApplyWindowAttributes(vshWnd);
         }
 
-        const string VisualStudioProcessName = "devenv";
+        #endregion
+
 
         private void WinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
         {

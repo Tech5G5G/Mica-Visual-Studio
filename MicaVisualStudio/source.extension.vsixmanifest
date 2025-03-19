@@ -8,7 +8,7 @@
         <License>Resources\license.txt</License>
         <Icon>Resources\logo.png</Icon>
         <PreviewImage>Resources\logo.png</PreviewImage>
-        <Tags>Design; Modern; Theme; UI; Windows; Mica; Tabbed; Arcylic</Tags>
+        <Tags>Design, Modern, Theme, UI, Windows, Mica, Tabbed, Acrylic</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">

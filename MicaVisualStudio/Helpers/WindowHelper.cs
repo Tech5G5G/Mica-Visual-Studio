@@ -13,14 +13,28 @@ namespace MicaVisualStudio.Helpers
         [DllImport("Dwmapi.dll", EntryPoint = "DwmExtendFrameIntoClientArea", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int ExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
 
+        [DllImport("Dwmapi.dll", EntryPoint = "DwmEnableBlurBehindWindow")]
+        private static extern int EnableBlurBehindWindow(IntPtr hWnd, ref DWM_BLURBEHIND pBlurBehind);
+
         [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
         private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("gdi32.dll")]
+        private static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
         const int GWL_STYLE = -16;
 
         const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
         const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
         const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+
+        [Flags]
+        private enum DWM_BB
+        {
+            DWM_BB_ENABLE = 1,
+            DWM_BB_BLURREGION = 2,
+            DWM_BB_TRANSITIONONMAXIMIZED = 4
+        }
 
         private struct MARGINS
         {
@@ -30,12 +44,20 @@ namespace MicaVisualStudio.Helpers
             public int cyBottomHeight;
         }
 
+        private struct DWM_BLURBEHIND
+        {
+            public DWM_BB dwFlags;
+            public bool fEnable;
+            public IntPtr hRgnBlur;
+            public bool fTransitionOnMaximized;
+        }
+
         #endregion
 
-        public static void SetSystemBackdropType(IntPtr hWnd, BackdropType backdrop)
+        public static void ExtendFrameIntoClientArea(IntPtr hWnd)
         {
-            int type = (int)backdrop;
-            SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
+            var margins = new MARGINS { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
+            ExtendFrameIntoClientArea(hWnd, ref margins);
         }
 
         public static void SetImmersiveDarkMode(IntPtr hWnd, Theme theme)
@@ -50,10 +72,25 @@ namespace MicaVisualStudio.Helpers
             SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPrefence, sizeof(int));
         }
 
-        public static void ExtendFrameIntoClientArea(IntPtr hWnd)
+        public static void SetSystemBackdropType(IntPtr hWnd, BackdropType backdrop)
         {
-            var margins = new MARGINS { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
-            ExtendFrameIntoClientArea(hWnd, ref margins);
+            int type = (int)(backdrop == BackdropType.Transparent ? BackdropType.Auto : backdrop);
+            SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
+
+            bool transparent = backdrop == BackdropType.Transparent;
+            EnableWindowTransparency(hWnd, transparent);
+        }
+
+        public static void EnableWindowTransparency(IntPtr hWnd, bool enable)
+        {
+            var bb = new DWM_BLURBEHIND
+            {
+                dwFlags = DWM_BB.DWM_BB_ENABLE | DWM_BB.DWM_BB_BLURREGION | DWM_BB.DWM_BB_TRANSITIONONMAXIMIZED,
+                fEnable = enable,
+                hRgnBlur = enable ? CreateRectRgn(-2, -2, -1, -1) : IntPtr.Zero,
+                fTransitionOnMaximized = true
+            };
+            _ = EnableBlurBehindWindow(hWnd, ref bb);
         }
 
         public static WindowStyle GetWindowStyles(IntPtr hWnd) => (WindowStyle)GetWindowLong(hWnd, GWL_STYLE);
@@ -68,6 +105,7 @@ namespace MicaVisualStudio.Helpers
         Mica,
         Acrylic,
         Tabbed,
+        Transparent
     }
 
     public enum CornerPreference

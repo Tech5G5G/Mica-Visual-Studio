@@ -25,11 +25,12 @@
                     
                     <TextBlock Text="Backdrop" VerticalAlignment="Center" Margin="6,0,0,0" />
                     <ComboBox x:Name="backdrop" VerticalContentAlignment="Center" Height="26" Grid.Column="2">
-                        <ComboBoxItem Content="Auto" />
+                        <ComboBoxItem Content="Auto" Visibility="Collapsed" />
                         <ComboBoxItem Content="None" />
                         <ComboBoxItem Content="Mica" />
                         <ComboBoxItem Content="Acrylic" />
                         <ComboBoxItem Content="Tabbed" />
+                        <ComboBoxItem Content="Transparent" />
                     </ComboBox>
 
                     <TextBlock Text="Theme" VerticalAlignment="Center" Margin="6,0,0,0" Grid.Row="2" />
@@ -71,11 +72,12 @@
 
                         <TextBlock Text="Backdrop" VerticalAlignment="Center" Margin="6,0,0,0" Grid.Row="2" />
                         <ComboBox x:Name="toolBackdrop" VerticalContentAlignment="Center" Height="26" Grid.Column="2" Grid.Row="2">
-                            <ComboBoxItem Content="Auto" />
+                            <ComboBoxItem Content="Auto" Visibility="Collapsed" />
                             <ComboBoxItem Content="None" />
                             <ComboBoxItem Content="Mica" />
                             <ComboBoxItem Content="Acrylic" />
                             <ComboBoxItem Content="Tabbed" />
+                            <ComboBoxItem Content="Transparent" />
                         </ComboBox>
 
                         <TextBlock Text="Theme" VerticalAlignment="Center" Margin="6,0,0,0" Grid.Row="4" />

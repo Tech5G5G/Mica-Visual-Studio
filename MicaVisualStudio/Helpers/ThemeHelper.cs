@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
@@ -42,6 +41,6 @@ namespace MicaVisualStudio.Helpers
                 ThemeChanged?.Invoke(Theme);
 
             return DefSubclassProc(hWnd, uMsg, wParam, lParam);
-        }
+        } 
     }
 }

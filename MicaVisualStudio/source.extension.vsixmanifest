@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="MicaVisualStudio.8fbea740-d2b6-47c3-a69f-ace0c4f526ac" Version="1.0.1" Language="en-US" Publisher="Tech5G5G" />
+        <Identity Id="MicaVisualStudio.8fbea740-d2b6-47c3-a69f-ace0c4f526ac" Version="1.0.2" Language="en-US" Publisher="Tech5G5G" />
         <DisplayName>Mica Visual Studio</DisplayName>
-        <Description xml:space="preserve">Enchance your Visual Studio experience with Windows materials like Mica, Acrylic and Glass.</Description>
+        <Description xml:space="preserve">Enhance your Visual Studio experience with Windows materials like Mica, Acrylic and Glass.</Description>
         <MoreInfo>https://github.com/Tech5G5G/Mica-Visual-Studio</MoreInfo>
         <License>Resources\license.txt</License>
         <Icon>Resources\logo.png</Icon>

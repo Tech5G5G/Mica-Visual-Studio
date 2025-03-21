@@ -41,7 +41,7 @@ namespace MicaVisualStudio
         #region Package Members
 
         IntPtr vshWnd;
-        const string VisualStudioProcessName = "devenv";
+        int processId;
 
         WinEventHelper eventHelper;
         ThemeHelper themeHelper;
@@ -58,8 +58,11 @@ namespace MicaVisualStudio
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
+            var proc = Process.GetCurrentProcess();
+            processId = proc.Id;
+
             eventHelper = new WinEventHelper(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
-            ApplyWindowAttributes(Process.GetCurrentProcess().MainWindowHandle, false);
+            ApplyWindowAttributes(proc.MainWindowHandle, false);
 
             #region GetVsHandle
 
@@ -72,7 +75,7 @@ namespace MicaVisualStudio
 
         private void SetVsHandle(object sender, MainWindowVisChangedEventArgs args)
         {
-            if (args.MainWindowHandle == vshWnd)
+            if (args.MainWindowHandle == vshWnd || !args.MainWindowVisible)
                 return;
             vshWnd = args.MainWindowHandle;
 
@@ -88,11 +91,10 @@ namespace MicaVisualStudio
 
         #endregion
 
-
         private void WinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
         {
             if (hWnd != IntPtr.Zero && //Checks for null reference
-                ProcessHelper.GetWindowProcess(hWnd) is Process proc && proc.ProcessName == VisualStudioProcessName && //Only applies to windows under VS process
+                ProcessHelper.GetWindowProcessID(hWnd) == processId && //Only applies to windows under current VS process
                 WindowHelper.GetWindowStyles(hWnd).HasFlag(WindowStyle.Caption)) //Checks window for a title bar
                 ApplyWindowAttributes(hWnd, hWnd != vshWnd);
         }

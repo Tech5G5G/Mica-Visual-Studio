@@ -74,10 +74,10 @@ namespace MicaVisualStudio.Helpers
 
         public static void SetSystemBackdropType(IntPtr hWnd, BackdropType backdrop)
         {
-            int type = (int)(backdrop == BackdropType.Transparent ? BackdropType.Auto : backdrop);
+            int type = (int)(backdrop == BackdropType.Glass ? BackdropType.Auto : backdrop);
             SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
 
-            bool transparent = backdrop == BackdropType.Transparent;
+            bool transparent = backdrop == BackdropType.Glass;
             EnableWindowTransparency(hWnd, transparent);
         }
 
@@ -105,7 +105,7 @@ namespace MicaVisualStudio.Helpers
         Mica,
         Acrylic,
         Tabbed,
-        Transparent
+        Glass
     }
 
     public enum CornerPreference

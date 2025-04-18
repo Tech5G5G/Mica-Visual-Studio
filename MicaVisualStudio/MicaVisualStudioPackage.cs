@@ -85,10 +85,9 @@ namespace MicaVisualStudio
             themeHelper = new ThemeHelper(vshWnd);
             themeHelper.ThemeChanged += (e) =>
             {
-                var general = General.Instance;
-                WindowHelper.SetImmersiveDarkMode(vshWnd, general.Theme == 2 ? e : (Theme)general.Theme);
+                if ((Theme)General.Instance.Theme == Theme.System)
+                    WindowHelper.SetImmersiveDarkMode(vshWnd, e);
             };
-
         }
 
         private void WinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)

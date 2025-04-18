@@ -79,6 +79,8 @@ namespace MicaVisualStudio
                 return;
             vshWnd = args.MainWindowHandle;
 
+            #endregion
+
             General.Saved += (s) => ApplyWindowAttributes(vshWnd, false);
             themeHelper = new ThemeHelper(vshWnd);
             themeHelper.ThemeChanged += (e) =>
@@ -88,8 +90,6 @@ namespace MicaVisualStudio
             };
 
         }
-
-        #endregion
 
         private void WinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
         {

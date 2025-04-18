@@ -27,13 +27,7 @@ namespace MicaVisualStudio.Helpers
 
         readonly SubclassDelegate subclass;
 
-        public ThemeHelper(IntPtr hWnd)
-        {
-            if (hWnd == IntPtr.Zero)
-                throw new ArgumentNullException(nameof(hWnd));
-
-            SetWindowSubclass(hWnd, subclass = new SubclassDelegate(WindowSubclass), 0, 0);
-        }
+        public ThemeHelper(IntPtr hWnd) => SetWindowSubclass(hWnd, subclass = new SubclassDelegate(WindowSubclass), 0, 0);
 
         private int WindowSubclass(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, uint dwRefData)
         {

@@ -58,6 +58,8 @@ namespace MicaVisualStudio
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
+            try
+            {
             var proc = Process.GetCurrentProcess();
             processId = proc.Id;
 
@@ -70,7 +72,12 @@ namespace MicaVisualStudio
             listener.MainWindowVisChanged += SetVsHandle;
 
             IVsShell vsShell = (await GetServiceAsync(typeof(SVsShell))) as IVsShell;
-            vsShell.AdviseShellPropertyChanges(listener, out _);
+                vsShell?.AdviseShellPropertyChanges(listener, out _);
+        }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error initializing Mica Visual Studio: {ex.Message}");
+            }
         }
 
         private void SetVsHandle(object sender, MainWindowVisChangedEventArgs args)

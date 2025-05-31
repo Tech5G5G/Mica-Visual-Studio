@@ -24,9 +24,9 @@ namespace MicaVisualStudio.Helpers
 
         const int GWL_STYLE = -16;
 
-        const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
-        const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
-        const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+        const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
+            DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
+            DWMWA_WINDOW_CORNER_PREFERENCE = 33;
 
         [Flags]
         private enum DWM_BB
@@ -56,29 +56,29 @@ namespace MicaVisualStudio.Helpers
 
         public static void ExtendFrameIntoClientArea(IntPtr hWnd)
         {
-            var margins = new MARGINS { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
+            MARGINS margins = new MARGINS { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
             ExtendFrameIntoClientArea(hWnd, ref margins);
         }
 
-        public static void SetImmersiveDarkMode(IntPtr hWnd, Theme theme)
+        public static void EnableDarkMode(IntPtr hWnd)
         {
-            int actualTheme = (int)theme;
-            SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref actualTheme, sizeof(int));
+            int mode = 1; //TRUE
+            SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(int));
         }
 
         public static void SetCornerPreference(IntPtr hWnd, CornerPreference preference)
         {
-            int cornerPrefence = (int)preference;
-            SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPrefence, sizeof(int));
+            int corner = (int)preference;
+            SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref corner, sizeof(int));
         }
 
         public static void SetSystemBackdropType(IntPtr hWnd, BackdropType backdrop)
         {
-            int type = (int)(backdrop == BackdropType.Glass ? BackdropType.Auto : backdrop);
+            int type = (int)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
             SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
 
-            bool transparent = backdrop == BackdropType.Glass;
-            EnableWindowTransparency(hWnd, transparent);
+            bool glass = backdrop == BackdropType.Glass;
+            EnableWindowTransparency(hWnd, glass);
         }
 
         public static void EnableWindowTransparency(IntPtr hWnd, bool enable)

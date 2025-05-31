@@ -46,7 +46,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Helpers\ProcessHelper.cs" />
-    <Compile Include="Helpers\ThemeHelper.cs" />
     <Compile Include="Helpers\VsEventsHelper.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="Helpers\WinEventHelper.cs" />

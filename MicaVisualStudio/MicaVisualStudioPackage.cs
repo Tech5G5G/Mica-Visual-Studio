@@ -59,18 +59,18 @@ namespace MicaVisualStudio
 
             try
             {
-            var proc = Process.GetCurrentProcess();
-            processId = proc.Id;
+                var proc = Process.GetCurrentProcess();
+                processId = proc.Id;
 
                 helper = new WinEventHelper(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
-            ApplyWindowAttributes(proc.MainWindowHandle, false);
+                ApplyWindowAttributes(proc.MainWindowHandle, false);
 
-            listener = new VsEventsHelper();
-            listener.MainWindowVisChanged += SetVsHandle;
+                listener = new VsEventsHelper();
+                listener.MainWindowVisChanged += SetVsHandle;
 
-            IVsShell vsShell = (await GetServiceAsync(typeof(SVsShell))) as IVsShell;
+                IVsShell vsShell = (await GetServiceAsync(typeof(SVsShell))) as IVsShell;
                 vsShell?.AdviseShellPropertyChanges(listener, out _);
-        }
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error initializing Mica Visual Studio: {ex.Message}");
@@ -97,17 +97,17 @@ namespace MicaVisualStudio
         private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow)
         {
             var general = General.Instance;
+
             WindowHelper.ExtendFrameIntoClientArea(hWnd);
+            WindowHelper.EnableDarkMode(hWnd);
 
             if (toolWindow && general.ToolWindows)
             {
-                WindowHelper.SetImmersiveDarkMode(hWnd, (Theme)general.ToolTheme);
                 WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
                 WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
             }
             else
             {
-                WindowHelper.SetImmersiveDarkMode(hWnd, general.Theme == 2 ? themeHelper.Theme : (Theme)general.Theme);
                 WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
                 WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
             }

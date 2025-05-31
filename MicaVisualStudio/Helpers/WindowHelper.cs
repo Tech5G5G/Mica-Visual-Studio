@@ -116,13 +116,6 @@ namespace MicaVisualStudio.Helpers
         RoundSmall
     }
 
-    public enum Theme
-    {
-        Light,
-        Dark,
-        System
-    }
-
     [Flags]
     public enum WindowStyle : uint
     {

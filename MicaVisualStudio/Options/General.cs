@@ -18,12 +18,10 @@ namespace MicaVisualStudio
     public class General : BaseOptionModel<General>
     {
         public int Backdrop { get; set; } = 2;
-        public int Theme { get; set; } = 1;
         public int CornerPreference { get; set; } = 0;
 
         public bool ToolWindows { get; set; } = false;
         public int ToolBackdrop { get; set; } = 2;
-        public int ToolTheme { get; set; } = 1;
         public int ToolCornerPreference { get; set; } = 0;
     }
 }

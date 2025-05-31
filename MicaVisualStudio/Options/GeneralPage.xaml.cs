@@ -16,11 +16,9 @@ namespace MicaVisualStudio.Options
             var general = General.Instance;
 
             InitializeComboBox(backdrop, general, nameof(General.Backdrop));
-            InitializeComboBox(theme, general, nameof(General.Theme));
             InitializeComboBox(cornerPreference, general, nameof(General.CornerPreference));
 
             InitializeComboBox(toolBackdrop, general, nameof(General.ToolBackdrop)); 
-            InitializeComboBox(toolTheme, general, nameof(General.ToolTheme));
             InitializeComboBox(toolCornerPreference, general, nameof(General.ToolCornerPreference));
 
             toolWindowsGrid.Visibility = (toolWindows.IsChecked = general.ToolWindows) == true ? Visibility.Visible : Visibility.Collapsed;

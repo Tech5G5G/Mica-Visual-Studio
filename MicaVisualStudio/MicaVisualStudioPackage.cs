@@ -40,8 +40,8 @@ namespace MicaVisualStudio
 
         #region Package Members
 
-        IntPtr vshWnd;
         int processId;
+        IntPtr vsHandle;
 
         WinEventHelper helper;
         VsEventsHelper listener;
@@ -91,7 +91,7 @@ namespace MicaVisualStudio
             if (hWnd != IntPtr.Zero && //Checks for null reference
                 ProcessHelper.GetWindowProcessID(hWnd) == processId && //Only applies to windows under current VS process
                 WindowHelper.GetWindowStyles(hWnd).HasFlag(WindowStyle.Caption)) //Checks window for a title bar
-                ApplyWindowAttributes(hWnd, hWnd != vshWnd);
+                ApplyWindowAttributes(hWnd, hWnd != vsHandle);
         }
 
         private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow)

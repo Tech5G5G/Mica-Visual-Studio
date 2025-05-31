@@ -43,8 +43,7 @@ namespace MicaVisualStudio
         IntPtr vshWnd;
         int processId;
 
-        WinEventHelper eventHelper;
-        ThemeHelper themeHelper;
+        WinEventHelper helper;
         VsEventsHelper listener;
 
         /// <summary>
@@ -63,7 +62,7 @@ namespace MicaVisualStudio
             var proc = Process.GetCurrentProcess();
             processId = proc.Id;
 
-            eventHelper = new WinEventHelper(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
+                helper = new WinEventHelper(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
             ApplyWindowAttributes(proc.MainWindowHandle, false);
 
             #region GetVsHandle
@@ -89,12 +88,10 @@ namespace MicaVisualStudio
             #endregion
 
             General.Saved += (s) => ApplyWindowAttributes(vshWnd, false);
-            themeHelper = new ThemeHelper(vshWnd);
-            themeHelper.ThemeChanged += (e) =>
             {
-                if ((Theme)General.Instance.Theme == Theme.System)
-                    WindowHelper.SetImmersiveDarkMode(vshWnd, e);
-            };
+                vsHandle = args.MainWindowHandle;
+                General.Saved += (s) => ApplyWindowAttributes(vsHandle, false);
+            }
         }
 
         private void WinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)

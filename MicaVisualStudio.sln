@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicaVisualStudio", "MicaVisualStudio\MicaVisualStudio.csproj", "{D4F84E24-0BE1-41E1-A510-68535792520D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicaVisualStudio.Extensibility", "MicaVisualStudio.Extensibility\MicaVisualStudio.Extensibility.csproj", "{981D95D7-CE85-4D66-9876-85817282136A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{D4F84E24-0BE1-41E1-A510-68535792520D}.Release|arm64.Build.0 = Release|arm64
 		{D4F84E24-0BE1-41E1-A510-68535792520D}.Release|x86.ActiveCfg = Release|x86
 		{D4F84E24-0BE1-41E1-A510-68535792520D}.Release|x86.Build.0 = Release|x86
+		{981D95D7-CE85-4D66-9876-85817282136A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Debug|arm64.Build.0 = Debug|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Debug|x86.Build.0 = Debug|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Release|arm64.ActiveCfg = Release|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Release|arm64.Build.0 = Release|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Release|x86.ActiveCfg = Release|Any CPU
+		{981D95D7-CE85-4D66-9876-85817282136A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

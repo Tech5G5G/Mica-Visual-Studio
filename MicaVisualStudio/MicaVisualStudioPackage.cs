@@ -41,7 +41,7 @@ namespace MicaVisualStudio
         #region Package Members
 
         int processId;
-        IntPtr vsHandle;
+        nint vsHandle;
 
         WinEventHelper helper;
         VsEventsHelper listener;
@@ -62,10 +62,10 @@ namespace MicaVisualStudio
                 var proc = Process.GetCurrentProcess();
                 processId = proc.Id;
 
-                helper = new WinEventHelper(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
+                helper = new(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
                 ApplyWindowAttributes(proc.MainWindowHandle, false);
 
-                listener = new VsEventsHelper();
+                listener = new();
                 listener.MainWindowVisChanged += SetVsHandle;
 
                 IVsShell vsShell = (await GetServiceAsync(typeof(SVsShell))) as IVsShell;

@@ -56,7 +56,7 @@ namespace MicaVisualStudio.Helpers
 
         public static void ExtendFrameIntoClientArea(IntPtr hWnd)
         {
-            MARGINS margins = new MARGINS { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
+        MARGINS margins = new() { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
             ExtendFrameIntoClientArea(hWnd, ref margins);
         }
 
@@ -83,7 +83,7 @@ namespace MicaVisualStudio.Helpers
 
         public static void EnableWindowTransparency(IntPtr hWnd, bool enable)
         {
-            var bb = new DWM_BLURBEHIND
+        DWM_BLURBEHIND bb = new()
             {
                 dwFlags = DWM_BB.DWM_BB_ENABLE | DWM_BB.DWM_BB_BLURREGION | DWM_BB.DWM_BB_TRANSITIONONMAXIMIZED,
                 fEnable = enable,

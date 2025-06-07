@@ -24,16 +24,9 @@ namespace MicaVisualStudio.Helpers
         public event EventHandler<MainWindowVisChangedEventArgs> MainWindowVisChanged;
     }
 
-    public class MainWindowVisChangedEventArgs : EventArgs
+public class MainWindowVisChangedEventArgs(IntPtr handle, bool visible) : EventArgs
     {
-        public IntPtr MainWindowHandle { get; private set; }
+    public IntPtr MainWindowHandle { get; } = handle;
 
-        public bool MainWindowVisible { get; private set; }
-
-        public MainWindowVisChangedEventArgs(IntPtr handle, bool vis)
-        {
-            MainWindowHandle = handle;
-            MainWindowVisible = vis;
-        }
-    }
+    public bool MainWindowVisible { get; } = visible;
 }

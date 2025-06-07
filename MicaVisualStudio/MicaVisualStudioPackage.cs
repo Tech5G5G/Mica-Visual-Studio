@@ -1,12 +1,3 @@
-﻿using System;
-using System.Threading;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Task = System.Threading.Tasks.Task;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using MicaVisualStudio.Helpers;
-
 namespace MicaVisualStudio
 {
     /// <summary>

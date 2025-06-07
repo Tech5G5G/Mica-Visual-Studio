@@ -1,8 +1,4 @@
 ﻿using System.Windows;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell;
-using Community.VisualStudio.Toolkit;
-using MicaVisualStudio.Options;
 
 namespace MicaVisualStudio
 {

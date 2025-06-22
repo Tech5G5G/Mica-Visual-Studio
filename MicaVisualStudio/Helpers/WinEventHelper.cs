@@ -27,7 +27,9 @@ public class WinEventHelper
     readonly IntPtr hookId;
     readonly WinEventDelegate hook;
 
-    public WinEventHelper(WinEventDelegate proc, uint eventMin, uint eventMax, uint dwFlags) => hookId = SetWinEventHook(eventMin, eventMax, IntPtr.Zero, hook = proc, 0, 0, dwFlags);
+    public WinEventHelper(WinEventDelegate proc, uint winEvent, uint procId, uint dwFlags) =>
+        hookId = SetWinEventHook(winEvent, winEvent, IntPtr.Zero, hook = proc, procId, 0, dwFlags);
+
     ~WinEventHelper() => UnhookWinEvent(hookId);
 }
 

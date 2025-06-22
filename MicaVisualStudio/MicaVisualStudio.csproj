@@ -50,7 +50,6 @@
     <Compile Include="Composition\DispatcherQueueController.cs" />
     <Compile Include="Composition\MicaController.cs" />
     <Compile Include="GlobalUsings.cs" />
-    <Compile Include="Helpers\ProcessHelper.cs" />
     <Compile Include="Helpers\VsEventsHelper.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="Helpers\WinEventHelper.cs" />

@@ -104,12 +104,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MicaVisualStudio.Composition\MicaVisualStudio.Composition.vcxproj">
-      <Project>{a48f3854-a86a-0e58-979c-7214218759fa}</Project>
-      <Name>MicaVisualStudio.Composition</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

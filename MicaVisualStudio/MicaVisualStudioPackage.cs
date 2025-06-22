@@ -94,6 +94,8 @@ namespace MicaVisualStudio
 
         Compositor compositor;
         DispatcherQueueController dispatcher;
+
+        readonly System.Collections.Generic.Dictionary<nint, MicaController> controllers = [];
         private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow)
         {
             var general = General.Instance;

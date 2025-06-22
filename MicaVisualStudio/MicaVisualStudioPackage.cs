@@ -34,8 +34,10 @@ namespace MicaVisualStudio
         int processId;
         nint vsHandle;
 
-        WinEventHelper helper;
         VsEventsHelper listener;
+
+        WinEventHelper openHelper;
+        WinEventHelper closeHelper;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -58,6 +60,9 @@ namespace MicaVisualStudio
 
                 listener = new();
                 listener.MainWindowVisChanged += SetVsHandle;
+
+                openHelper = new(OpenWinEventProc, WinEventHelper.EVENT_OBJECT_CREATE, (uint)processId, WinEventHelper.WINEVENT_OUTOFCONTEXT);
+                closeHelper = new(CloseWinEventProc, WinEventHelper.EVENT_OBJECT_DESTROY /*Replace with another event*/, (uint)processId, WinEventHelper.WINEVENT_OUTOFCONTEXT);
 
                 IVsShell vsShell = (await GetServiceAsync(typeof(SVsShell))) as IVsShell;
                 vsShell?.AdviseShellPropertyChanges(listener, out _);

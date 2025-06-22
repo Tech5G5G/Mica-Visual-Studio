@@ -108,7 +108,20 @@ namespace MicaVisualStudio
         readonly System.Collections.Generic.Dictionary<nint, MicaController> controllers = [];
         private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow)
         {
-            var general = General.Instance;
+            //Make sure DispatcherQueue and Compositor are created for current thread
+            if (dispatcher is null && DispatcherQueueController.TryCreate(out dispatcher))
+                compositor = new();
+
+            //Null check compositor
+            if (compositor is null)
+                return;
+            //Create target and controller and appy to window
+            var controller = new MicaController(compositor);
+            controller.SetTarget(hWnd);
+
+            //Cache controller
+            controllers.Add(hWnd, controller);
+
             //var general = General.Instance;
 
             //WindowHelper.ExtendFrameIntoClientArea(hWnd);

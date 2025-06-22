@@ -92,6 +92,8 @@ namespace MicaVisualStudio
                 ApplyWindowAttributes(hWnd, hWnd != vsHandle);
         }
 
+        Compositor compositor;
+        DispatcherQueueController dispatcher;
         private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow)
         {
             var general = General.Instance;

@@ -57,6 +57,11 @@ namespace MicaVisualStudio
 
                 helper = new(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
                 ApplyWindowAttributes(proc.MainWindowHandle, false);
+                General.Saved += (s) =>
+                {
+                    if (vsHandle != IntPtr.Zero)
+                        ApplyWindowAttributes(vsHandle, false);
+                };
 
                 listener = new();
                 listener.MainWindowVisChanged += SetVsHandle;
@@ -76,11 +81,8 @@ namespace MicaVisualStudio
         private void SetVsHandle(object sender, MainWindowVisChangedEventArgs args)
         {
             if (args.MainWindowHandle != vsHandle && args.MainWindowVisible)
-            {
                 vsHandle = args.MainWindowHandle;
-                General.Saved += (s) => ApplyWindowAttributes(vsHandle, false);
             }
-        }
 
         private void WinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
         {

@@ -5,8 +5,9 @@ public class WinEventHelper
     public const uint EVENT_OBJECT_SHOW = 0x8002;
     public const uint WINEVENT_OUTOFCONTEXT = 0;
 
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate pfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+    public const uint EVENT_OBJECT_SHOW = 0x8002,
+        EVENT_OBJECT_CREATE = 0x8000,
+        EVENT_OBJECT_DESTROY = 0x8001;
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool UnhookWinEvent(IntPtr hWinEventHook);

@@ -46,6 +46,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Composition\CompositionExtensions.cs" />
     <Compile Include="Composition\DispatcherQueueController.cs" />
     <Compile Include="Composition\MicaController.cs" />
     <Compile Include="GlobalUsings.cs" />

@@ -109,20 +109,21 @@ namespace MicaVisualStudio
         private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow)
         {
             var general = General.Instance;
+            //var general = General.Instance;
 
-            WindowHelper.ExtendFrameIntoClientArea(hWnd);
-            WindowHelper.EnableDarkMode(hWnd);
+            //WindowHelper.ExtendFrameIntoClientArea(hWnd);
+            //WindowHelper.EnableDarkMode(hWnd);
 
-            if (toolWindow && general.ToolWindows)
-            {
-                WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
-                WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
-            }
-            else
-            {
-                WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
-                WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
-            }
+            //if (toolWindow && general.ToolWindows)
+            //{
+            //    WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
+            //    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
+            //}
+            //else
+            //{
+            //    WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
+            //    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
+            //}
         }
 
         #endregion

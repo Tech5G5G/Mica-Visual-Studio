@@ -84,12 +84,22 @@ namespace MicaVisualStudio
                 vsHandle = args.MainWindowHandle;
             }
 
-        private void WinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
+        private void OpenWinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
         {
-            if (hWnd != IntPtr.Zero && //Checks for null reference
-                ProcessHelper.GetWindowProcessID(hWnd) == processId && //Only applies to windows under current VS process
-                WindowHelper.GetWindowStyles(hWnd).HasFlag(WindowStyle.Caption)) //Checks window for a title bar
+            if (hWnd != IntPtr.Zero && //Check for null reference
+                !controllers.ContainsKey(hWnd) && //Don't composite more than once
+                WindowHelper.GetWindowStyles(hWnd).HasFlag(WindowStyle.Caption)) //Check window for title bar
                 ApplyWindowAttributes(hWnd, hWnd != vsHandle);
+        }
+
+        private void CloseWinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
+        {
+            if (hWnd != IntPtr.Zero && //Check for null reference
+                controllers.TryGetValue(hWnd, out MicaController controller)) //Get controller (if any) for window handle
+            {
+                controller.Dispose();
+                controllers.Remove(hWnd);
+            }
         }
 
         Compositor compositor;

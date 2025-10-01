@@ -30,7 +30,7 @@ Mica Visual Studio may contain up to three main issues, being:
 - [Duplicate caption buttons](https://github.com/Tech5G5G/Mica-Visual-Studio/issues/1)
 
 If you ever experience the first issue, try running Visual Studio in safe mode: `devenv /SafeMode`  
-and Mica Visual Studio will be disabled. This will allow you to uninstall Mica Visual Studio with having to repair/reinstall Visual Studio.
+and Mica Visual Studio will be disabled. This will allow you to uninstall Mica Visual Studio without having to repair/reinstall Visual Studio.
 
 If you are facing the second issue, try applying Tabbed as your backdrop instead of Mica.  
 For the final issue (as linked earlier) there is an issue open on GitHub. If you have any ideas on a fix, feel free to reply.

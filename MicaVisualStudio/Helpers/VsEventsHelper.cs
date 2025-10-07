@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualStudio.Threading;
-using System.Threading;
-
-namespace MicaVisualStudio.Helpers;
+﻿namespace MicaVisualStudio.Helpers;
 
 /// <summary>
 /// Handles <see cref="IVsShell"/> property changes.

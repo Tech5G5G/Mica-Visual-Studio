@@ -64,11 +64,11 @@ namespace MicaVisualStudio
                 shellHelper.WindowCreated += WindowCreated;
                 shellHelper.WindowDestroyed += WindowDestroyed;
 
-                openHelper = new(OpenWinEventProc, WinEventHelper.EVENT_OBJECT_CREATE, (uint)processId, WinEventHelper.WINEVENT_OUTOFCONTEXT);
-                closeHelper = new(CloseWinEventProc, WinEventHelper.EVENT_OBJECT_DESTROY /*Replace with another event*/, (uint)processId, WinEventHelper.WINEVENT_OUTOFCONTEXT);
-
-                IVsShell vsShell = (await GetServiceAsync(typeof(SVsShell))) as IVsShell;
-                vsShell?.AdviseShellPropertyChanges(listener, out _);
+                if (await VsEventsHelper.CreateAsync(this, cancellationToken) is VsEventsHelper helper)
+                {
+                    listener = helper;
+                    listener.MainWindowVisChanged += SetVsHandle;
+            }
             }
             catch (Exception ex)
             {

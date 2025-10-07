@@ -1,4 +1,4 @@
-namespace MicaVisualStudio
+﻿namespace MicaVisualStudio
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -68,7 +68,7 @@ namespace MicaVisualStudio
                 {
                     listener = helper;
                     listener.MainWindowVisChanged += SetVsHandle;
-            }
+                }
             }
             catch (Exception ex)
             {
@@ -81,7 +81,7 @@ namespace MicaVisualStudio
         {
             if (args.MainWindowHandle != vsHandle && args.MainWindowVisible)
                 vsHandle = args.MainWindowHandle;
-            }
+        }
 
         private void WindowCreated(object sender, WindowChangedEventArgs args)
         {
@@ -107,37 +107,45 @@ namespace MicaVisualStudio
         DispatcherQueueController dispatcher;
 
         readonly System.Collections.Generic.Dictionary<nint, MicaController> controllers = [];
-        private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow)
+
+        private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow, bool composite = false)
         {
-            //Make sure DispatcherQueue and Compositor are created for current thread
-            if (dispatcher is null && DispatcherQueueController.TryCreate(out dispatcher))
-                compositor = new();
+            if (composite)
+            {
+                //Make sure DispatcherQueue and Compositor are created for current thread
+                if (dispatcher is null && DispatcherQueueController.TryCreate(out dispatcher))
+                    compositor = new();
 
-            //Null check compositor
-            if (compositor is null)
-                return;
-            //Create target and controller and appy to window
-            var controller = new MicaController(compositor);
-            controller.SetTarget(hWnd);
+                //Null check compositor and HwndSource
+                if (compositor is null || HwndSource.FromHwnd(hWnd) is not HwndSource source)
+                    return;
 
-            //Cache controller
-            controllers.Add(hWnd, controller);
+                //Get existing controller (if any)
+                MicaController controller = controllers.ContainsKey(hWnd) ? controllers[hWnd] : new(compositor);
+                controller.SetTarget(source);
 
-            //var general = General.Instance;
+                //Cache controller (if not already)
+                if (!controllers.ContainsKey(hWnd))
+                    controllers.Add(hWnd, controller);
+            }
+            else
+            {
+                var general = General.Instance;
 
-            //WindowHelper.ExtendFrameIntoClientArea(hWnd);
-            //WindowHelper.EnableDarkMode(hWnd);
+                WindowHelper.ExtendFrameIntoClientArea(hWnd);
+                WindowHelper.EnableDarkMode(hWnd); //Just looks better
 
-            //if (toolWindow && general.ToolWindows)
-            //{
-            //    WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
-            //    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
-            //}
-            //else
-            //{
-            //    WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
-            //    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
-            //}
+                if (toolWindow && general.ToolWindows)
+                {
+                    WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
+                    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
+                }
+                else
+                {
+                    WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
+                    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
+                }
+            }
         }
 
         #endregion

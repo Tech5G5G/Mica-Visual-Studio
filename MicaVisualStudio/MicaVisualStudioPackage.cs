@@ -31,13 +31,11 @@ namespace MicaVisualStudio
 
         #region Package Members
 
-        int processId;
-        nint vsHandle;
+        private int pid;
+        private IntPtr vsHandle;
 
-        VsEventsHelper listener;
-
-        WinEventHelper openHelper;
-        WinEventHelper closeHelper;
+        private ShellHelper shellHelper;
+        private VsEventsHelper listener;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -53,9 +51,8 @@ namespace MicaVisualStudio
             try
             {
                 var proc = Process.GetCurrentProcess();
-                processId = proc.Id;
+                pid = proc.Id;
 
-                helper = new(WinEventProc, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.EVENT_OBJECT_SHOW, WinEventHelper.WINEVENT_OUTOFCONTEXT);
                 ApplyWindowAttributes(proc.MainWindowHandle, false);
                 General.Saved += (s) =>
                 {
@@ -63,8 +60,9 @@ namespace MicaVisualStudio
                         ApplyWindowAttributes(vsHandle, false);
                 };
 
-                listener = new();
-                listener.MainWindowVisChanged += SetVsHandle;
+                shellHelper = new();
+                shellHelper.WindowCreated += WindowCreated;
+                shellHelper.WindowDestroyed += WindowDestroyed;
 
                 openHelper = new(OpenWinEventProc, WinEventHelper.EVENT_OBJECT_CREATE, (uint)processId, WinEventHelper.WINEVENT_OUTOFCONTEXT);
                 closeHelper = new(CloseWinEventProc, WinEventHelper.EVENT_OBJECT_DESTROY /*Replace with another event*/, (uint)processId, WinEventHelper.WINEVENT_OUTOFCONTEXT);
@@ -84,21 +82,23 @@ namespace MicaVisualStudio
                 vsHandle = args.MainWindowHandle;
             }
 
-        private void OpenWinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
+        private void WindowCreated(object sender, WindowChangedEventArgs args)
         {
-            if (hWnd != IntPtr.Zero && //Check for null reference
-                !controllers.ContainsKey(hWnd) && //Don't composite more than once
-                WindowHelper.GetWindowStyles(hWnd).HasFlag(WindowStyle.Caption)) //Check window for title bar
-                ApplyWindowAttributes(hWnd, hWnd != vsHandle);
+            if (args.WindowHandle != IntPtr.Zero && //Check for null reference
+                WindowHelper.GetWindowProcessId(args.WindowHandle) == pid && //Check if window belongs to current process
+                !controllers.ContainsKey(args.WindowHandle) && //Don't composite the same window twice
+                WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(WindowStyle.Caption)) //Check window for title bar
+                ApplyWindowAttributes(args.WindowHandle, args.WindowHandle != vsHandle);
         }
 
-        private void CloseWinEventProc(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
+        private void WindowDestroyed(object sender, WindowChangedEventArgs args)
         {
-            if (hWnd != IntPtr.Zero && //Check for null reference
-                controllers.TryGetValue(hWnd, out MicaController controller)) //Get controller (if any) for window handle
+            if (args.WindowHandle != IntPtr.Zero && //Check for null reference
+                WindowHelper.GetWindowProcessId(args.WindowHandle) == pid && //Check if window belongs to current process
+                controllers.TryGetValue(args.WindowHandle, out MicaController controller)) //Get controller (if any) for window handle
             {
                 controller.Dispose();
-                controllers.Remove(hWnd);
+                controllers.Remove(args.WindowHandle);
             }
         }
 

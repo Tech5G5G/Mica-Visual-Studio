@@ -50,9 +50,9 @@
     <Compile Include="Composition\DispatcherQueueController.cs" />
     <Compile Include="Composition\MicaController.cs" />
     <Compile Include="GlobalUsings.cs" />
+    <Compile Include="Helpers\ShellHelper.cs" />
     <Compile Include="Helpers\VsEventsHelper.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
-    <Compile Include="Helpers\WinEventHelper.cs" />
     <Compile Include="Options\General.cs" />
     <Compile Include="Options\GeneralPage.xaml.cs">
       <DependentUpon>GeneralPage.xaml</DependentUpon>

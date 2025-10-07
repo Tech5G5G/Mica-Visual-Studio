@@ -2,6 +2,9 @@
 
 namespace MicaVisualStudio.Helpers;
 
+/// <summary>
+/// Handles Windows shell events for window creation and destruction.
+/// </summary>
 public class ShellHelper : NativeWindow
 {
     #region PInvoke
@@ -22,6 +25,9 @@ public class ShellHelper : NativeWindow
 
     private readonly uint WM_SHELLHOOK;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="ShellHelper"/>.
+    /// </summary>
     public ShellHelper()
     {
         CreateHandle(new() { ClassName = "static" });
@@ -47,12 +53,25 @@ public class ShellHelper : NativeWindow
         base.WndProc(ref m);
     }
 
+    /// <summary>
+    /// Occurs when a window is created.
+    /// </summary>
     public event EventHandler<WindowChangedEventArgs> WindowCreated;
 
+    /// <summary>
+    /// Occurs when a window is destroyed.
+    /// </summary>
     public event EventHandler<WindowChangedEventArgs> WindowDestroyed;
 }
 
+/// <summary>
+/// Event arguments for window change events.
+/// </summary>
+/// <param name="handle">The handle of the window that was changed.</param>
 public class WindowChangedEventArgs(nint handle) : EventArgs
 {
+    /// <summary>
+    /// Gets the handle of the window that was changed.
+    /// </summary>
     public nint WindowHandle { get; } = handle;
 }

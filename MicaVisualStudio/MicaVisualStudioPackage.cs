@@ -73,6 +73,7 @@ namespace MicaVisualStudio
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error initializing Mica Visual Studio: {ex.Message}");
+                progress.Report(new("Mica Visual Studio", $"Error while initializing Mica Visual Studio:\n{ex.Message}"));
             }
         }
 

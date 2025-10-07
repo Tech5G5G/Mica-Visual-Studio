@@ -4,13 +4,13 @@ public static class WindowHelper
 {
     #region PInvoke
 
-    [DllImport("Dwmapi.dll", EntryPoint = "DwmSetWindowAttribute", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport("dwmapi.dll", EntryPoint = "DwmSetWindowAttribute", CharSet = CharSet.Unicode)]
     private static extern int SetWindowAttribute(IntPtr hWnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
 
-    [DllImport("Dwmapi.dll", EntryPoint = "DwmExtendFrameIntoClientArea", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport("dwmapi.dll", EntryPoint = "DwmExtendFrameIntoClientArea", CharSet = CharSet.Unicode)]
     private static extern int ExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
 
-    [DllImport("Dwmapi.dll", EntryPoint = "DwmEnableBlurBehindWindow")]
+    [DllImport("dwmapi.dll", EntryPoint = "DwmEnableBlurBehindWindow")]
     private static extern int EnableBlurBehindWindow(IntPtr hWnd, ref DWM_BLURBEHIND pBlurBehind);
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
@@ -22,9 +22,9 @@ public static class WindowHelper
     [DllImport("gdi32.dll")]
     private static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
-    const int GWL_STYLE = -16;
+    private const int GWL_STYLE = -16;
 
-    const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
+    private const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
         DWMWA_WINDOW_CORNER_PREFERENCE = 33;
 

@@ -2,13 +2,14 @@
 global using System.Threading;
 global using System.Diagnostics;
 global using System.Runtime.InteropServices;
+global using System.Windows.Interop;
 global using Task = System.Threading.Tasks.Task;
-global using Windows.UI;
-global using Windows.UI.Composition;
-global using Windows.UI.Composition.Desktop;
 global using Microsoft.VisualStudio;
 global using Microsoft.VisualStudio.Shell;
 global using Microsoft.VisualStudio.Shell.Interop;
+global using Windows.UI;
+global using Windows.UI.Composition;
+global using Windows.UI.Composition.Desktop;
 global using Community.VisualStudio.Toolkit;
 global using MicaVisualStudio;
 global using MicaVisualStudio.Helpers;

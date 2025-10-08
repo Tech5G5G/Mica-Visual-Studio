@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace MicaVisualStudio
+﻿namespace MicaVisualStudio
 {
     internal partial class OptionsProvider
     {

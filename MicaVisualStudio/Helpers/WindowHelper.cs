@@ -5,7 +5,7 @@ public static class WindowHelper
     #region PInvoke
 
     [DllImport("dwmapi.dll", EntryPoint = "DwmSetWindowAttribute", CharSet = CharSet.Unicode)]
-    private static extern int SetWindowAttribute(IntPtr hWnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
+    private static extern int SetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
 
     [DllImport("dwmapi.dll", EntryPoint = "DwmExtendFrameIntoClientArea", CharSet = CharSet.Unicode)]
     private static extern int ExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
@@ -17,7 +17,7 @@ public static class WindowHelper
     private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
 
     [DllImport("user32.dll")]
-    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
     [DllImport("gdi32.dll")]
     private static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);

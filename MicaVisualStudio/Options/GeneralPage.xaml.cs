@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using Community.VisualStudio.Toolkit;
+﻿using System.Windows.Controls;
 
 namespace MicaVisualStudio.Options
 {
@@ -29,7 +27,7 @@ namespace MicaVisualStudio.Options
             };
         }
 
-        private void InitializeComboBox<T>(ComboBox box, T model, string propertyName) where T : BaseOptionModel<T>, new()
+        private void InitializeComboBox(ComboBox box, General model, string propertyName)
         {
             var prop = model.GetType().GetProperty(propertyName);
             box.SelectedIndex = (int)prop.GetValue(model);

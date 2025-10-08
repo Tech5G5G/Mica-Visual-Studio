@@ -1,4 +1,6 @@
-﻿namespace MicaVisualStudio
+﻿using System.Linq;
+
+namespace MicaVisualStudio
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -32,7 +34,8 @@
 
         #region Package Members
 
-        private int pid;
+        private readonly int pid = Process.GetCurrentProcess().Id;
+
         private IntPtr vsHandle;
 
         private ShellHelper shellHelper;
@@ -51,10 +54,7 @@
 
             try
             {
-                var proc = Process.GetCurrentProcess();
-                pid = proc.Id;
-
-                ApplyWindowAttributes(proc.MainWindowHandle, false);
+                ApplyWindowAttributes(Application.Current.Windows.OfType<Window>().First(i => i.IsActive).GetHandle(), false);
                 General.Saved += (s) =>
                 {
                     if (vsHandle != IntPtr.Zero)
@@ -89,7 +89,7 @@
             if (args.WindowHandle != IntPtr.Zero && //Check for null reference
                 WindowHelper.GetWindowProcessId(args.WindowHandle) == pid && //Check if window belongs to current process
                 !controllers.ContainsKey(args.WindowHandle) && //Don't composite the same window twice
-                WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(WindowStyle.Caption)) //Check window for title bar
+                WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(Helpers.WindowStyle.Caption)) //Check window for title bar
                 ApplyWindowAttributes(args.WindowHandle, args.WindowHandle != vsHandle);
         }
 

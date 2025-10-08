@@ -16,7 +16,7 @@ public class VsEventsHelper : IVsShellPropertyEvents
         {
             case (int)__VSSPROPID2.VSSPROPID_MainWindowVisibility:
                 MainWindowVisChanged?.Invoke(this, new MainWindowVisChangedEventArgs(
-                    Process.GetCurrentProcess().MainWindowHandle,
+                    Application.Current.MainWindow.GetHandle(),
                     (bool)var));
                 break;
         }

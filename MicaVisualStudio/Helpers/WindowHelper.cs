@@ -100,6 +100,13 @@ public static class WindowHelper
     }
 
     public static WindowStyle GetWindowStyles(IntPtr hWnd) => (WindowStyle)GetWindowLong(hWnd, GWL_STYLE);
+
+    public static IntPtr GetHandle(this Window window)
+    {
+        WindowInteropHelper interop = new(window);
+        interop.EnsureHandle();
+        return interop.Handle;
+    }
 }
 
 #region Enums

@@ -39,7 +39,6 @@ namespace MicaVisualStudio
         private IntPtr vsHandle;
 
         private ShellHelper shellHelper;
-        private VsEventsHelper listener;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -65,8 +64,8 @@ namespace MicaVisualStudio
                 shellHelper.WindowCreated += WindowCreated;
                 shellHelper.WindowDestroyed += WindowDestroyed;
 
-                if (await VsEventsHelper.CreateAsync(this, cancellationToken) is VsEventsHelper helper)
-                {
+                vsHandle = Application.Current.MainWindow.GetHandle();
+
                     listener = helper;
                     listener.MainWindowVisChanged += SetVsHandle;
                 }
@@ -77,11 +76,6 @@ namespace MicaVisualStudio
                 progress.Report(new("Mica Visual Studio", $"Error while initializing Mica Visual Studio:\n{ex.Message}"));
             }
         }
-
-        private void SetVsHandle(object sender, MainWindowVisChangedEventArgs args)
-        {
-            if (args.MainWindowHandle != vsHandle && args.MainWindowVisible)
-                vsHandle = args.MainWindowHandle;
         }
 
         private void WindowCreated(object sender, WindowChangedEventArgs args)

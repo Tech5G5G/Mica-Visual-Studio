@@ -102,7 +102,8 @@ public static class WindowHelper
         return (int)pid;
     }
 
-    public static WindowStyle GetWindowStyles(IntPtr hWnd) => (WindowStyle)GetWindowLong(hWnd, GWL_STYLE);
+    public static WindowStyles GetWindowStyles(IntPtr hWnd) => (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);
+
     public static void SetAppTheme(PreferredAppMode theme) => SetPreferredAppMode(theme);
 
     public static IntPtr GetHandle(this Window window)
@@ -141,7 +142,7 @@ public enum PreferredAppMode
 }
 
 [Flags]
-public enum WindowStyle : uint
+public enum WindowStyles : uint
 {
     Border = 0x00800000,
     Caption = 0x00C00000,

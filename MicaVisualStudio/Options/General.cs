@@ -17,5 +17,9 @@
         public bool ToolWindows { get; set; } = false;
         public int ToolBackdrop { get; set; } = 2;
         public int ToolCornerPreference { get; set; } = 0;
+
+        public bool DialogWindows { get; set; } = false;
+        public int DialogBackdrop { get; set; } = 2;
+        public int DialogCornerPreference { get; set; } = 0;
     }
 }

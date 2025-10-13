@@ -63,7 +63,8 @@ namespace MicaVisualStudio
                 shellHelper.WindowCreated += WindowCreated;
                 shellHelper.WindowDestroyed += WindowDestroyed;
 
-                vsHandle = Application.Current.MainWindow.GetHandle();
+                WindowManager.WindowOpened += (s, e) => ApplyWindowAttributes(e.WindowHandle, e.WindowType);
+                //WindowManager.WindowClosed += (s, e) => { };
 
                 General.Saved += (s) =>
                 {
@@ -78,8 +79,6 @@ namespace MicaVisualStudio
                 progress.Report(new("Mica Visual Studio", $"Error while initializing Mica Visual Studio:\n{ex.Message}"));
                 queuedInfo = ($"Error while initializing Mica Visual Studio: {ex.Message} ({ex.GetType().Name})\n{ex.StackTrace}", KnownMonikers.StatusError);
             }
-        }
-        }
 
             void Window_Loaded(object sender, RoutedEventArgs args)
         {

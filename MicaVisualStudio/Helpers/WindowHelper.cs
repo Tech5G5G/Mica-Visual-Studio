@@ -22,6 +22,9 @@ public static class WindowHelper
     [DllImport("gdi32.dll")]
     private static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
+    [DllImport("uxtheme.dll", EntryPoint = "#135")]
+    private static extern int SetPreferredAppMode(PreferredAppMode preferredAppMode);
+
     private const int GWL_STYLE = -16;
 
     private const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
@@ -100,6 +103,7 @@ public static class WindowHelper
     }
 
     public static WindowStyle GetWindowStyles(IntPtr hWnd) => (WindowStyle)GetWindowLong(hWnd, GWL_STYLE);
+    public static void SetAppTheme(PreferredAppMode theme) => SetPreferredAppMode(theme);
 
     public static IntPtr GetHandle(this Window window)
     {
@@ -127,6 +131,13 @@ public enum CornerPreference
     Square,
     Round,
     RoundSmall
+}
+
+public enum PreferredAppMode
+{
+    Default,
+    Light,
+    Dark
 }
 
 [Flags]

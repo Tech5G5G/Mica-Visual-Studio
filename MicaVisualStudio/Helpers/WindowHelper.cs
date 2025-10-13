@@ -1,31 +1,22 @@
-﻿namespace MicaVisualStudio.Helpers;
+﻿using Microsoft.VisualStudio.OLE.Interop;
+
+namespace MicaVisualStudio.Helpers;
 
 public static class WindowHelper
 {
-    #region PInvoke
+    #region DWM
 
-    [DllImport("dwmapi.dll", EntryPoint = "DwmSetWindowAttribute", CharSet = CharSet.Unicode)]
-    private static extern int SetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
-
-    [DllImport("dwmapi.dll", EntryPoint = "DwmExtendFrameIntoClientArea", CharSet = CharSet.Unicode)]
+    [DllImport("dwmapi.dll", EntryPoint = "DwmExtendFrameIntoClientArea")]
     private static extern int ExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
+
+    [DllImport("dwmapi.dll", EntryPoint = "DwmSetWindowAttribute")]
+    private static extern int SetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
 
     [DllImport("dwmapi.dll", EntryPoint = "DwmEnableBlurBehindWindow")]
     private static extern int EnableBlurBehindWindow(IntPtr hWnd, ref DWM_BLURBEHIND pBlurBehind);
 
-    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
-    private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
-
-    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
-    private static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
-
     [DllImport("gdi32.dll")]
     private static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
-
-    [DllImport("uxtheme.dll", EntryPoint = "#135")]
-    private static extern int SetPreferredAppMode(PreferredAppMode preferredAppMode);
-
-    private const int GWL_STYLE = -16;
 
     private const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
@@ -54,8 +45,6 @@ public static class WindowHelper
         public IntPtr hRgnBlur;
         public bool fTransitionOnMaximized;
     }
-
-    #endregion
 
     public static void ExtendFrameIntoClientArea(IntPtr hWnd)
     {
@@ -95,6 +84,10 @@ public static class WindowHelper
         };
         _ = EnableBlurBehindWindow(hWnd, ref bb);
     }
+
+    #endregion
+
+    #region Caption Buttons
 
     [DllImport("user32.dll")]
     private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
@@ -267,11 +260,34 @@ public static class WindowHelper
             == 1; //TRUE
     }
 
+    #endregion
+
+    #region Window Styles
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+    private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+    private static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
+
+    private const int GWL_STYLE = -16;
+
     public static WindowStyles GetWindowStyles(IntPtr hWnd) => (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);
 
     public static void SetWindowStyles(IntPtr hWnd, WindowStyles styles) => SetWindowLong(hWnd, GWL_STYLE, (uint)styles);
 
+    #endregion
+
+    #region App Theme
+
+    [DllImport("uxtheme.dll", EntryPoint = "#135")]
+    private static extern int SetPreferredAppMode(PreferredAppMode preferredAppMode);
+
     public static void SetAppTheme(PreferredAppMode theme) => SetPreferredAppMode(theme);
+
+    #endregion
+
+    #region Interop
 
     public static IntPtr GetHandle(this Window window)
     {
@@ -279,6 +295,8 @@ public static class WindowHelper
         interop.EnsureHandle();
         return interop.Handle;
     }
+
+    #endregion
 }
 
 #region Enums

@@ -104,6 +104,8 @@ public static class WindowHelper
 
     public static WindowStyles GetWindowStyles(IntPtr hWnd) => (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);
 
+    public static void SetWindowStyles(IntPtr hWnd, WindowStyles styles) => SetWindowLong(hWnd, GWL_STYLE, (uint)styles);
+
     public static void SetAppTheme(PreferredAppMode theme) => SetPreferredAppMode(theme);
 
     public static IntPtr GetHandle(this Window window)

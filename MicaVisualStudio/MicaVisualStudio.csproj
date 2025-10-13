@@ -91,13 +91,15 @@
     <PackageReference Include="Community.VisualStudio.Toolkit.17">
       <Version>17.0.533</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime" NoWarn="NU1604" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.13.2126" NoWarn="NU1604" />
-    <PackageReference Include="Microsoft.Windows.SDK.Contracts">
-      <Version>10.0.26100.4188</Version>
+    <PackageReference Include="MessagePack">
+      <Version>3.1.4</Version>
     </PackageReference>
-    <PackageReference Include="Win2D.uwp">
-      <Version>1.28.2</Version>
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime" NoWarn="NU1604">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120" NoWarn="NU1604">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

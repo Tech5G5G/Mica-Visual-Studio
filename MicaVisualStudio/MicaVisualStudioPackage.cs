@@ -35,10 +35,7 @@ namespace MicaVisualStudio
         #region Package Members
 
         private readonly int pid = Process.GetCurrentProcess().Id;
-
-        private IntPtr vsHandle;
-
-        private ShellHelper shellHelper;
+        private (string Content, ImageMoniker Image) queuedInfo;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -53,12 +50,14 @@ namespace MicaVisualStudio
 
             try
             {
-                ApplyWindowAttributes(Application.Current.Windows.OfType<Window>().First(i => i.IsActive).GetHandle(), false);
-                General.Saved += (s) =>
+                WindowManager.MainWindow.Loaded += Window_Loaded;
+                shell = await this.GetVsShellAsync();
+
+                if (Environment.OSVersion.Version.Build < 22000) //Allow Windows 11 or later
                 {
-                    if (vsHandle != IntPtr.Zero)
-                        ApplyWindowAttributes(vsHandle, false);
-                };
+                    queuedInfo = ("Mica Visual Studio is not compatible with Windows 10 and earlier.", KnownMonikers.StatusWarning);
+                    return;
+                }
 
                 shellHelper = new();
                 shellHelper.WindowCreated += WindowCreated;
@@ -73,28 +72,19 @@ namespace MicaVisualStudio
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error initializing Mica Visual Studio: {ex.Message}");
+
                 progress.Report(new("Mica Visual Studio", $"Error while initializing Mica Visual Studio:\n{ex.Message}"));
+                queuedInfo = ($"Error while initializing Mica Visual Studio: {ex.Message} ({ex.GetType().Name})\n{ex.StackTrace}", KnownMonikers.StatusError);
             }
         }
         }
 
-        private void WindowCreated(object sender, WindowChangedEventArgs args)
+            void Window_Loaded(object sender, RoutedEventArgs args)
         {
-            if (args.WindowHandle != IntPtr.Zero && //Check for null reference
-                WindowHelper.GetWindowProcessId(args.WindowHandle) == pid && //Check if window belongs to current process
-                !controllers.ContainsKey(args.WindowHandle) && //Don't composite the same window twice
-                WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(Helpers.WindowStyle.Caption)) //Check window for title bar
-                ApplyWindowAttributes(args.WindowHandle, args.WindowHandle != vsHandle);
-        }
+                if (queuedInfo.Content is not null)
+                    _ = this.ShowInfoBarAsync(queuedInfo.Content, queuedInfo.Image, shell);
 
-        private void WindowDestroyed(object sender, WindowChangedEventArgs args)
-        {
-            if (args.WindowHandle != IntPtr.Zero && //Check for null reference
-                WindowHelper.GetWindowProcessId(args.WindowHandle) == pid && //Check if window belongs to current process
-                controllers.TryGetValue(args.WindowHandle, out MicaController controller)) //Get controller (if any) for window handle
-            {
-                controller.Dispose();
-                controllers.Remove(args.WindowHandle);
+                WindowManager.MainWindow.Loaded -= Window_Loaded;
             }
         }
 

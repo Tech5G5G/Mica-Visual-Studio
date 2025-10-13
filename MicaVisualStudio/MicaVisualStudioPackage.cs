@@ -88,48 +88,39 @@ namespace MicaVisualStudio
             }
         }
 
-        Compositor compositor;
-        DispatcherQueueController dispatcher;
-
-        readonly System.Collections.Generic.Dictionary<nint, MicaController> controllers = [];
-
-        private void ApplyWindowAttributes(IntPtr hWnd, bool toolWindow, bool composite = false)
+        private void ApplyWindowAttributes(IntPtr hWnd, WindowType type, bool firstTime = true)
         {
-            if (composite)
-            {
-                //Make sure DispatcherQueue and Compositor are created for current thread
-                if (dispatcher is null && DispatcherQueueController.TryCreate(out dispatcher))
-                    compositor = new();
+            var general = General.Instance;
 
-                //Null check compositor and HwndSource
-                if (compositor is null || HwndSource.FromHwnd(hWnd) is not HwndSource source)
-                    return;
-
-                //Get existing controller (if any)
-                MicaController controller = controllers.ContainsKey(hWnd) ? controllers[hWnd] : new(compositor);
-                controller.SetTarget(source);
-
-                //Cache controller (if not already)
-                if (!controllers.ContainsKey(hWnd))
-                    controllers.Add(hWnd, controller);
-            }
-            else
-            {
-                var general = General.Instance;
-
+            if (firstTime && //Remove caption buttons once
+                HwndSource.FromHwnd(hWnd) is HwndSource source &&
+                source.RootVisual is Window window)
+        {
                 WindowHelper.ExtendFrameIntoClientArea(hWnd);
+                window.Background = new System.Windows.Media.SolidColorBrush(source.CompositionTarget.BackgroundColor = System.Windows.Media.Colors.Transparent);
+
+                //Don't remove caption buttons from windows that need them
+                if (window.WindowStyle == WindowStyle.None || window is not Microsoft.VisualStudio.PlatformUI.DialogWindowBase)
+                    WindowHelper.RemoveCaptionButtons(source);
+            }
+
                 WindowHelper.EnableDarkMode(hWnd); //Just looks better
 
-                if (toolWindow && general.ToolWindows)
+            switch (type)
                 {
-                    WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
-                    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
-                }
-                else
-                {
-                    WindowHelper.SetSystemBackdropType(hWnd, (BackdropType)general.Backdrop);
+                default:
+                case WindowType.Main:
+                    WindowHelper.SetBackdropType(hWnd, (BackdropType)general.Backdrop);
                     WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
-                }
+                    break;
+                case WindowType.Tool when general.ToolWindows:
+                    WindowHelper.SetBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
+                    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
+                    break;
+                case WindowType.Dialog when general.DialogWindows:
+                    WindowHelper.SetBackdropType(hWnd, (BackdropType)general.DialogBackdrop);
+                    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.DialogCornerPreference);
+                    break;
             }
         }
 

@@ -34,7 +34,7 @@ namespace MicaVisualStudio
 
         #region Package Members
 
-        private readonly int pid = Process.GetCurrentProcess().Id;
+        private IVsShell shell;
         private (string Content, ImageMoniker Image) queuedInfo;
 
         /// <summary>
@@ -59,9 +59,12 @@ namespace MicaVisualStudio
                     return;
                 }
 
-                shellHelper = new();
-                shellHelper.WindowCreated += WindowCreated;
-                shellHelper.WindowDestroyed += WindowDestroyed;
+                if (WindowManager.CurrentWindow is Window window) //Apply to start window
+                {
+                    var handle = window.GetHandle();
+                    ApplyWindowAttributes(handle, WindowType.Tool);
+                    WindowManager.Windows.Add(handle, (WindowType.Tool, window));
+                }
 
                 WindowManager.WindowOpened += (s, e) => ApplyWindowAttributes(e.WindowHandle, e.WindowType);
                 //WindowManager.WindowClosed += (s, e) => { };

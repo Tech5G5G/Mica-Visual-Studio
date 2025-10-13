@@ -96,10 +96,175 @@ public static class WindowHelper
         _ = EnableBlurBehindWindow(hWnd, ref bb);
     }
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
 
+    [DllImport("user32.dll")]
+    private static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowPlacement(IntPtr hWnd, out WINDOWPLACEMENT lpwndpl);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr EnableMenuItem(IntPtr hMenu, uint uIDEnableItem, uint uEnable);
+
+    [DllImport("user32.dll")]
+    private static extern int TrackPopupMenuEx(IntPtr hMenu, uint uFlags, int x, int y, IntPtr hwnd, IntPtr lptpm);
+
+    [DllImport("dwmapi.dll")]
+    private static extern bool DwmGetWindowAttribute(IntPtr hwnd, uint dwAttribute, out RECT pvAttribute, uint cbAttribute);
+
+    struct WINDOWPLACEMENT
     {
-        _ = GetWindowThreadProcessId(hWnd, out uint pid);
-        return (int)pid;
+        public uint length;
+        public uint flags;
+        public uint showCmd;
+        public POINT ptMinPosition;
+        public POINT ptMaxPosition;
+        public RECT rcNormalPosition;
+        public RECT rcDevice;
+    }
+
+    private struct STYLESTRUCT
+    {
+#pragma warning disable 0649
+        public uint styleOld;
+        public uint styleNew;
+#pragma warning restore 0649
+    }
+
+    private const int WM_DESTROY = 0x02,
+        WM_STYLECHANGING = 0x7C,
+        WM_NCRBUTTONUP = 0xA5,
+        WM_SYSKEYDOWN = 0x104,
+        WM_SYSCOMMAND = 0x112;
+
+    private const uint SC_RESTORE = 0xF120,
+        SC_MOVE = 0xF010,
+        SC_SIZE = 0xF000,
+        SC_MAXIMIZE = 0xF030,
+        SC_MINIMIZE = 0xF020,
+        SC_CLOSE = 0xF060;
+
+    private const uint TPM_LEFTBUTTON = 0x0,
+        TPM_RIGHTBUTTON = 0x2,
+        TPM_RIGHTALIGN = 0x8,
+        TPM_NONOTIFY = 0x80,
+        TPM_RETURNCMD = 0x100,
+        TPM_NOANIMATION = 0x4000;
+
+    private const uint SW_NORMAL = 1,
+        SW_MAXIMIZE = 3;
+
+    private const uint MF_ENABLED = 0x0,
+        MF_GRAYED = 0x1;
+
+    private const int HTCAPTION = 2;
+
+    private const int VK_SPACE = 0x20;
+
+    private const int DWMWA_CAPTION_BUTTON_BOUNDS = 5;
+
+    public static int GetTitleBarHeight(IntPtr hWnd)
+    {
+        DwmGetWindowAttribute(hWnd, DWMWA_CAPTION_BUTTON_BOUNDS, out RECT bounds, (uint)Marshal.SizeOf<RECT>());
+        return bounds.bottom - bounds.top;
+    }
+
+    public static void RemoveCaptionButtons(HwndSource source)
+    {
+        const int MenuSpacing = 2;
+
+        GetSystemMenu(source.Handle, bRevert: false); //Make sure window menu is created
+
+        source.AddHook(Hook);
+        SetWindowStyles(source.Handle, GetWindowStyles(source.Handle)); //Refresh styles
+
+        IntPtr Hook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            switch (msg)
+            {
+                case WM_DESTROY:
+                    source.RemoveHook(Hook); //Avoid memory leaks
+                    break;
+                case WM_STYLECHANGING when (int)wParam == GWL_STYLE:
+                    STYLESTRUCT structure = Marshal.PtrToStructure<STYLESTRUCT>(lParam);
+
+                    //Remove WS_SYSMENU style
+                    structure.styleNew |= (uint)WindowStyles.OverlappedWindow;
+                    structure.styleNew &= (uint)~WindowStyles.SystemMenu;
+
+                    Marshal.StructureToPtr(structure, lParam, fDeleteOld: true);
+                    handled = true;
+                    break;
+                case WM_NCRBUTTONUP when (int)wParam == HTCAPTION:
+                    ShowMenu(
+                        hwnd,
+                        (short)lParam,
+                        (short)((int)lParam >> 16 /*Y position shift*/),
+                        keyboard: false);
+                    handled = true;
+                    break;
+                case WM_SYSKEYDOWN when (int)wParam == VK_SPACE && IsAltPressed(lParam):
+                    int height = GetTitleBarHeight(hwnd);
+
+                    POINT point = new() { x = MenuSpacing, y = (height < 1 ? System.Windows.Forms.SystemInformation.CaptionHeight : height) + MenuSpacing };
+                    ClientToScreen(hwnd, ref point);
+
+                    ShowMenu(hwnd, point.x, point.y, keyboard: true);
+                    break;
+            }
+
+            return IntPtr.Zero;
+        }
+
+        void ShowMenu(IntPtr hWnd, int x, int y, bool keyboard)
+        {
+            IntPtr menu = GetSystemMenu(hWnd, bRevert: false);
+
+            uint minimize = (source.RootVisual as Window).Owner is null ? MF_ENABLED : MF_GRAYED; //If the window is a child, it is probably a dialog
+            if (GetWindowPlacement(hWnd, out WINDOWPLACEMENT placement))  
+                if (placement.showCmd == SW_NORMAL)
+                {
+                    EnableMenuItem(menu, SC_RESTORE, MF_GRAYED);
+                    EnableMenuItem(menu, SC_MOVE, MF_ENABLED);
+                    EnableMenuItem(menu, SC_SIZE, MF_ENABLED);
+                    EnableMenuItem(menu, SC_MINIMIZE, minimize);
+                    EnableMenuItem(menu, SC_MAXIMIZE, MF_ENABLED);
+                    EnableMenuItem(menu, SC_CLOSE, MF_ENABLED);
+                }
+                else if (placement.showCmd == SW_MAXIMIZE)
+                {
+                    EnableMenuItem(menu, SC_RESTORE, MF_ENABLED);
+                    EnableMenuItem(menu, SC_MOVE, MF_GRAYED);
+                    EnableMenuItem(menu, SC_SIZE, MF_GRAYED);
+                    EnableMenuItem(menu, SC_MINIMIZE, minimize);
+                    EnableMenuItem(menu, SC_MAXIMIZE, MF_GRAYED);
+                    EnableMenuItem(menu, SC_CLOSE, MF_ENABLED);
+                }
+
+            int cmd = TrackPopupMenuEx(
+                menu,
+                TPM_RETURNCMD | TPM_NONOTIFY | //Don't notify as we'll send a message later
+                ((uint)System.Windows.Forms.SystemInformation.PopupMenuAlignment * TPM_RIGHTALIGN) |
+                (keyboard ? TPM_LEFTBUTTON : TPM_RIGHTBUTTON) |
+                (keyboard ? TPM_NOANIMATION : 0 /*Default fade animation*/),
+                keyboard && placement.showCmd == SW_MAXIMIZE ? x - MenuSpacing : x,
+                y,
+                hWnd,
+                IntPtr.Zero);
+
+            if (cmd != 0)
+                SendMessage(hWnd, WM_SYSCOMMAND, (IntPtr)cmd, IntPtr.Zero);
+        }
+
+        bool IsAltPressed(IntPtr lParam) =>
+            (((int)lParam >> 29) //Context code shift
+            & 0b1) //First bit mask
+            == 1; //TRUE
     }
 
     public static WindowStyles GetWindowStyles(IntPtr hWnd) => (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);

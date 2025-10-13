@@ -16,8 +16,8 @@ public static class WindowHelper
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
     private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
 
-    [DllImport("user32.dll")]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+    private static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
 
     [DllImport("gdi32.dll")]
     private static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
@@ -93,7 +93,7 @@ public static class WindowHelper
         _ = EnableBlurBehindWindow(hWnd, ref bb);
     }
 
-    public static int GetWindowProcessId(IntPtr hWnd)
+
     {
         _ = GetWindowThreadProcessId(hWnd, out uint pid);
         return (int)pid;

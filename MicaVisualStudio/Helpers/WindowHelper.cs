@@ -72,13 +72,13 @@ public static class WindowHelper
         SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref corner, sizeof(int));
     }
 
-    public static void SetSystemBackdropType(IntPtr hWnd, BackdropType backdrop)
+    public static void SetBackdropType(IntPtr hWnd, BackdropType backdrop)
     {
         int type = (int)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
         SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
 
-        bool glass = backdrop == BackdropType.Glass;
-        EnableWindowTransparency(hWnd, glass);
+        bool enable = backdrop == BackdropType.Glass;
+        EnableWindowTransparency(hWnd, enable);
     }
 
     public static void EnableWindowTransparency(IntPtr hWnd, bool enable)

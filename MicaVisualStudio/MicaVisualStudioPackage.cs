@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace MicaVisualStudio
+﻿namespace MicaVisualStudio
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -84,7 +82,7 @@ namespace MicaVisualStudio
             }
 
             void Window_Loaded(object sender, RoutedEventArgs args)
-        {
+            {
                 if (queuedInfo.Content is not null)
                     _ = this.ShowInfoBarAsync(queuedInfo.Content, queuedInfo.Image, shell);
 
@@ -99,7 +97,7 @@ namespace MicaVisualStudio
             if (firstTime && //Remove caption buttons once
                 HwndSource.FromHwnd(hWnd) is HwndSource source &&
                 source.RootVisual is Window window)
-        {
+            {
                 WindowHelper.ExtendFrameIntoClientArea(hWnd);
                 window.Background = new System.Windows.Media.SolidColorBrush(source.CompositionTarget.BackgroundColor = System.Windows.Media.Colors.Transparent);
 
@@ -108,10 +106,10 @@ namespace MicaVisualStudio
                     WindowHelper.RemoveCaptionButtons(source);
             }
 
-                WindowHelper.EnableDarkMode(hWnd); //Just looks better
+            WindowHelper.EnableDarkMode(hWnd); //Just looks better
 
             switch (type)
-                {
+            {
                 default:
                 case WindowType.Main:
                     WindowHelper.SetBackdropType(hWnd, (BackdropType)general.Backdrop);

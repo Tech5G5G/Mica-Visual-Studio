@@ -65,9 +65,11 @@ namespace MicaVisualStudio
 
                 vsHandle = Application.Current.MainWindow.GetHandle();
 
-                    listener = helper;
-                    listener.MainWindowVisChanged += SetVsHandle;
-                }
+                General.Saved += (s) =>
+                {
+                    foreach (var entry in WindowManager.Windows)
+                        ApplyWindowAttributes(entry.Key, entry.Value.Type, firstTime: false);
+                };
             }
             catch (Exception ex)
             {

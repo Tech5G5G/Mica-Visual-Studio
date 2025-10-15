@@ -177,7 +177,7 @@ public static class WindowHelper
         source.AddHook(Hook);
         SetWindowStyles(source.Handle, GetWindowStyles(source.Handle)); //Refresh styles
 
-        IntPtr Hook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        IntPtr Hook(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             switch (msg)
             {
@@ -189,7 +189,7 @@ public static class WindowHelper
 
                     if (type == WindowType.Main || //Apply WS_OVERLAPPEDWINDOW style to main window
                         ((WindowStyles)structure.styleNew).HasFlag(WindowStyles.ThickFrame)) //or any sizable window
-                    structure.styleNew |= (uint)WindowStyles.OverlappedWindow;
+                        structure.styleNew |= (uint)WindowStyles.OverlappedWindow;
 
                     structure.styleNew &= (uint)~WindowStyles.SystemMenu; //Remove the WS_SYSMENU style
 
@@ -198,19 +198,19 @@ public static class WindowHelper
                     break;
                 case WM_NCRBUTTONUP when (int)wParam == HTCAPTION:
                     ShowMenu(
-                        hwnd,
+                        hWnd,
                         (short)lParam,
                         (short)((int)lParam >> 16 /*Y position shift*/),
                         keyboard: false);
                     handled = true;
                     break;
                 case WM_SYSKEYDOWN when (int)wParam == VK_SPACE && IsAltPressed(lParam):
-                    int height = GetTitleBarHeight(hwnd);
+                    int height = GetTitleBarHeight(hWnd);
 
-                    POINT point = new() { x = MenuSpacing, y = (height < 1 ? System.Windows.Forms.SystemInformation.CaptionHeight : height) + MenuSpacing };
-                    ClientToScreen(hwnd, ref point);
+                    POINT point = new() { x = MenuSpacing, y = (height > 0 ? height : System.Windows.Forms.SystemInformation.CaptionHeight) + MenuSpacing };
+                    ClientToScreen(hWnd, ref point);
 
-                    ShowMenu(hwnd, point.x, point.y, keyboard: true);
+                    ShowMenu(hWnd, point.x, point.y, keyboard: true);
                     break;
             }
 
@@ -225,7 +225,7 @@ public static class WindowHelper
             uint maximize = GetWindowStyles(source.Handle).HasFlag(WindowStyles.MaximizeBox) ? MF_ENABLED : MF_GRAYED;
             uint size = GetWindowStyles(source.Handle).HasFlag(WindowStyles.ThickFrame) ? MF_ENABLED : MF_GRAYED;
 
-            if (GetWindowPlacement(hWnd, out WINDOWPLACEMENT placement))  
+            if (GetWindowPlacement(hWnd, out WINDOWPLACEMENT placement))
                 if (placement.showCmd == SW_NORMAL)
                 {
                     EnableMenuItem(menu, SC_RESTORE, MF_GRAYED);

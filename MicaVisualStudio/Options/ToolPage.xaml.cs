@@ -1,11 +1,11 @@
 ﻿namespace MicaVisualStudio.Options
 {
     /// <summary>
-    /// Interaction logic for GeneralPage.xaml
+    /// Interaction logic for ToolPage.xaml
     /// </summary>
-    public partial class GeneralPage : UserControl
+    public partial class ToolPage : UserControl
     {
-        public GeneralPage()
+        public ToolPage()
         {
             InitializeComponent();
             windowOptions.SetOptionModel(General.Instance);

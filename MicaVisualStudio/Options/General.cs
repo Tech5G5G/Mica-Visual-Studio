@@ -7,6 +7,18 @@
         {
             protected override UIElement Child => new GeneralPage();
         }
+
+        [ComVisible(true)]
+        public class ToolOptions : UIElementDialogPage
+        {
+            protected override UIElement Child => new ToolPage();
+        }
+
+        [ComVisible(true)]
+        public class DialogOptions : UIElementDialogPage
+        {
+            protected override UIElement Child => new Options.DialogPage();
+    }
     }
     
     public class General : BaseOptionModel<General>

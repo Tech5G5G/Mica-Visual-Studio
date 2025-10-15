@@ -170,6 +170,7 @@ public static class WindowHelper
     public static void RemoveCaptionButtons(HwndSource source)
     {
         const int MenuSpacing = 2;
+        WindowType type = GetWindowType(source.RootVisual as Window);
 
         GetSystemMenu(source.Handle, bRevert: false); //Make sure window menu is created
 
@@ -186,9 +187,11 @@ public static class WindowHelper
                 case WM_STYLECHANGING when (int)wParam == GWL_STYLE:
                     STYLESTRUCT structure = Marshal.PtrToStructure<STYLESTRUCT>(lParam);
 
-                    //Remove WS_SYSMENU style
+                    if (type == WindowType.Main || //Apply WS_OVERLAPPEDWINDOW style to main window
+                        ((WindowStyles)structure.styleNew).HasFlag(WindowStyles.ThickFrame)) //or any sizable window
                     structure.styleNew |= (uint)WindowStyles.OverlappedWindow;
-                    structure.styleNew &= (uint)~WindowStyles.SystemMenu;
+
+                    structure.styleNew &= (uint)~WindowStyles.SystemMenu; //Remove the WS_SYSMENU style
 
                     Marshal.StructureToPtr(structure, lParam, fDeleteOld: true);
                     handled = true;
@@ -218,15 +221,18 @@ public static class WindowHelper
         {
             IntPtr menu = GetSystemMenu(hWnd, bRevert: false);
 
-            uint minimize = (source.RootVisual as Window).Owner is null ? MF_ENABLED : MF_GRAYED; //If the window is a child, it is probably a dialog
+            uint minimize = type == WindowType.Dialog ? MF_GRAYED : MF_ENABLED;
+            uint maximize = GetWindowStyles(source.Handle).HasFlag(WindowStyles.MaximizeBox) ? MF_ENABLED : MF_GRAYED;
+            uint size = GetWindowStyles(source.Handle).HasFlag(WindowStyles.ThickFrame) ? MF_ENABLED : MF_GRAYED;
+
             if (GetWindowPlacement(hWnd, out WINDOWPLACEMENT placement))  
                 if (placement.showCmd == SW_NORMAL)
                 {
                     EnableMenuItem(menu, SC_RESTORE, MF_GRAYED);
                     EnableMenuItem(menu, SC_MOVE, MF_ENABLED);
-                    EnableMenuItem(menu, SC_SIZE, MF_ENABLED);
+                    EnableMenuItem(menu, SC_SIZE, size);
                     EnableMenuItem(menu, SC_MINIMIZE, minimize);
-                    EnableMenuItem(menu, SC_MAXIMIZE, MF_ENABLED);
+                    EnableMenuItem(menu, SC_MAXIMIZE, maximize);
                     EnableMenuItem(menu, SC_CLOSE, MF_ENABLED);
                 }
                 else if (placement.showCmd == SW_MAXIMIZE)
@@ -271,6 +277,18 @@ public static class WindowHelper
     private static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
 
     private const int GWL_STYLE = -16;
+
+    public static WindowType GetWindowType(Window window)
+    {
+        if (window == WindowManager.MainWindow)
+            return WindowType.Main;
+        else if (window is not null && //Check if window is WPF
+            (window.WindowStyle == WindowStyle.None || //and has no style
+            window.Owner is null)) //or no owner
+            return WindowType.Tool;
+        else
+            return WindowType.Dialog;
+    }
 
     public static WindowStyles GetWindowStyles(IntPtr hWnd) => (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);
 
@@ -324,6 +342,13 @@ public enum PreferredAppMode
     Default,
     Light,
     Dark
+}
+
+public enum WindowType
+{
+    Main,
+    Tool,
+    Dialog
 }
 
 [Flags]

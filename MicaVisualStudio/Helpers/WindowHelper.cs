@@ -52,9 +52,9 @@ public static class WindowHelper
         ExtendFrameIntoClientArea(hWnd, ref margins);
     }
 
-    public static void EnableDarkMode(IntPtr hWnd)
+    public static void SetDarkMode(IntPtr hWnd, bool enable)
     {
-        int mode = 1; //TRUE
+        int mode = enable ? 1 : 0;
         SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(int));
     }
 

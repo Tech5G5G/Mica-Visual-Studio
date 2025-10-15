@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.PlatformUI;
 
 namespace MicaVisualStudio.Helpers;
 
-public class ThemeHelper
+public class ThemeHelper : IDisposable
 {
     #region Visual Studio Theme
 
@@ -51,20 +51,39 @@ public class ThemeHelper
             visualStudioTheme = GetVisualStudioTheme();
             VisualStudioThemeChanged?.Invoke(shell, VisualStudioTheme);
         };
+    }
 
-        //Dispose normally
-        WindowManager.MainWindow.Unloaded += (s, e) => //Probably means application is closing, so unhook UserPreferenceChanging to prevent memory leaks
-            SystemEvents.InvokeOnEventsThread(new Action(() => SystemEvents.UserPreferenceChanging -= PreferenceChanging));
-
-        void PreferenceChanging(object sender, UserPreferenceChangingEventArgs args)
+    private void PreferenceChanging(object sender, UserPreferenceChangingEventArgs args)
+    {
+        if (args.Category == UserPreferenceCategory.General)
         {
-            if (args.Category == UserPreferenceCategory.General)
-            {
-                systemTheme = GetSystemTheme();
-                SystemThemeChanged?.Invoke(sender, systemTheme);
-            }
+            systemTheme = GetSystemTheme();
+            SystemThemeChanged?.Invoke(sender, systemTheme);
         }
     }
+
+    #region Dispose
+
+    private bool disposed;
+
+    ~ThemeHelper() => Dispose(disposing: false);
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            SystemEvents.InvokeOnEventsThread(new Action(() => SystemEvents.UserPreferenceChanging -= PreferenceChanging));
+            disposed = true;
+        }
+    }
+
+    #endregion
 }
 
 public enum Theme

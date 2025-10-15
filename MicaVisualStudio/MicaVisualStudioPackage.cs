@@ -40,6 +40,7 @@
         private (string Content, ImageMoniker Image) queuedInfo;
 
         private ThemeHelper helper;
+        private readonly WindowManager manager = WindowManager.Instance;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -71,11 +72,11 @@
                 {
                     var handle = window.GetHandle();
                     ApplyWindowPreferences(handle, WindowType.Tool);
-                    WindowManager.Windows.Add(handle, (WindowType.Tool, window));
+                    manager.Windows.Add(handle, (WindowType.Tool, window));
                 }
 
-                WindowManager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
-                //WindowManager.WindowClosed += (s, e) => { };
+                manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
+                //manager.WindowClosed += (s, e) => { };
 
                 General.Saved += (s) => RefreshWindows();
             }
@@ -97,7 +98,7 @@
 
             void RefreshWindows()
             {
-                foreach (var entry in WindowManager.Windows)
+                foreach (var entry in manager.Windows)
                     ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false);
             }
         }
@@ -145,6 +146,20 @@
                 Theme.System => GetDarkModeEnabled(helper.SystemTheme),
                 Theme.VisualStudio or _ => GetDarkModeEnabled(helper.VisualStudioTheme)
             };
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            helper?.Dispose();
+            manager.Dispose();
+
+            if (disposing)
+            {
+                helper = null;
+                shell = null;
+            }
+
+            base.Dispose(disposing);
         }
 
         #endregion

@@ -1,10 +1,7 @@
 ﻿namespace MicaVisualStudio.Helpers;
 
-public static class WindowManager
+public class WindowManager : IDisposable
 {
-    public static Dictionary<IntPtr, (WindowType Type, Window Window)> Windows => windows;
-    private static readonly Dictionary<IntPtr, (WindowType Type, Window Window)> windows = [];
-
     public static Window MainWindow => Application.Current.MainWindow;
 
     public static Window CurrentWindow
@@ -16,12 +13,17 @@ public static class WindowManager
         }
     }
 
-    public static event WindowChangedEventHandler WindowOpened;
-    public static event WindowChangedEventHandler WindowClosed;
+    public static WindowManager Instance { get; } = new();
 
-    private static readonly WinEventHook hook;
+    public Dictionary<IntPtr, (WindowType Type, Window Window)> Windows => windows;
+    private readonly Dictionary<IntPtr, (WindowType Type, Window Window)> windows = [];
 
-    static WindowManager()
+    public event WindowChangedEventHandler WindowOpened;
+    public event WindowChangedEventHandler WindowClosed;
+
+    private readonly WinEventHook hook;
+
+    private WindowManager()
     {
         hook = new(Event.Foreground, EventFlags.OutOfContext, Process.GetCurrentProcess().Id);
         hook.EventOccurred += EventOccurred;
@@ -37,7 +39,7 @@ public static class WindowManager
             new RoutedEventHandler(WindowUnloaded));
     }
 
-    private static void WindowLoaded(object sender, RoutedEventArgs args)
+    private void WindowLoaded(object sender, RoutedEventArgs args)
     {
         if (sender is Window window)
         {
@@ -49,7 +51,7 @@ public static class WindowManager
         }
     }
 
-    private static void WindowUnloaded(object sender, RoutedEventArgs args)
+    private void WindowUnloaded(object sender, RoutedEventArgs args)
     {
         if (sender is Window window &&
             windows.FirstOrDefault(i => i.Value.Window == window) is KeyValuePair<IntPtr, (WindowType Type, Window Window)> pair)
@@ -59,7 +61,7 @@ public static class WindowManager
         }
     }
 
-    private static void EventOccurred(WinEventHook sender, EventOccuredEventArgs args)
+    private void EventOccurred(WinEventHook sender, EventOccuredEventArgs args)
     {
         if (!windows.ContainsKey(args.WindowHandle) && //Prefer WPF over WinEventHook and avoid duplicates
             WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(WindowStyles.Caption)) //Check window for title bar 
@@ -71,6 +73,29 @@ public static class WindowManager
             WindowOpened?.Invoke(window, new(args.WindowHandle, type));
         }
     }
+
+    #region Dispose
+
+    private bool disposed;
+
+    ~WindowManager() => Dispose(disposing: false);
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            hook.Dispose();
+            disposed = true;
+        }
+    }
+
+    #endregion
 }
 
 public delegate void WindowChangedEventHandler(Window sender, WindowChangedEventArgs args);

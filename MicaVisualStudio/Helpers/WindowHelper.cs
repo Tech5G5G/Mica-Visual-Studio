@@ -69,11 +69,10 @@ public static class WindowHelper
         int type = (int)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
         SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
 
-        bool enable = backdrop == BackdropType.Glass;
-        EnableWindowTransparency(hWnd, enable);
+        SetWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
     }
 
-    public static void EnableWindowTransparency(IntPtr hWnd, bool enable)
+    public static void SetWindowTransparency(IntPtr hWnd, bool enable)
     {
         DWM_BLURBEHIND bb = new()
         {

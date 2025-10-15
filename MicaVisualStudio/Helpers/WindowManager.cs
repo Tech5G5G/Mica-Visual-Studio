@@ -3,7 +3,7 @@
 public static class WindowManager
 {
     public static Dictionary<IntPtr, (WindowType Type, Window Window)> Windows => windows;
-    private readonly static Dictionary<IntPtr, (WindowType Type, Window Window)> windows = [];
+    private static readonly Dictionary<IntPtr, (WindowType Type, Window Window)> windows = [];
 
     public static Window MainWindow => Application.Current.MainWindow;
 

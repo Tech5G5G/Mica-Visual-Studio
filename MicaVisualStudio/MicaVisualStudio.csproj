@@ -47,12 +47,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="GlobalUsings.cs" />
+    <Compile Include="Helpers\ThemeHelper.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Helpers\WinEventHook.cs" />
+    <Compile Include="Options\DialogPage.xaml.cs">
+      <DependentUpon>DialogPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Options\General.cs" />
     <Compile Include="Options\GeneralPage.xaml.cs">
       <DependentUpon>GeneralPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\ToolPage.xaml.cs">
+      <DependentUpon>ToolPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\WindowOptions.xaml.cs">
+      <DependentUpon>WindowOptions.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MicaVisualStudioPackage.cs" />
@@ -101,7 +111,19 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Options\DialogPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Options\GeneralPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\ToolPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\WindowOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

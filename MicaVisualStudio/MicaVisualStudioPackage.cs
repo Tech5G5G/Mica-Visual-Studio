@@ -39,6 +39,8 @@
         private IVsShell shell;
         private (string Content, ImageMoniker Image) queuedInfo;
 
+        private ThemeHelper helper;
+
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -61,21 +63,21 @@
                     return;
                 }
 
+                helper = new();
+                helper.VisualStudioThemeChanged += (s, e) => RefreshWindows();
+                helper.SystemThemeChanged += (s, e) => RefreshWindows();
+
                 if (WindowManager.CurrentWindow is Window window) //Apply to start window
                 {
                     var handle = window.GetHandle();
-                    ApplyWindowAttributes(handle, WindowType.Tool);
+                    ApplyWindowPreferences(handle, WindowType.Tool);
                     WindowManager.Windows.Add(handle, (WindowType.Tool, window));
                 }
 
-                WindowManager.WindowOpened += (s, e) => ApplyWindowAttributes(e.WindowHandle, e.WindowType);
+                WindowManager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
                 //WindowManager.WindowClosed += (s, e) => { };
 
-                General.Saved += (s) =>
-                {
-                    foreach (var entry in WindowManager.Windows)
-                        ApplyWindowAttributes(entry.Key, entry.Value.Type, firstTime: false);
-                };
+                General.Saved += (s) => RefreshWindows();
             }
             catch (Exception ex)
             {
@@ -92,42 +94,57 @@
 
                 WindowManager.MainWindow.Loaded -= Window_Loaded;
             }
+
+            void RefreshWindows()
+            {
+                foreach (var entry in WindowManager.Windows)
+                    ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false);
+            }
         }
 
-        private void ApplyWindowAttributes(IntPtr hWnd, WindowType type, bool firstTime = true)
+        private void ApplyWindowPreferences(IntPtr hWnd, WindowType type, bool firstTime = true)
         {
-            var general = General.Instance;
+            General general = General.Instance;
 
             if (firstTime && //Remove caption buttons once
                 HwndSource.FromHwnd(hWnd) is HwndSource source &&
                 source.RootVisual is Window window)
             {
                 WindowHelper.ExtendFrameIntoClientArea(hWnd);
-                window.Background = new System.Windows.Media.SolidColorBrush(source.CompositionTarget.BackgroundColor = System.Windows.Media.Colors.Transparent);
+                window.Background = new SolidColorBrush(source.CompositionTarget.BackgroundColor = Colors.Transparent);
 
                 //Don't remove caption buttons from windows that need them
                 if (window.WindowStyle == WindowStyle.None || window is not Microsoft.VisualStudio.PlatformUI.DialogWindowBase)
                     WindowHelper.RemoveCaptionButtons(source);
             }
 
-            WindowHelper.EnableDarkMode(hWnd); //Just looks better
-
             switch (type)
             {
                 default:
                 case WindowType.Main:
+                    WindowHelper.SetDarkMode(hWnd, GetDarkModeEnabled((Theme)general.Theme));
                     WindowHelper.SetBackdropType(hWnd, (BackdropType)general.Backdrop);
                     WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
                     break;
                 case WindowType.Tool when general.ToolWindows:
+                    WindowHelper.SetDarkMode(hWnd, GetDarkModeEnabled((Theme)general.ToolTheme));
                     WindowHelper.SetBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
                     WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
                     break;
                 case WindowType.Dialog when general.DialogWindows:
+                    WindowHelper.SetDarkMode(hWnd, GetDarkModeEnabled((Theme)general.DialogTheme));
                     WindowHelper.SetBackdropType(hWnd, (BackdropType)general.DialogBackdrop);
                     WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.DialogCornerPreference);
                     break;
             }
+
+            bool GetDarkModeEnabled(Theme theme) => theme switch
+            {
+                Theme.Light => false,
+                Theme.Dark => true,
+                Theme.System => GetDarkModeEnabled(helper.SystemTheme),
+                Theme.VisualStudio or _ => GetDarkModeEnabled(helper.VisualStudioTheme)
+            };
         }
 
         #endregion

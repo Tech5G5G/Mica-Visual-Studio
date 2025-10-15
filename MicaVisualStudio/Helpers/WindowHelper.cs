@@ -256,7 +256,7 @@ public static class WindowHelper
 
         bool IsAltPressed(IntPtr lParam) =>
             (((int)lParam >> 29) //Context code shift
-            & 0b1) //First bit mask
+            & 1) //First bit mask
             == 1; //TRUE
     }
 

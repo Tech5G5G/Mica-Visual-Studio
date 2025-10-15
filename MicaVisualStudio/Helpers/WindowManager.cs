@@ -42,7 +42,7 @@ public static class WindowManager
         if (sender is Window window)
         {
             var handle = window.GetHandle();
-            var type = GetWindowType(handle, window);
+            var type = WindowHelper.GetWindowType(window);
 
             windows.Add(handle, (type, window));
             WindowOpened?.Invoke(window, new(handle, type));
@@ -65,35 +65,12 @@ public static class WindowManager
             WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(WindowStyles.Caption)) //Check window for title bar 
         {
             var window = HwndSource.FromHwnd(args.WindowHandle) is HwndSource source ? source.RootVisual as Window : null;
-            var type = GetWindowType(args.WindowHandle, window);
+            var type = WindowHelper.GetWindowType(window);
 
             windows.Add(args.WindowHandle, (type, window));
             WindowOpened?.Invoke(window, new(args.WindowHandle, type));
         }
     }
-
-    private static WindowType GetWindowType(IntPtr hWnd, Window window)
-    {
-        if (window == MainWindow)
-            return WindowType.Main;
-
-        var styles = WindowHelper.GetWindowStyles(hWnd);
-
-        if (window is not null && //Check if window is WPF
-            styles.HasFlag(WindowStyles.ThickFrame) && //Check window for resizable border
-            (window.WindowStyle == WindowStyle.None || //Check window for custom title bar
-            styles.HasFlag(WindowStyles.MaximizeBox))) //Or for maximize button 
-            return WindowType.Tool;
-        else
-            return WindowType.Dialog;
-    }
-}
-
-public enum WindowType
-{
-    Main,
-    Tool,
-    Dialog
 }
 
 public delegate void WindowChangedEventHandler(Window sender, WindowChangedEventArgs args);

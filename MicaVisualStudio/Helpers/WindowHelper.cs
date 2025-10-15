@@ -128,7 +128,8 @@ public static class WindowHelper
 #pragma warning restore 0649
     }
 
-    private const int WM_DESTROY = 0x02,
+    private const int WM_NULL = 0x0,
+        WM_DESTROY = 0x2,
         WM_STYLECHANGING = 0x7C,
         WM_NCRBUTTONUP = 0xA5,
         WM_SYSKEYDOWN = 0x104,
@@ -249,7 +250,7 @@ public static class WindowHelper
                 hWnd,
                 IntPtr.Zero);
 
-            if (cmd != 0)
+            if (cmd != WM_NULL)
                 SendMessage(hWnd, WM_SYSCOMMAND, (IntPtr)cmd, IntPtr.Zero);
         }
 

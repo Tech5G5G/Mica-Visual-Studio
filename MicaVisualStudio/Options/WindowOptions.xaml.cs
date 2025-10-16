@@ -63,7 +63,7 @@ namespace MicaVisualStudio.Options
             InitializeCheckBox(enabled, EnabledSource, model);
         }
 
-        private static void InitializeComboBox<T>(ComboBox box, string propertyName, T model)
+        public static void InitializeComboBox<T>(ComboBox box, string propertyName, T model)
             where T : BaseOptionModel<T>, new()
         {
             if (propertyName is null)
@@ -82,7 +82,7 @@ namespace MicaVisualStudio.Options
             };
         }
 
-        private static void InitializeCheckBox<T>(CheckBox box, string propertyName, T model)
+        public static void InitializeCheckBox<T>(CheckBox box, string propertyName, T model)
             where T : BaseOptionModel<T>, new()
         {
             if (propertyName is null)

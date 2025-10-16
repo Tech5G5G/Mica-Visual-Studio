@@ -8,7 +8,10 @@
         public GeneralPage()
         {
             InitializeComponent();
-            windowOptions.SetOptionModel(General.Instance);
+
+            General general = General.Instance;
+            windowOptions.SetOptionModel(general);
+            WindowOptions.InitializeComboBox(theme, nameof(General.AppTheme), general);
         }
     }
 }

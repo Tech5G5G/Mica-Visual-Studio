@@ -7,12 +7,29 @@
              mc:Ignorable="d">
 
     <ScrollViewer>
-        <local:WindowOptions x:Name="windowOptions"
-                             WindowName="Main window"
-                             ShowCheck="False"
-                             ThemeSource="Theme"
-                             BackdropSource="Backdrop"
-                             CornerPreferenceSource="CornerPreference"
-                             VerticalAlignment="Top" />
+        <StackPanel>
+            <local:WindowOptions x:Name="windowOptions"
+                                 WindowName="Main window"
+                                 ShowCheck="False"
+                                 ThemeSource="Theme"
+                                 BackdropSource="Backdrop"
+                                 CornerPreferenceSource="CornerPreference"
+                                 VerticalAlignment="Top" />
+
+            <GroupBox Header="App" Padding="2,4">
+                <StackPanel Orientation="Horizontal">
+                    <Grid Margin="6,0,14,0">
+                        <TextBlock Text="Theme" VerticalAlignment="Center" />
+                        <TextBlock Text="Corner preference" VerticalAlignment="Center" Visibility="Hidden" />
+                    </Grid>
+                    <ComboBox x:Name="theme" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="26" Grid.Column="2">
+                        <ComboBoxItem Content="Visual Studio" />
+                        <ComboBoxItem Content="System" />
+                        <ComboBoxItem Content="Light" />
+                        <ComboBoxItem Content="Dark" />
+                    </ComboBox>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
     </ScrollViewer>
 </UserControl>

@@ -36,5 +36,7 @@
         public int DialogTheme { get; set; } = 0; //Theme.VisualStudio
         public int DialogBackdrop { get; set; } = 2; //BackdropType.Mica
         public int DialogCornerPreference { get; set; } = 0; //CornerPreference.Default
+
+        public int AppTheme { get; set; } = 0; //Theme.VisualStudio
     }
 }

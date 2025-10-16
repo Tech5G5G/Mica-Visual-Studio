@@ -5,6 +5,22 @@ namespace MicaVisualStudio.Helpers;
 
 public class ThemeHelper : IDisposable
 {
+    #region PInvoke
+
+    [DllImport("uxtheme.dll", EntryPoint = "#135")]
+    private static extern int SetPreferredAppMode(PreferredAppMode preferredAppMode);
+
+    [DllImport("uxtheme.dll", EntryPoint = "#136")]
+    private static extern void FlushMenuThemes();
+
+    private enum PreferredAppMode
+    {
+        ForceDark = 2,
+        ForceLight = 3
+    }
+
+    #endregion
+
     #region Visual Studio Theme
 
     public Theme VisualStudioTheme => visualStudioTheme;
@@ -60,6 +76,20 @@ public class ThemeHelper : IDisposable
             systemTheme = GetSystemTheme();
             SystemThemeChanged?.Invoke(sender, systemTheme);
         }
+    }
+
+    public void SetAppTheme(Theme theme)
+    {
+        SetPreferredAppMode(GetPreferredAppMode(theme));
+        FlushMenuThemes();
+
+        PreferredAppMode GetPreferredAppMode(Theme theme) => theme switch
+        {
+            Theme.Light => PreferredAppMode.ForceLight,
+            Theme.Dark => PreferredAppMode.ForceDark,
+            Theme.System => GetPreferredAppMode(SystemTheme),
+            Theme.VisualStudio or _ => GetPreferredAppMode(VisualStudioTheme)
+        };
     }
 
     #region Dispose

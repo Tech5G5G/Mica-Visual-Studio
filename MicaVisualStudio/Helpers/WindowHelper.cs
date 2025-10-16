@@ -292,15 +292,6 @@ public static class WindowHelper
 
     #endregion
 
-    #region App Theme
-
-    [DllImport("uxtheme.dll", EntryPoint = "#135")]
-    private static extern int SetPreferredAppMode(PreferredAppMode preferredAppMode);
-
-    public static void SetAppTheme(PreferredAppMode theme) => SetPreferredAppMode(theme);
-
-    #endregion
-
     #region Interop
 
     public static IntPtr GetHandle(this Window window)
@@ -331,13 +322,6 @@ public enum CornerPreference
     Square,
     Round,
     RoundSmall
-}
-
-public enum PreferredAppMode
-{
-    Default,
-    Light,
-    Dark
 }
 
 public enum WindowType

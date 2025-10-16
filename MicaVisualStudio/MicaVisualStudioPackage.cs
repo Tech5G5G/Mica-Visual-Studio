@@ -40,7 +40,7 @@
         private (string Content, ImageMoniker Image) queuedInfo;
 
         private ThemeHelper helper;
-        private readonly WindowManager manager = WindowManager.Instance;
+        private WindowManager manager;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -65,7 +65,7 @@
                 }
 
                 helper = new();
-                helper.VisualStudioThemeChanged += (s, e) => RefreshWindows();
+                manager = WindowManager.Instance;
                 helper.SystemThemeChanged += (s, e) => RefreshWindows();
 
                 if (WindowManager.CurrentWindow is Window window) //Apply to start window
@@ -151,10 +151,11 @@
         protected override void Dispose(bool disposing)
         {
             helper?.Dispose();
-            manager.Dispose();
+            manager?.Dispose();
 
             if (disposing)
             {
+                manager = null;
                 helper = null;
                 shell = null;
             }

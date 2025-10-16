@@ -66,7 +66,7 @@
 
                 helper = new();
                 manager = WindowManager.Instance;
-                helper.SystemThemeChanged += (s, e) => RefreshWindows();
+                RefreshPreferences();
 
                 if (WindowManager.CurrentWindow is Window window) //Apply to start window
                 {
@@ -78,7 +78,10 @@
                 manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
                 //manager.WindowClosed += (s, e) => { };
 
-                General.Saved += (s) => RefreshWindows();
+                helper.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
+                helper.SystemThemeChanged += (s, e) => RefreshPreferences();
+
+                General.Saved += (s) => RefreshPreferences();
             }
             catch (Exception ex)
             {
@@ -96,16 +99,19 @@
                 WindowManager.MainWindow.Loaded -= Window_Loaded;
             }
 
-            void RefreshWindows()
+            void RefreshPreferences()
             {
+                General general = General.Instance;
+                helper.SetAppTheme((Theme)general.AppTheme);
+
                 foreach (var entry in manager.Windows)
-                    ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false);
+                    ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false, general);
             }
         }
 
-        private void ApplyWindowPreferences(IntPtr hWnd, WindowType type, bool firstTime = true)
+        private void ApplyWindowPreferences(IntPtr hWnd, WindowType type, bool firstTime = true, General general = null)
         {
-            General general = General.Instance;
+            general ??= General.Instance;
 
             if (firstTime && //Remove caption buttons once
                 HwndSource.FromHwnd(hWnd) is HwndSource source &&

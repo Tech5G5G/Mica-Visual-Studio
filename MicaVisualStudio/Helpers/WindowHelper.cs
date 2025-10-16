@@ -22,13 +22,9 @@ public static class WindowHelper
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
         DWMWA_WINDOW_CORNER_PREFERENCE = 33;
 
-    [Flags]
-    private enum DWM_BB
-    {
-        DWM_BB_ENABLE = 1,
-        DWM_BB_BLURREGION = 2,
-        DWM_BB_TRANSITIONONMAXIMIZED = 4
-    }
+    private const uint DWM_BB_ENABLE = 0x1,
+        DWM_BB_BLURREGION = 0x2,
+        DWM_BB_TRANSITIONONMAXIMIZED = 0x4;
 
     private struct MARGINS
     {
@@ -40,7 +36,7 @@ public static class WindowHelper
 
     private struct DWM_BLURBEHIND
     {
-        public DWM_BB dwFlags;
+        public uint dwFlags;
         public bool fEnable;
         public IntPtr hRgnBlur;
         public bool fTransitionOnMaximized;
@@ -76,10 +72,10 @@ public static class WindowHelper
     {
         DWM_BLURBEHIND bb = new()
         {
-            dwFlags = DWM_BB.DWM_BB_ENABLE | DWM_BB.DWM_BB_BLURREGION | DWM_BB.DWM_BB_TRANSITIONONMAXIMIZED,
             fEnable = enable,
             hRgnBlur = enable ? CreateRectRgn(-2, -2, -1, -1) : IntPtr.Zero,
-            fTransitionOnMaximized = true
+            fTransitionOnMaximized = true,
+            dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION | DWM_BB_TRANSITIONONMAXIMIZED
         };
         _ = EnableBlurBehindWindow(hWnd, ref bb);
     }

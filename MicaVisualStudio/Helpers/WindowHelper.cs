@@ -102,8 +102,8 @@ public static class WindowHelper
     [DllImport("user32.dll")]
     private static extern int TrackPopupMenuEx(IntPtr hMenu, uint uFlags, int x, int y, IntPtr hwnd, IntPtr lptpm);
 
-    [DllImport("dwmapi.dll")]
-    private static extern bool DwmGetWindowAttribute(IntPtr hwnd, uint dwAttribute, out RECT pvAttribute, uint cbAttribute);
+    [DllImport("dwmapi.dll", EntryPoint = "DwmGetWindowAttribute")]
+    private static extern bool GetWindowAttribute(IntPtr hwnd, uint dwAttribute, out RECT pvAttribute, uint cbAttribute);
 
     struct WINDOWPLACEMENT
     {
@@ -159,7 +159,7 @@ public static class WindowHelper
 
     public static int GetTitleBarHeight(IntPtr hWnd)
     {
-        DwmGetWindowAttribute(hWnd, DWMWA_CAPTION_BUTTON_BOUNDS, out RECT bounds, (uint)Marshal.SizeOf<RECT>());
+        GetWindowAttribute(hWnd, DWMWA_CAPTION_BUTTON_BOUNDS, out RECT bounds, (uint)Marshal.SizeOf<RECT>());
         return bounds.bottom - bounds.top;
     }
 

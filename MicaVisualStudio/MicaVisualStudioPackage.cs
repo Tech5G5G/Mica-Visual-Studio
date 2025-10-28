@@ -119,7 +119,7 @@
                 source.RootVisual is Window window)
             {
                 WindowHelper.ExtendFrameIntoClientArea(hWnd);
-                window.Background = new SolidColorBrush(source.CompositionTarget.BackgroundColor = Colors.Transparent);
+                source.CompositionTarget.BackgroundColor = Colors.Transparent;
 
                 //Don't remove caption buttons from windows that need them
                 if (window.WindowStyle == WindowStyle.None || window is not Microsoft.VisualStudio.PlatformUI.DialogWindowBase)

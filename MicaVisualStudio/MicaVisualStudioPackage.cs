@@ -40,7 +40,7 @@
         private (string Content, ImageMoniker Image) queuedInfo;
 
         private ThemeHelper helper;
-        private WindowManager manager;
+        private VsColorManager colors;
         private VsWindowManager manager;
 
         /// <summary>
@@ -164,6 +164,7 @@
             {
                 manager = null;
                 helper = null;
+                colors = null;
                 shell = null;
             }
 

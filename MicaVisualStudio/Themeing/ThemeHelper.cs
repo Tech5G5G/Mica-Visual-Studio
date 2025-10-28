@@ -1,7 +1,7 @@
 ﻿using Microsoft.Win32;
 using Microsoft.VisualStudio.PlatformUI;
 
-namespace MicaVisualStudio.Helpers;
+namespace MicaVisualStudio.Themeing;
 
 public class ThemeHelper : IDisposable
 {

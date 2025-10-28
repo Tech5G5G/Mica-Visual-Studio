@@ -1,4 +1,4 @@
-﻿namespace MicaVisualStudio.Helpers;
+﻿namespace MicaVisualStudio.Interop;
 
 public class WinEventHook : IDisposable
 {

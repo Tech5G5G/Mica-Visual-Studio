@@ -16,5 +16,7 @@ global using Microsoft.VisualStudio.Imaging;
 global using Microsoft.VisualStudio.Imaging.Interop;
 global using Community.VisualStudio.Toolkit;
 global using MicaVisualStudio;
-global using MicaVisualStudio.Helpers;
+global using MicaVisualStudio.Interop;
 global using MicaVisualStudio.Options;
+global using MicaVisualStudio.Themeing;
+global using MicaVisualStudio.VisualStudio;

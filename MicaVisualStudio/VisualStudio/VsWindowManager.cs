@@ -1,6 +1,6 @@
-﻿namespace MicaVisualStudio.Helpers;
+﻿namespace MicaVisualStudio.VisualStudio;
 
-public class WindowManager : IDisposable
+public class VsWindowManager : IDisposable
 {
     public static Window MainWindow => Application.Current.MainWindow;
 
@@ -13,7 +13,7 @@ public class WindowManager : IDisposable
         }
     }
 
-    public static WindowManager Instance { get; } = new();
+    public static VsWindowManager Instance { get; } = new();
 
     public Dictionary<IntPtr, (WindowType Type, Window Window)> Windows => windows;
     private readonly Dictionary<IntPtr, (WindowType Type, Window Window)> windows = [];
@@ -23,7 +23,7 @@ public class WindowManager : IDisposable
 
     private readonly WinEventHook hook;
 
-    private WindowManager()
+    private VsWindowManager()
     {
         hook = new(Event.Foreground, EventFlags.OutOfContext, Process.GetCurrentProcess().Id);
         hook.EventOccurred += EventOccurred;
@@ -78,7 +78,7 @@ public class WindowManager : IDisposable
 
     private bool disposed;
 
-    ~WindowManager() => Dispose(disposing: false);
+    ~VsWindowManager() => Dispose(disposing: false);
 
     public void Dispose()
     {

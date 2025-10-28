@@ -1,4 +1,4 @@
-﻿namespace MicaVisualStudio.Helpers;
+﻿namespace MicaVisualStudio.VisualStudio;
 
 public static class VisualStudioExtensions
 {

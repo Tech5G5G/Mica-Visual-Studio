@@ -41,6 +41,7 @@
 
         private ThemeHelper helper;
         private WindowManager manager;
+        private VsWindowManager manager;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -55,7 +56,7 @@
 
             try
             {
-                WindowManager.MainWindow.Loaded += Window_Loaded;
+                VsWindowManager.MainWindow.Loaded += Window_Loaded;
                 shell = await this.GetVsShellAsync();
 
                 if (Environment.OSVersion.Version.Build < 22000) //Allow Windows 11 or later
@@ -65,7 +66,7 @@
                 }
 
                 helper = new();
-                manager = WindowManager.Instance;
+                manager = VsWindowManager.Instance;
                 RefreshPreferences();
 
                 if (WindowManager.CurrentWindow is Window window) //Apply to start window

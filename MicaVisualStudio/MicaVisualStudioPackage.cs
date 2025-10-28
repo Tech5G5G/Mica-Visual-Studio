@@ -27,6 +27,7 @@
     [ProvideProfile(typeof(OptionsProvider.DialogOptions), "Mica Visual Studio", "Dialog Windows", 0, 0, true)]
     [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(UIContextGuids.EmptySolution, PackageAutoLoadFlags.BackgroundLoad)]
     public sealed class MicaVisualStudioPackage : AsyncPackage
     {
         /// <summary>

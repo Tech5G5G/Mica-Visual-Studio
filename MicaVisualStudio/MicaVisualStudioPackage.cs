@@ -84,7 +84,7 @@
             //windows.WindowClosed += (s, e) => { };
 
                 helper.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
-                helper.SystemThemeChanged += (s, e) => RefreshPreferences();
+            theme.SystemThemeChanged += (s, e) => RefreshPreferences();
 
                 General.Saved += (s) => RefreshPreferences();
             }
@@ -109,7 +109,7 @@
             void RefreshPreferences()
             {
                 General general = General.Instance;
-                helper.SetAppTheme((Theme)general.AppTheme);
+            theme.SetAppTheme(EvaluateTheme(general.AppTheme));
 
             foreach (var entry in windows.Windows)
                     ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false, general);
@@ -136,30 +136,29 @@
             {
                 default:
                 case WindowType.Main:
-                    WindowHelper.SetDarkMode(hWnd, GetDarkModeEnabled((Theme)general.Theme));
+                WindowHelper.SetDarkMode(hWnd, EvaluateTheme(general.Theme) == Theme.Dark);
                     WindowHelper.SetBackdropType(hWnd, (BackdropType)general.Backdrop);
                     WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
                     break;
                 case WindowType.Tool when general.ToolWindows:
-                    WindowHelper.SetDarkMode(hWnd, GetDarkModeEnabled((Theme)general.ToolTheme));
+                WindowHelper.SetDarkMode(hWnd, EvaluateTheme(general.ToolTheme) == Theme.Dark);
                     WindowHelper.SetBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
                     WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
                     break;
                 case WindowType.Dialog when general.DialogWindows:
-                    WindowHelper.SetDarkMode(hWnd, GetDarkModeEnabled((Theme)general.DialogTheme));
+                WindowHelper.SetDarkMode(hWnd, EvaluateTheme(general.DialogTheme) == Theme.Dark);
                     WindowHelper.SetBackdropType(hWnd, (BackdropType)general.DialogBackdrop);
                     WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.DialogCornerPreference);
                     break;
             }
+    }
 
-            bool GetDarkModeEnabled(Theme theme) => theme switch
+    private Theme EvaluateTheme(int theme) => (Theme)theme switch
             {
-                Theme.Light => false,
-                Theme.Dark => true,
-                Theme.System => GetDarkModeEnabled(helper.SystemTheme),
-                Theme.VisualStudio or _ => GetDarkModeEnabled(helper.VisualStudioTheme)
+        Theme.VisualStudio => colors.VisualStudioTheme,
+        Theme.System => this.theme.SystemTheme,
+        _ => (Theme)theme
             };
-        }
 
         protected override void Dispose(bool disposing)
         {

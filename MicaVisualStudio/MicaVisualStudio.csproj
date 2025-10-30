@@ -47,10 +47,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="GlobalUsings.cs" />
-    <Compile Include="Helpers\ThemeHelper.cs" />
-    <Compile Include="Helpers\WindowHelper.cs" />
-    <Compile Include="Helpers\WindowManager.cs" />
-    <Compile Include="Helpers\WinEventHook.cs" />
+    <Compile Include="Options\Theme.cs" />
+    <Compile Include="Interop\ThemeHelper.cs" />
+    <Compile Include="Interop\WindowHelper.cs" />
+    <Compile Include="VisualStudio\WindowManager.cs" />
+    <Compile Include="Interop\WinEventHook.cs" />
     <Compile Include="Options\DialogPage.xaml.cs">
       <DependentUpon>DialogPage.xaml</DependentUpon>
     </Compile>
@@ -66,7 +67,8 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MicaVisualStudioPackage.cs" />
-    <Compile Include="Helpers\VisualStudioExtensions.cs" />
+    <Compile Include="VisualStudio\VisualStudioExtensions.cs" />
+    <Compile Include="VisualStudio\Styling\VsColorManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\logo.png">

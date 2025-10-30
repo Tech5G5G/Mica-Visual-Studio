@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 
-namespace MicaVisualStudio.VisualStudio;
+namespace MicaVisualStudio.VisualStudio.Styling;
 
 public class VsColorManager
 {
@@ -13,15 +13,28 @@ public class VsColorManager
     public Dictionary<string, ColorConfig> ColorConfigs => configs;
     private readonly Dictionary<string, ColorConfig> configs = [];
 
-    #region VsTheme
+    #region Visual Studio Theme
 
-    private Theme VsTheme =>
-        shell?.GetThemedWPFColor(MainWindowActiveCaptionKey).IsLight() == true ? Theme.Light : Theme.Dark;
+    public Theme VisualStudioTheme => vsTheme;
+    private Theme vsTheme;
+
+    public event EventHandler<Theme> VisualStudioThemeChanged;
 
     private readonly static ThemeResourceKey MainWindowActiveCaptionKey =
         new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);
 
     private readonly IVsUIShell5 shell;
+
+    /// <summary>
+    /// Gets the current <see cref="Theme"/> of Visual Studio.
+    /// </summary>
+    /// <param name="theme">The <see cref="Theme"/> used by the Visual Studio.</param>
+    /// <returns>Whether or not the value has changed; that is, if <paramref name="theme"/> is different from <see cref="vsTheme"/>.</returns>
+    private bool GetVSTheme(out Theme theme)
+    {
+        theme = shell?.GetThemedWPFColor(MainWindowActiveCaptionKey).IsLight() == true ? Theme.Light : Theme.Dark;
+        return vsTheme != theme;
+    }
 
     #endregion
 
@@ -31,7 +44,14 @@ public class VsColorManager
         shell = (IVsUIShell5)Package.GetGlobalService(typeof(SVsUIShell));
 #pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
 
-        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (s, e) => UpdateColors();
+        GetVSTheme(out vsTheme);
+        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (s, e) =>
+        {
+            UpdateColors();
+
+            if (GetVSTheme(out Theme theme))
+                VisualStudioThemeChanged?.Invoke(this, vsTheme = theme);
+        };
     }
 
     public void UpdateColors()
@@ -94,11 +114,11 @@ public class VsColorManager
 
     private Color DetermineColor(Color color, ColorConfig config) =>
         !config.IsTranslucent || (config.TransparentOnGray && color.R == color.G && color.G == color.B) ?
-        (VsTheme == Theme.Light ? TransparentWhite : TranslucentBlack) :
+        (vsTheme == Theme.Light ? TransparentWhite : TranslucentBlack) :
         Color.FromArgb(Math.Min(config.Opacity, color.A), color.R, color.G, color.B);
 }
 
-//TODO: Change default of translucent?
+//TODO: Change default of translucent to true?
 public class ColorConfig(bool transparentOnGray = true, bool translucent = false, byte opacity = 0x38)
 {
     public static ColorConfig Default = new();

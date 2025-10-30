@@ -83,7 +83,7 @@
             windows.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
             //windows.WindowClosed += (s, e) => { };
 
-                helper.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
+            colors.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
             theme.SystemThemeChanged += (s, e) => RefreshPreferences();
 
                 General.Saved += (s) => RefreshPreferences();

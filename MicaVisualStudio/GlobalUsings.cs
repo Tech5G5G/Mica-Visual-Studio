@@ -18,5 +18,5 @@ global using Community.VisualStudio.Toolkit;
 global using MicaVisualStudio;
 global using MicaVisualStudio.Interop;
 global using MicaVisualStudio.Options;
-global using MicaVisualStudio.Themeing;
 global using MicaVisualStudio.VisualStudio;
+global using MicaVisualStudio.VisualStudio.Styling;

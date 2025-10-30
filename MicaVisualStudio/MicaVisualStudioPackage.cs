@@ -40,7 +40,7 @@
         private IVsShell shell;
         private (string Content, ImageMoniker Image) queuedInfo;
 
-        private ThemeHelper helper;
+    private ThemeHelper theme;
         private VsColorManager colors;
     private WindowManager windows;
 
@@ -65,6 +65,8 @@
                     queuedInfo = ("Mica Visual Studio is not compatible with Windows 10 and earlier.", KnownMonikers.StatusWarning);
                     return;
                 }
+
+            theme = ThemeHelper.Instance;
             windows = WindowManager.Instance;
 
                 helper = new();
@@ -161,13 +163,13 @@
 
         protected override void Dispose(bool disposing)
         {
-            helper?.Dispose();
+        theme?.Dispose();
         windows?.Dispose();
 
             if (disposing)
             {
-                manager = null;
-                helper = null;
+            shell = null;
+            theme = null;
                 colors = null;
             windows = null;
             }

@@ -276,7 +276,7 @@ public static class WindowHelper
 
     public static WindowType GetWindowType(Window window)
     {
-        if (window == VsWindowManager.MainWindow)
+        if (window == WindowManager.MainWindow)
             return WindowType.Main;
         else if (window is not null && //Check if window is WPF
             (window.WindowStyle == WindowStyle.None || //and has no style

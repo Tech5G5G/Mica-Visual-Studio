@@ -42,7 +42,7 @@
 
         private ThemeHelper helper;
         private VsColorManager colors;
-        private VsWindowManager manager;
+    private WindowManager windows;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -57,7 +57,7 @@
 
             try
             {
-                VsWindowManager.MainWindow.Loaded += Window_Loaded;
+            WindowManager.MainWindow.Loaded += Window_Loaded;
                 shell = await this.GetVsShellAsync();
 
                 if (Environment.OSVersion.Version.Build < 22000) //Allow Windows 11 or later
@@ -65,6 +65,7 @@
                     queuedInfo = ("Mica Visual Studio is not compatible with Windows 10 and earlier.", KnownMonikers.StatusWarning);
                     return;
                 }
+            windows = WindowManager.Instance;
 
                 helper = new();
                 manager = VsWindowManager.Instance;
@@ -74,11 +75,11 @@
                 {
                     var handle = window.GetHandle();
                     ApplyWindowPreferences(handle, WindowType.Tool);
-                    manager.Windows.Add(handle, (WindowType.Tool, window));
+                windows.Windows.Add(handle, (WindowType.Tool, window));
                 }
 
-                manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
-                //manager.WindowClosed += (s, e) => { };
+            windows.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
+            //windows.WindowClosed += (s, e) => { };
 
                 helper.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
                 helper.SystemThemeChanged += (s, e) => RefreshPreferences();
@@ -108,7 +109,7 @@
                 General general = General.Instance;
                 helper.SetAppTheme((Theme)general.AppTheme);
 
-                foreach (var entry in manager.Windows)
+            foreach (var entry in windows.Windows)
                     ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false, general);
             }
         }
@@ -161,14 +162,14 @@
         protected override void Dispose(bool disposing)
         {
             helper?.Dispose();
-            manager?.Dispose();
+        windows?.Dispose();
 
             if (disposing)
             {
                 manager = null;
                 helper = null;
                 colors = null;
-                shell = null;
+            windows = null;
             }
 
             base.Dispose(disposing);

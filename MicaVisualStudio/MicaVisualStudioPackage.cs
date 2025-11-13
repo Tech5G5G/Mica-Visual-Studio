@@ -37,12 +37,11 @@
 
         #region Package Members
 
-        private IVsShell shell;
-        private (string Content, ImageMoniker Image) queuedInfo;
-
     private ThemeHelper theme;
         private VsColorManager colors;
     private WindowManager windows;
+
+    private (string Content, ImageMoniker Image) queuedInfo;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -58,7 +57,6 @@
             try
             {
             WindowManager.MainWindow.Loaded += Window_Loaded;
-                shell = await this.GetVsShellAsync();
 
                 if (Environment.OSVersion.Version.Build < 22000) //Allow Windows 11 or later
                 {
@@ -101,7 +99,7 @@
             void Window_Loaded(object sender, RoutedEventArgs args)
             {
                 if (queuedInfo.Content is not null)
-                    _ = this.ShowInfoBarAsync(queuedInfo.Content, queuedInfo.Image, shell);
+                VS.InfoBar.CreateAsync(new(queuedInfo.Content, queuedInfo.Image)).Result.TryShowInfoBarUIAsync().Forget();
 
                 WindowManager.MainWindow.Loaded -= Window_Loaded;
             }

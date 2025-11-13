@@ -73,11 +73,56 @@
                 RefreshPreferences();
 
                 if (WindowManager.CurrentWindow is Window window) //Apply to start window
+            colors = new()
+
+            #region Resource Keys
+
                 {
-                    var handle = window.GetHandle();
-                    ApplyWindowPreferences(handle, WindowType.Tool);
-                windows.Windows.Add(handle, (WindowType.Tool, window));
+                ColorConfigs =
+                {
+                    { "Background", new(translucent: true) },
+
+                    { "SolidBackgroundFillQuaternary", new(translucent: true) },
+
+                    //{ "SolidBackgroundFillTertiary", ColorConfig.Default },
+                    //{ "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
+
+                    { "EnvironmentBackground", new(translucent: true) },
+                    { "EnvironmentBackgroundGradient", ColorConfig.Default },
+
+                    { "ActiveCaption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                    { "InactiveCaption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
+                    { "MainWindowActiveCaption", ColorConfig.Default },
+                    { "MainWindowInactiveCaption", ColorConfig.Default },
+
+                    { "ToolWindow", ColorConfig.Default },
+                    { "ToolWindowGroup", ColorConfig.Default },
+                    { "ToolWindowBackground", ColorConfig.Default },
+                    { "ToolWindowFloatingFrame", ColorConfig.Default },
+                    { "ToolWindowFloatingFrameInactive", ColorConfig.Default },
+
+                    { "WindowPanel", new(translucent: true) },
+
+                    { "CommandBarGradient", ColorConfig.Default },
+
+                    { "ListBox", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                    { "ListItemBackgroundHover", new(transparentOnGray: false, translucent: true) },
+
+                    { "TextBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
+                    { "ScrollBarBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                    { "ScrollBarArrowBackground", ColorConfig.Default },
+                    { "ScrollBarArrowDisabledBackground", ColorConfig.Default },
+
+                    { "SelectedItemActive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                    { "SelectedItemInactive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) }
                 }
+            };
+            colors.UpdateColors();
+
+            #endregion
+
             theme = ThemeHelper.Instance;
             manager = WindowManager.Instance;
 

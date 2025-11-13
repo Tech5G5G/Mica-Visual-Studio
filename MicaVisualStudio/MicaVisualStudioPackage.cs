@@ -78,6 +78,7 @@
                     ApplyWindowPreferences(handle, WindowType.Tool);
                 windows.Windows.Add(handle, (WindowType.Tool, window));
                 }
+            theme = ThemeHelper.Instance;
             manager = WindowManager.Instance;
 
             manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
@@ -179,7 +180,6 @@
 
             if (disposing)
             {
-            shell = null;
             theme = null;
             manager = null;
                 colors = null;

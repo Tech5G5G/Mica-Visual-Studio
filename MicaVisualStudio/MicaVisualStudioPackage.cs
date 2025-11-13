@@ -136,21 +136,33 @@
             {
                 default:
                 case WindowType.Main:
-                WindowHelper.SetDarkMode(hWnd, EvaluateTheme(general.Theme) == Theme.Dark);
-                    WindowHelper.SetBackdropType(hWnd, (BackdropType)general.Backdrop);
-                    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.CornerPreference);
+                ApplyWindowAttributes(
+                    general.Theme,
+                    (CornerPreference)general.CornerPreference,
+                    (BackdropType)general.Backdrop);
                     break;
+
                 case WindowType.Tool when general.ToolWindows:
-                WindowHelper.SetDarkMode(hWnd, EvaluateTheme(general.ToolTheme) == Theme.Dark);
-                    WindowHelper.SetBackdropType(hWnd, (BackdropType)general.ToolBackdrop);
-                    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.ToolCornerPreference);
+                ApplyWindowAttributes(
+                    general.ToolTheme,
+                    (CornerPreference)general.ToolCornerPreference,
+                    (BackdropType)general.ToolBackdrop);
                     break;
+
                 case WindowType.Dialog when general.DialogWindows:
-                WindowHelper.SetDarkMode(hWnd, EvaluateTheme(general.DialogTheme) == Theme.Dark);
-                    WindowHelper.SetBackdropType(hWnd, (BackdropType)general.DialogBackdrop);
-                    WindowHelper.SetCornerPreference(hWnd, (CornerPreference)general.DialogCornerPreference);
+                ApplyWindowAttributes(
+                    general.DialogTheme,
+                    (CornerPreference)general.DialogCornerPreference,
+                    (BackdropType)general.DialogBackdrop);
                     break;
             }
+
+        void ApplyWindowAttributes(int theme, CornerPreference corner, BackdropType backdrop)
+        {
+            WindowHelper.SetDarkMode(hWnd, EvaluateTheme(theme) == Theme.Dark);
+            WindowHelper.SetCornerPreference(hWnd, corner);
+            WindowHelper.SetBackdropType(hWnd, source is not null || backdrop != BackdropType.Glass ? backdrop : BackdropType.None);
+        }
     }
 
     private Theme EvaluateTheme(int theme) => (Theme)theme switch

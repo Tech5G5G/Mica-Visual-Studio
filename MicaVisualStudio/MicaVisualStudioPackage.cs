@@ -128,7 +128,7 @@
                 source.CompositionTarget.BackgroundColor = Colors.Transparent;
 
                 //Don't remove caption buttons from windows that need them
-                if (window.WindowStyle == WindowStyle.None || window is not Microsoft.VisualStudio.PlatformUI.DialogWindowBase)
+            if (window.WindowStyle == WindowStyle.None || window is not DialogWindowBase)
                     WindowHelper.RemoveCaptionButtons(source);
             }
 

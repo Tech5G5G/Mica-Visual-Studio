@@ -38,6 +38,7 @@
         #region Package Members
 
     private ThemeHelper theme;
+    private WindowManager manager;
         private VsColorManager colors;
     private WindowManager windows;
 
@@ -77,8 +78,9 @@
                     ApplyWindowPreferences(handle, WindowType.Tool);
                 windows.Windows.Add(handle, (WindowType.Tool, window));
                 }
+            manager = WindowManager.Instance;
 
-            windows.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
+            manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
             //windows.WindowClosed += (s, e) => { };
 
             colors.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
@@ -109,7 +111,7 @@
                 General general = General.Instance;
             theme.SetAppTheme(EvaluateTheme(general.AppTheme));
 
-            foreach (var entry in windows.Windows)
+            foreach (var entry in manager.Windows)
                     ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false, general);
             }
         }
@@ -161,12 +163,13 @@
         protected override void Dispose(bool disposing)
         {
         theme?.Dispose();
-        windows?.Dispose();
+        manager?.Dispose();
 
             if (disposing)
             {
             shell = null;
             theme = null;
+            manager = null;
                 colors = null;
             windows = null;
             }

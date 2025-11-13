@@ -67,7 +67,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MicaVisualStudioPackage.cs" />
-    <Compile Include="VisualStudio\VisualStudioExtensions.cs" />
+    <Compile Include="VisualStudio\VsColorManager.cs" />
     <Compile Include="VisualStudio\Styling\VsColorManager.cs" />
   </ItemGroup>
   <ItemGroup>

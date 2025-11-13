@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Specialized;
-using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 
-namespace MicaVisualStudio.VisualStudio.Styling;
+namespace MicaVisualStudio.VisualStudio;
 
 public class VsColorManager
 {
@@ -23,7 +22,10 @@ public class VsColorManager
     private readonly static ThemeResourceKey MainWindowActiveCaptionKey =
         new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);
 
-    private readonly IVsUIShell5 shell;
+    private readonly IVsUIShell5 shell = VS.GetRequiredService<SVsUIShell, IVsUIShell5>();
+
+    public Color GetColor(ThemeResourceKey key) =>
+        shell?.GetThemedWPFColor(key) ?? default;
 
     /// <summary>
     /// Gets the current <see cref="Theme"/> of Visual Studio.
@@ -32,7 +34,7 @@ public class VsColorManager
     /// <returns>Whether or not the value has changed; that is, if <paramref name="theme"/> is different from <see cref="vsTheme"/>.</returns>
     private bool GetVSTheme(out Theme theme)
     {
-        theme = shell?.GetThemedWPFColor(MainWindowActiveCaptionKey).IsLight() == true ? Theme.Light : Theme.Dark;
+        theme = GetColor(MainWindowActiveCaptionKey).IsLight() == true ? Theme.Light : Theme.Dark;
         return vsTheme != theme;
     }
 
@@ -40,10 +42,6 @@ public class VsColorManager
 
     public VsColorManager()
     {
-#pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
-        shell = (IVsUIShell5)Package.GetGlobalService(typeof(SVsUIShell));
-#pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
-
         GetVSTheme(out vsTheme);
         (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (s, e) =>
         {
@@ -58,8 +56,8 @@ public class VsColorManager
     {
         List<object> keys = [];
 
-        foreach (ResourceDictionary dictionary in Application.Current.Resources.MergedDictionaries.Where(i => i is DeferredResourceDictionaryBase))
-            foreach (object obj in dictionary)
+        foreach (var dictionary in Application.Current.Resources.MergedDictionaries.Where(i => i is DeferredResourceDictionaryBase))
+            foreach (var obj in dictionary)
             {
                 DictionaryEntry entry = (DictionaryEntry)obj;
 

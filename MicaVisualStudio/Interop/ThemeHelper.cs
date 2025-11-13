@@ -30,7 +30,8 @@ public class ThemeHelper : IDisposable
     public event EventHandler<Theme> SystemThemeChanged;
 
     private Theme GetSystemTheme() =>
-        (int)Registry.GetValue(PersonalizeSettings, valueName: "AppsUseLightTheme", defaultValue: 0) == 1 ? Theme.Light : Theme.Dark;
+        (int)Registry.GetValue(PersonalizeSettings, valueName: "AppsUseLightTheme", defaultValue: 0) == 1 ? //TRUE
+        Theme.Light : Theme.Dark;
 
     #endregion
 

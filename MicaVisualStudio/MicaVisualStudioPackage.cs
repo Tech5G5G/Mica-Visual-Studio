@@ -119,10 +119,10 @@
         private void ApplyWindowPreferences(IntPtr hWnd, WindowType type, bool firstTime = true, General general = null)
         {
             general ??= General.Instance;
+        var source = HwndSource.FromHwnd(hWnd);
 
             if (firstTime && //Remove caption buttons once
-                HwndSource.FromHwnd(hWnd) is HwndSource source &&
-                source.RootVisual is Window window)
+            source?.RootVisual is Window window)
             {
                 WindowHelper.ExtendFrameIntoClientArea(hWnd);
                 source.CompositionTarget.BackgroundColor = Colors.Transparent;

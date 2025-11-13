@@ -81,6 +81,15 @@
             theme = ThemeHelper.Instance;
             manager = WindowManager.Instance;
 
+            RefreshPreferences(); //Set app theme
+
+            if (WindowManager.MainWindow.Visibility == Visibility.Visible) //We're late, so add all windows
+                Application.Current.Windows.Cast<Window>()
+                                           .ToList()
+                                           .ForEach(i => AddWindow(i, WindowHelper.GetWindowType(i)));
+            else if (WindowManager.CurrentWindow is Window window) //Apply to start window
+                AddWindow(window, WindowType.Tool);
+
             manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
             //windows.WindowClosed += (s, e) => { };
 
@@ -115,6 +124,13 @@
             foreach (var entry in manager.Windows)
                     ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false, general);
             }
+
+        void AddWindow(Window window, WindowType type)
+        {
+            var handle = window.GetHandle();
+            manager.Windows.Add(window.GetHandle(), (type, window));
+            ApplyWindowPreferences(handle, type);
+        }
         }
 
         private void ApplyWindowPreferences(IntPtr hWnd, WindowType type, bool firstTime = true, General general = null)

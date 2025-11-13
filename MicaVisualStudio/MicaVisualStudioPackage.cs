@@ -135,7 +135,7 @@
             else if (WindowManager.CurrentWindow is Window window) //Apply to start window
                 AddWindow(window, WindowType.Tool);
 
-            manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, e.WindowType);
+            manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, s, e.WindowType);
             //windows.WindowClosed += (s, e) => { };
 
             colors.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
@@ -167,26 +167,31 @@
             theme.SetAppTheme(EvaluateTheme(general.AppTheme));
 
             foreach (var entry in manager.Windows)
-                    ApplyWindowPreferences(entry.Key, entry.Value.Type, firstTime: false, general);
+                ApplyWindowPreferences(entry.Key, entry.Value.Window, entry.Value.Type, firstTime: false, general);
             }
 
         void AddWindow(Window window, WindowType type)
         {
             var handle = window.GetHandle();
             manager.Windows.Add(window.GetHandle(), (type, window));
-            ApplyWindowPreferences(handle, type);
+            ApplyWindowPreferences(handle, window, type);
         }
         }
 
-        private void ApplyWindowPreferences(IntPtr hWnd, WindowType type, bool firstTime = true, General general = null)
+    private void ApplyWindowPreferences(
+        IntPtr handle,
+        Window window,
+        WindowType type,
+        bool firstTime = true,
+        General general = null)
         {
             general ??= General.Instance;
-        var source = HwndSource.FromHwnd(hWnd);
 
             if (firstTime && //Remove caption buttons once
-            source?.RootVisual is Window window)
+            window is not null &&
+            HwndSource.FromHwnd(handle) is HwndSource source)
             {
-                WindowHelper.ExtendFrameIntoClientArea(hWnd);
+            WindowHelper.ExtendFrameIntoClientArea(handle);
                 source.CompositionTarget.BackgroundColor = Colors.Transparent;
 
                 //Don't remove caption buttons from windows that need them
@@ -221,9 +226,9 @@
 
         void ApplyWindowAttributes(int theme, CornerPreference corner, BackdropType backdrop)
         {
-            WindowHelper.SetDarkMode(hWnd, EvaluateTheme(theme) == Theme.Dark);
-            WindowHelper.SetCornerPreference(hWnd, corner);
-            WindowHelper.SetBackdropType(hWnd, source is not null || backdrop != BackdropType.Glass ? backdrop : BackdropType.None);
+            WindowHelper.SetDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
+            WindowHelper.SetCornerPreference(handle, corner);
+            WindowHelper.SetBackdropType(handle, window is not null || backdrop != BackdropType.Glass ? backdrop : BackdropType.None);
         }
     }
 

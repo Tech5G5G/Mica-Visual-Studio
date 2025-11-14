@@ -8,9 +8,9 @@ namespace MicaVisualStudio.VisualStudio;
 //This code is bad, but it works, so...
 public class VsWindowStyler : IVsWindowFrameEvents
 {
-    private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
-
     public static VsWindowStyler Instance { get; } = new();
+
+    private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
 
     private readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundColor);

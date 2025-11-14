@@ -47,6 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Extensions\ExpressionExtensions.cs" />
+    <Compile Include="Extensions\TreeExtensions.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Options\Theme.cs" />
     <Compile Include="Interop\ThemeHelper.cs" />

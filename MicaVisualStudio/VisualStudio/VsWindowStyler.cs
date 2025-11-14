@@ -178,21 +178,19 @@ public class VsWindowStyler : IVsWindowFrameEvents
 
     private readonly HashSet<WeakReference<ContentPresenter>> presenters = [];
 
-    private void ApplyToContent(Grid host, bool applyToDock = true)
+    private void ApplyToContent(FrameworkElement content, bool applyToDock = true)
     {
-        if (!host.IsLoaded)
-            host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, e) => ApplyToContent(s as Grid, applyToDock));
+        if (!content.IsLoaded)
+            content.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, e) => ApplyToContent(s as FrameworkElement, applyToDock));
 
-        if (applyToDock && host.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), x => x.GetType() == dockTargetType) is Border dock)
+        if (applyToDock && content.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), x => x.GetType() == dockTargetType) is Border dock)
             ApplyToDockTarget(dock, applyToContent: false);
 
-        var descendants = host.FindDescendants<FrameworkElement>();
+        var descendants = content.FindDescendants<FrameworkElement>().Append(content);
         if (!descendants.Any())
             return;
 
-        WeakReference<Grid> weakHost = new(host);
         presenters.RemoveWhere(i => !i.TryGetTarget(out _)); //Remove redundant references
-
         foreach (var presenter in descendants.OfType<ContentPresenter>())
         {
             if (presenters.Any(i => i.TryGetTarget(out ContentPresenter p) && p == presenter))
@@ -200,20 +198,9 @@ public class VsWindowStyler : IVsWindowFrameEvents
 
             presenter.AddWeakPropertyChangeHandler(ContentPresenter.ContentProperty, (s, e) =>
             {
-                if (s is not ContentPresenter presenter ||
-                    presenter.Content is not FrameworkElement element)
-                    return;
-
-                if (!element.IsLoaded)
-                {
-                    element.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, e) =>
-                    {
-                        if (weakHost.TryGetTarget(out Grid host))
-                            ApplyToContent(host, applyToDock: false);
-                    });
-                }
-                else
-                    ApplyToContent(host);
+                if (s is ContentPresenter presenter &&
+                    presenter.Content is FrameworkElement element)
+                    ApplyToContent(element, applyToDock: false);
             });
 
             presenters.Add(new(presenter));

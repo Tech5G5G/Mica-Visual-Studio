@@ -39,8 +39,9 @@
 
     private ThemeHelper theme;
     private WindowManager manager;
+
         private VsColorManager colors;
-    private WindowManager windows;
+    private VsWindowStyler styler;
 
     private (string Content, ImageMoniker Image) queuedInfo;
 
@@ -122,6 +123,8 @@
             colors.UpdateColors();
 
             #endregion
+
+            styler = VsWindowStyler.Instance;
 
             theme = ThemeHelper.Instance;
             manager = WindowManager.Instance;
@@ -248,8 +251,9 @@
             {
             theme = null;
             manager = null;
+
                 colors = null;
-            windows = null;
+            styler = null;
             }
 
             base.Dispose(disposing);

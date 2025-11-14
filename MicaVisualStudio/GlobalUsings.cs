@@ -20,4 +20,5 @@ global using Community.VisualStudio.Toolkit;
 global using MicaVisualStudio;
 global using MicaVisualStudio.Interop;
 global using MicaVisualStudio.Options;
+global using MicaVisualStudio.Extensions;
 global using MicaVisualStudio.VisualStudio;

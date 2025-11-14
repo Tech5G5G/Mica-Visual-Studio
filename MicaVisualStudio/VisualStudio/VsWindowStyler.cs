@@ -24,6 +24,8 @@ public class VsWindowStyler : IVsWindowFrameEvents
 
     private readonly DependencyProperty viewContentProperty;
 
+    private readonly HashSet<WeakReference<ContentPresenter>> presenters = [];
+
     private VsWindowStyler()
     {
 #pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
@@ -178,8 +180,6 @@ public class VsWindowStyler : IVsWindowFrameEvents
             foreach (var tab in tabs.Children.OfType<TabItem>()) //Tab items
                 tab.Background = Brushes.Transparent;
     }
-
-    private readonly HashSet<WeakReference<ContentPresenter>> presenters = [];
 
     private void ApplyToContent(FrameworkElement content, bool applyToDock = true)
     {

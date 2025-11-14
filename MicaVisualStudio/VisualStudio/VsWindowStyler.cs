@@ -18,8 +18,8 @@ public class VsWindowStyler : IVsWindowFrameEvents
     private readonly IVsUIShell shell = VS.GetRequiredService<SVsUIShell, IVsUIShell>();
     private readonly IVsUIShell5 shell5 = VS.GetRequiredService<SVsUIShell, IVsUIShell5>();
 
-    private readonly Func<IVsWindowFrame, DependencyObject> get_FrameView;
-    private readonly Func<DependencyObject, object> get_Content;
+    private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
+    private readonly Func<DependencyObject, object> get_View_Content;
     private readonly Func<object, bool> isDockTarget;
 
     private readonly DependencyProperty viewContentProperty;
@@ -38,7 +38,7 @@ public class VsWindowStyler : IVsWindowFrameEvents
                                 .GetProperty("FrameView");
 
         var frameParam = Expression.Parameter(typeof(IVsWindowFrame));
-        get_FrameView = frameParam.Convert(frameViewProp.DeclaringType)
+        get_WindowFrame_FrameView = frameParam.Convert(frameViewProp.DeclaringType)
                                   .Property(frameViewProp)
                                   .Convert<DependencyObject>()
                                   .Compile<IVsWindowFrame, DependencyObject>(frameParam);
@@ -47,9 +47,8 @@ public class VsWindowStyler : IVsWindowFrameEvents
         var contentProp = viewType.GetProperty("Content");
 
         var viewParam = Expression.Parameter(typeof(DependencyObject));
-        get_Content = viewParam.Convert(contentProp.DeclaringType)
+        get_View_Content = viewParam.Convert(contentProp.DeclaringType)
                                .Property(contentProp)
-                               .Convert<object>()
                                .Compile<DependencyObject, object>(viewParam);
 
         viewContentProperty = viewType.GetField("ContentProperty", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
@@ -117,10 +116,10 @@ public class VsWindowStyler : IVsWindowFrameEvents
     {
         ThreadHelper.ThrowIfNotOnUIThread();
 
-        if (get_FrameView(frame) is not DependencyObject view)
+        if (get_WindowFrame_FrameView(frame) is not DependencyObject view)
             return;
 
-        if (get_Content(view) is not Grid host)
+        if (get_View_Content(view) is not Grid host)
         {
             WeakReference<IVsWindowFrame> weakFrame = new(frame);
 

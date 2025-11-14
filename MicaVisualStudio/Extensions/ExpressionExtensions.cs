@@ -21,7 +21,7 @@ namespace MicaVisualStudio.Extensions
         public static MemberExpression Property(this Expression expression, PropertyInfo property) =>
             Expression.Property(expression, property);
 
-        public static Func<T, TResult> Compile<T, TResult>(this Expression body, params ParameterExpression[] parameters) =>
-            Expression.Lambda<Func<T, TResult>>(body, parameters).Compile();
+        public static Func<T, TResult> Compile<T, TResult>(this Expression body, ParameterExpression parameter) =>
+            Expression.Lambda<Func<T, TResult>>(body, parameter).Compile();
     }
 }

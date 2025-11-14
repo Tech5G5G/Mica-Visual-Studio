@@ -32,7 +32,7 @@ public class VsWindowStyler : IVsWindowFrameEvents
         VS.GetRequiredService<SVsUIShell, IVsUIShell7>().AdviseWindowFrameEvents(this);
 #pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
 
-        #region Getters Initialization
+        #region Functions Initialization
 
         var frameViewProp = Type.GetType("Microsoft.VisualStudio.Platform.WindowManagement.WindowFrame, Microsoft.VisualStudio.Platform.WindowManagement")
                                 .GetProperty("FrameView");
@@ -79,6 +79,8 @@ public class VsWindowStyler : IVsWindowFrameEvents
 
         #endregion
 
+        #region Listeners
+
         EventManager.RegisterClassHandler(
             dockType,
             FrameworkElement.LoadedEvent,
@@ -90,9 +92,13 @@ public class VsWindowStyler : IVsWindowFrameEvents
                 ApplyToWindow(s);
         };
 
+        #endregion
+
         ApplyToAllWindows();
         ApplyToAllWindowPanesAsync().Forget();
     }
+
+    #region Apply To All
 
     private void ApplyToAllWindows() => Application.Current.Windows.Cast<Window>()
                                                                    .ToList()
@@ -111,6 +117,8 @@ public class VsWindowStyler : IVsWindowFrameEvents
         foreach (var frame in toolEnum.ToEnumerable().Concat(docEnum.ToEnumerable()))
             ApplyToWindowFrame(frame);
     }
+
+    #endregion
 
     private void ApplyToWindowFrame(IVsWindowFrame frame)
     {

@@ -53,6 +53,7 @@
     <Compile Include="Interop\ThemeHelper.cs" />
     <Compile Include="Interop\WindowHelper.cs" />
     <Compile Include="Extensions\WeakEventExtensions.cs" />
+    <Compile Include="VisualStudio\EnumFramesExtensions.cs" />
     <Compile Include="VisualStudio\WindowManager.cs" />
     <Compile Include="Interop\WinEventHook.cs" />
     <Compile Include="Options\DialogPage.xaml.cs">

@@ -12,6 +12,12 @@ namespace MicaVisualStudio.Extensions
         public static UnaryExpression Convert<T>(this Expression expression) =>
             expression.Convert(typeof(T));
 
+        public static TypeBinaryExpression TypeIs(this Expression expression, Type type) =>
+            Expression.TypeIs(expression, type);
+
+        public static TypeBinaryExpression TypeIs<T>(this Expression expression) =>
+            expression.TypeIs(typeof(T));
+
         public static MemberExpression Property(this Expression expression, PropertyInfo property) =>
             Expression.Property(expression, property);
 

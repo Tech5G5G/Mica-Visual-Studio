@@ -15,14 +15,12 @@ public class VsWindowStyler : IVsWindowFrameEvents
     private readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundColor);
 
-    private readonly Type dockTargetType =
-        Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.Controls.DockTarget, Microsoft.VisualStudio.Shell.ViewManager");
-
     private readonly IVsUIShell shell = VS.GetRequiredService<SVsUIShell, IVsUIShell>();
     private readonly IVsUIShell5 shell5 = VS.GetRequiredService<SVsUIShell, IVsUIShell5>();
 
     private readonly Func<IVsWindowFrame, DependencyObject> get_FrameView;
     private readonly Func<DependencyObject, object> get_Content;
+    private readonly Func<object, bool> isDockTarget;
 
     private readonly DependencyProperty viewContentProperty;
 
@@ -55,6 +53,11 @@ public class VsWindowStyler : IVsWindowFrameEvents
         viewContentProperty = viewType.GetField("ContentProperty", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
                                       .GetValue(null) as DependencyProperty;
 
+        var dockType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.Controls.DockTarget, Microsoft.VisualStudio.Shell.ViewManager");
+        var borderParam = Expression.Parameter(typeof(object));
+        isDockTarget = borderParam.TypeIs(dockType)
+                                  .Compile<object, bool>(borderParam);
+
         #endregion
 
         #region Layered Brush
@@ -76,7 +79,7 @@ public class VsWindowStyler : IVsWindowFrameEvents
         #endregion
 
         EventManager.RegisterClassHandler(
-            dockTargetType,
+            dockType,
             FrameworkElement.LoadedEvent,
             new RoutedEventHandler((s, e) => ApplyToDockTarget(s as Border)));
 
@@ -144,7 +147,7 @@ public class VsWindowStyler : IVsWindowFrameEvents
             buttonFooter.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
         foreach (var descendant in descendants)
-            if (descendant is Border border && border.GetType() == dockTargetType)
+            if (descendant is Border border && isDockTarget(border))
                 ApplyToDockTarget(border);
     }
 
@@ -183,7 +186,7 @@ public class VsWindowStyler : IVsWindowFrameEvents
         if (!content.IsLoaded)
             content.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, e) => ApplyToContent(s as FrameworkElement, applyToDock));
 
-        if (applyToDock && content.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), x => x.GetType() == dockTargetType) is Border dock)
+        if (applyToDock && content.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), x => isDockTarget(x)) is Border dock)
             ApplyToDockTarget(dock, applyToContent: false);
 
         var descendants = content.FindDescendants<FrameworkElement>().Append(content);

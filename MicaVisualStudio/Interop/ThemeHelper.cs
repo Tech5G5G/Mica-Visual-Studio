@@ -43,11 +43,8 @@ public sealed class ThemeHelper : IDisposable
         SystemEvents.InvokeOnEventsThread(new Action(() => SystemEvents.UserPreferenceChanging += PreferenceChanging));
     }
 
-    private void PreferenceChanging(object sender, UserPreferenceChangingEventArgs args)
-    {
-        if (args.Category == UserPreferenceCategory.General)
-            SystemThemeChanged?.Invoke(this, sysTheme = GetSystemTheme());
-    }
+    private void PreferenceChanging(object sender, UserPreferenceChangingEventArgs args) =>
+        SystemThemeChanged?.Invoke(this, sysTheme = GetSystemTheme());
 
     public void SetAppTheme(Theme theme)
     {

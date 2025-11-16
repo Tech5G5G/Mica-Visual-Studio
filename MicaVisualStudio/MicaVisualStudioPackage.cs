@@ -66,12 +66,11 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 return;
             }
 
-            colors = new()
+            colors = VsColorManager.Instance;
 
             #region Resource Keys
 
-            {
-                ColorConfigs =
+            colors.AddConfigs(new()
                 {
                     { "Background", new(translucent: true) },
 
@@ -110,8 +109,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
                     { "SelectedItemActive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
                     { "SelectedItemInactive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) }
-                }
-            };
+            });
             colors.UpdateColors();
 
             #endregion
@@ -169,7 +167,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
         void AddWindow(Window window, WindowType type)
         {
             var handle = window.GetHandle();
-            manager.Windows.Add(window.GetHandle(), (type, window));
+            manager.AddWindow(window, type);
             ApplyWindowPreferences(handle, window, type);
         }
     }

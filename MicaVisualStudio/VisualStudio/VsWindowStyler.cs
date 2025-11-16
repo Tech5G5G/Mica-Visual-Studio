@@ -10,14 +10,26 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 {
     public static VsWindowStyler Instance { get; } = new();
 
+    #region Keys
+
     private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
 
     private readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundColor);
 
+    #endregion
+
+    #region Shells
+
     private readonly IVsUIShell shell = VS.GetRequiredService<SVsUIShell, IVsUIShell>();
     private readonly IVsUIShell5 shell5 = VS.GetRequiredService<SVsUIShell, IVsUIShell5>();
     private readonly IVsUIShell7 shell7 = VS.GetRequiredService<SVsUIShell, IVsUIShell7>();
+
+    private readonly uint cookie;
+
+    #endregion
+
+    #region Dependency Properties
 
     private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
     private readonly Func<DependencyObject, object> get_View_Content;
@@ -25,10 +37,10 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private readonly DependencyProperty viewContentProperty;
 
+    #endregion
+
     private readonly Hook hook;
     private readonly List<WeakReference<FrameworkElement>> elements = [];
-
-    private readonly uint cookie;
 
     private VsWindowStyler()
     {

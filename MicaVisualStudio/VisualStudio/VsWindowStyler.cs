@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using System.Collections.Specialized;
+using MonoMod.RuntimeDetour;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Expression = System.Linq.Expressions.Expression;
 

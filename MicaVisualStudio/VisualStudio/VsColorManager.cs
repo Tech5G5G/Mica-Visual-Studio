@@ -55,7 +55,7 @@ public class VsColorManager
     {
         List<object> keys = [];
 
-        foreach (var dictionary in Application.Current.Resources.MergedDictionaries.Where(i => i is DeferredResourceDictionaryBase))
+        foreach (var dictionary in Application.Current.Resources.MergedDictionaries.OfType<DeferredResourceDictionaryBase>())
             foreach (var obj in dictionary)
             {
                 DictionaryEntry entry = (DictionaryEntry)obj;

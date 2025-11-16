@@ -73,7 +73,7 @@ public class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             color.A = 0xFF / 2; //50% opacity
             SolidColorBrush brush = new(color);
 
-            foreach (var dictionary in Application.Current.Resources.MergedDictionaries.Where(i => i is DeferredResourceDictionaryBase))
+            foreach (var dictionary in Application.Current.Resources.MergedDictionaries.OfType<DeferredResourceDictionaryBase>())
                 if (!dictionary.Contains(SolidBackgroundFillTertiaryLayeredKey))
                     dictionary.Add(SolidBackgroundFillTertiaryLayeredKey, brush);
         }

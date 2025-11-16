@@ -115,6 +115,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="MonoMod.RuntimeDetour">
+      <Version>25.3.3</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Options\DialogPage.xaml">

@@ -138,8 +138,6 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private void ApplyToWindowFrame(IVsWindowFrame frame)
     {
-        ThreadHelper.ThrowIfNotOnUIThread();
-
         if (get_WindowFrame_FrameView(frame) is not DependencyObject view)
             return;
 

@@ -252,6 +252,12 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             ApplyToWindowFrame(frame);
     }
 
+    public void OnActiveFrameChanged(IVsWindowFrame oldFrame, IVsWindowFrame newFrame)
+    {
+        if (newFrame is not null)
+            ApplyToWindowFrame(newFrame);
+    }
+
     #endregion
 
     #region Dispose

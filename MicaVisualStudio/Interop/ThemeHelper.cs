@@ -2,7 +2,7 @@
 
 namespace MicaVisualStudio.Interop;
 
-public class ThemeHelper : IDisposable
+public sealed class ThemeHelper : IDisposable
 {
     #region PInvoke
 
@@ -64,15 +64,7 @@ public class ThemeHelper : IDisposable
 
     private bool disposed;
 
-    ~ThemeHelper() => Dispose(disposing: false);
-
     public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
     {
         if (!disposed)
         {

@@ -245,6 +245,8 @@
         theme?.Dispose();
         manager?.Dispose();
 
+        styler?.Dispose();
+
             if (disposing)
             {
             theme = null;

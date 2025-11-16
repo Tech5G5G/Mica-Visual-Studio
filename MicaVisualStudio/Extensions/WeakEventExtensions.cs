@@ -6,9 +6,11 @@ public class PropertyChangeNotifier : DependencyObject, IDisposable
 {
     private readonly WeakReference<DependencyObject> propertySource;
 
-    public PropertyChangeNotifier(DependencyObject source, string path) : this(source, new PropertyPath(path)) { }
+    public PropertyChangeNotifier(DependencyObject source, string path) :
+        this(source, new PropertyPath(path)) { }
 
-    public PropertyChangeNotifier(DependencyObject source, DependencyProperty property) : this(source, new PropertyPath(property)) { }
+    public PropertyChangeNotifier(DependencyObject source, DependencyProperty property) :
+        this(source, new PropertyPath(property)) { }
 
     public PropertyChangeNotifier(DependencyObject source, PropertyPath path)
     {

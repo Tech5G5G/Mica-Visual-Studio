@@ -1,6 +1,6 @@
 ﻿namespace MicaVisualStudio.VisualStudio;
 
-public class WindowManager : IDisposable
+public sealed class WindowManager : IDisposable
 {
     public static Window MainWindow => Application.Current.MainWindow;
 
@@ -78,15 +78,7 @@ public class WindowManager : IDisposable
 
     private bool disposed;
 
-    ~WindowManager() => Dispose(disposing: false);
-
     public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
     {
         if (!disposed)
         {

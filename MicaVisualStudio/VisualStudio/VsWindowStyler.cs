@@ -6,7 +6,7 @@ using Expression = System.Linq.Expressions.Expression;
 namespace MicaVisualStudio.VisualStudio;
 
 //This code is bad, but it works, so...
-public class VsWindowStyler : IVsWindowFrameEvents
+public class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 {
     public static VsWindowStyler Instance { get; } = new();
 
@@ -24,7 +24,8 @@ public class VsWindowStyler : IVsWindowFrameEvents
 
     private readonly DependencyProperty viewContentProperty;
 
-    private readonly HashSet<WeakReference<ContentPresenter>> presenters = [];
+    private readonly Hook hook;
+    private readonly List<WeakReference<FrameworkElement>> elements = [];
 
     private VsWindowStyler()
     {
@@ -91,6 +92,18 @@ public class VsWindowStyler : IVsWindowFrameEvents
             if (s is not null)
                 ApplyToWindow(s);
         };
+
+        hook = new(
+            typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic),
+            new Action<Action<Visual, Visual>, Visual, Visual>((orig, instance, child) =>
+            {
+                orig(instance, child); //Invoke original method
+
+                elements.RemoveAll(i => !i.TryGetTarget(out _)); //Remove redundant references
+                if (instance is FrameworkElement content &&
+                    elements.Any(i => i.TryGetTarget(out FrameworkElement element) && element == content))
+                    ApplyToContent(content, applyToDock: false);
+            }));
 
         #endregion
 
@@ -200,21 +213,10 @@ public class VsWindowStyler : IVsWindowFrameEvents
         if (!descendants.Any())
             return;
 
-        presenters.RemoveWhere(i => !i.TryGetTarget(out _)); //Remove redundant references
-        foreach (var presenter in descendants.OfType<ContentPresenter>())
-        {
-            if (presenters.Any(i => i.TryGetTarget(out ContentPresenter p) && p == presenter))
-                continue;
-
-            presenter.AddWeakPropertyChangeHandler(ContentPresenter.ContentProperty, (s, e) =>
-            {
-                if (s is ContentPresenter presenter &&
-                    presenter.Content is FrameworkElement element)
-                    ApplyToContent(element, applyToDock: false);
-            });
-
-            presenters.Add(new(presenter));
-        }
+        elements.RemoveAll(i => !i.TryGetTarget(out _)); //Remove redundant references
+        foreach (var element in descendants.Where(i => i is ContentPresenter || i is Decorator || i is Panel))
+            if (!elements.Any(i => i.TryGetTarget(out FrameworkElement e) && e == element))
+                elements.Add(new(element));
 
         if (descendants.FindElement<ToolBar>(string.Empty) is ToolBar bar) //Tool bar
         {
@@ -250,7 +252,28 @@ public class VsWindowStyler : IVsWindowFrameEvents
             ApplyToWindowFrame(frame);
     }
 
-    public void OnActiveFrameChanged(IVsWindowFrame oldFrame, IVsWindowFrame newFrame) => ApplyToWindowFrame(newFrame);
+    #endregion
+
+    #region Dispose
+
+    private bool disposed;
+
+    ~VsWindowStyler() => Dispose(disposing: false);
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            hook.Dispose();
+            disposed = true;
+        }
+    }
 
     #endregion
 }

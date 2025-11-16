@@ -17,15 +17,14 @@ public sealed class WindowManager : IDisposable
 
     public static List<Window> AllWindows => [.. Application.Current.Windows.OfType<Window>()];
 
-    public static WindowManager Instance { get; } = new();
-
-    public Dictionary<IntPtr, (WindowType Type, Window Window)> Windows => windows;
-    private readonly Dictionary<IntPtr, (WindowType Type, Window Window)> windows = [];
+    public ReadOnlyDictionary<IntPtr, (WindowType Type, Window Window)> Windows => new(
+        windows.Select(i => (i.Key, (i.Value.Type, i.Value.Window.TryGetTarget(out Window window) ? window : null))).ToDictionary(i => i.Key, i => i.Item2));
 
     public event WindowChangedEventHandler WindowOpened;
     public event WindowChangedEventHandler WindowClosed;
 
     private readonly WinEventHook hook;
+    private readonly Dictionary<IntPtr, (WindowType Type, WeakReference<Window> Window)> windows = [];
 
     private WindowManager()
     {
@@ -46,35 +45,43 @@ public sealed class WindowManager : IDisposable
     private void WindowLoaded(object sender, RoutedEventArgs args)
     {
         if (sender is Window window)
-        {
-            var handle = window.GetHandle();
-            var type = WindowHelper.GetWindowType(window);
-
-            windows.Add(handle, (type, window));
-            WindowOpened?.Invoke(window, new(handle, type));
-        }
+            AddWindow(window, WindowHelper.GetWindowType(window));
     }
 
     private void WindowUnloaded(object sender, RoutedEventArgs args)
     {
-        if (sender is Window window &&
-            windows.FirstOrDefault(i => i.Value.Window == window) is KeyValuePair<IntPtr, (WindowType Type, Window Window)> pair)
-        {
-            windows.Remove(pair.Key);
-            WindowClosed?.Invoke(window, new(pair.Key, pair.Value.Type));
-        }
+        if (sender is Window window)
+            RemoveWindow(window);
     }
 
     private void EventOccurred(WinEventHook sender, EventOccuredEventArgs args)
     {
-        if (!windows.ContainsKey(args.WindowHandle) && //Prefer WPF over WinEventHook and avoid duplicates
-            WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(WindowStyles.Caption)) //Check window for title bar 
+        if (WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(WindowStyles.Caption) && //Check window for title bar
+            !windows.ContainsKey(args.WindowHandle)) //Prefer WPF over WinEventHook and avoid duplicates
         {
             var window = HwndSource.FromHwnd(args.WindowHandle) is HwndSource source ? source.RootVisual as Window : null;
             var type = WindowHelper.GetWindowType(window);
 
-            windows.Add(args.WindowHandle, (type, window));
+            windows.Add(args.WindowHandle, (type, new(window)));
             WindowOpened?.Invoke(window, new(args.WindowHandle, type));
+        }
+    }
+
+    public void AddWindow(Window window, WindowType type)
+    {
+        var handle = window.GetHandle();
+
+        windows.Add(handle, (type, new(window)));
+        WindowOpened?.Invoke(window, new(handle, type));
+    }
+
+    public void RemoveWindow(Window window)
+    {
+        if (windows.FirstOrDefault(i => i.Value.Window.TryGetTarget(out Window w) && w == window) is
+            KeyValuePair<IntPtr, (WindowType Type, WeakReference<Window> Window)> pair)
+        {
+            windows.Remove(pair.Key);
+            WindowClosed?.Invoke(window, new(pair.Key, pair.Value.Type));
         }
     }
 

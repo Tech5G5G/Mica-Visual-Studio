@@ -4,6 +4,8 @@ namespace MicaVisualStudio.Interop;
 
 public sealed class ThemeHelper : IDisposable
 {
+    public static ThemeHelper Instance { get; } = new();
+
     #region PInvoke
 
     [DllImport("uxtheme.dll", EntryPoint = "#135")]
@@ -34,8 +36,6 @@ public sealed class ThemeHelper : IDisposable
         Theme.Light : Theme.Dark;
 
     #endregion
-
-    public static ThemeHelper Instance { get; } = new();
 
     private ThemeHelper()
     {

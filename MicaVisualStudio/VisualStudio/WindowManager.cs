@@ -2,6 +2,8 @@
 
 public sealed class WindowManager : IDisposable
 {
+    public static WindowManager Instance { get; } = new();
+
     public static Window MainWindow => Application.Current.MainWindow;
 
     public static Window CurrentWindow

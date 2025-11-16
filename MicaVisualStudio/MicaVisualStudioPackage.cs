@@ -124,7 +124,10 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             RefreshPreferences(); //Set app theme
 
             if (WindowManager.MainWindow.Visibility == Visibility.Visible) //We're late, so add all windows
+            {
                 WindowManager.AllWindows.ForEach(i => AddWindow(i, WindowHelper.GetWindowType(i)));
+                WindowManager.MainWindow.Loaded -= Window_Loaded;
+            }
             else if (WindowManager.CurrentWindow is Window window) //Apply to start window
                 AddWindow(window, WindowType.Tool);
 

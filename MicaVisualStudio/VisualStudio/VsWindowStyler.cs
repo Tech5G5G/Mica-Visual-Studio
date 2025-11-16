@@ -17,6 +17,12 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     private readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundColor);
 
+    private readonly ThemeResourceKey TextFillPrimaryKey =
+        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextFillPrimary", ThemeResourceKeyType.BackgroundBrush);
+
+    private readonly ThemeResourceKey TextOnAccentFillPrimaryKey =
+        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextOnAccentFillPrimary", ThemeResourceKeyType.BackgroundBrush);
+
     #endregion
 
     #region Shells
@@ -33,10 +39,11 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
     private readonly Func<DependencyObject, object> get_View_Content;
-    private readonly Func<object, bool> isDockTarget;
+    private readonly Func<DependencyObject, bool> get_View_IsActive;
     private readonly Func<object, bool> IsDockTarget;
 
     private readonly DependencyProperty View_ContentProperty,
+        View_IsActiveProperty;
 
     #endregion
 
@@ -66,6 +73,15 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         View_ContentProperty = viewType.GetField("ContentProperty", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
                                       .GetValue(null) as DependencyProperty;
+
+        var isActiveProp = viewType.GetProperty("IsActive");
+
+        get_View_IsActive = viewParam.Convert(isActiveProp.DeclaringType)
+                                     .Property(isActiveProp)
+                                     .Compile<DependencyObject, bool>(viewParam);
+
+        View_IsActiveProperty = viewType.GetField("IsActiveProperty", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+                                        .GetValue(null) as DependencyProperty;
 
         var dockType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.Controls.DockTarget, Microsoft.VisualStudio.Shell.ViewManager");
         var borderParam = Expression.Parameter(typeof(object));
@@ -212,7 +228,30 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         if (descendants.FindElement<Panel>("PART_TabPanel") is Panel tabs) //Tab strip
             foreach (var tab in tabs.Children.OfType<TabItem>()) //Tab items
+            {
                 tab.Background = Brushes.Transparent;
+
+                if (tab.DataContext is not DependencyObject view)
+                    continue;
+
+                WeakReference<TabItem> weakTab = new(tab);
+
+                ApplyTabForeground(tab, view);
+                tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, (s, e) =>
+                {
+                    if (s is TabItem tab && tab.DataContext is DependencyObject view)
+                        ApplyTabForeground(tab, view);
+                });
+                view.AddPropertyChangeHandler(View_IsActiveProperty, (s, e) =>
+                {
+                    if (weakTab.TryGetTarget(out TabItem tab) && s is DependencyObject view)
+                        ApplyTabForeground(tab, view);
+                });
+
+                void ApplyTabForeground(TabItem item, DependencyObject view) => tab.SetResourceReference(
+                    Control.ForegroundProperty,
+                    tab.IsSelected && get_View_IsActive(view) ? TextOnAccentFillPrimaryKey : TextFillPrimaryKey);
+    }
     }
 
     private void ApplyToContent(FrameworkElement content, bool applyToDock = true)

@@ -6,7 +6,7 @@ using Expression = System.Linq.Expressions.Expression;
 namespace MicaVisualStudio.VisualStudio;
 
 //This code is bad, but it works, so...
-public class VsWindowStyler : IVsWindowFrameEvents, IDisposable
+public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 {
     public static VsWindowStyler Instance { get; } = new();
 
@@ -258,19 +258,16 @@ public class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private bool disposed;
 
-    ~VsWindowStyler() => Dispose(disposing: false);
-
     public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
     {
         if (!disposed)
         {
-            hook.Dispose();
+            hook?.Dispose();
+
+#pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
+            shell7.UnadviseWindowFrameEvents(cookie);
+#pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
+
             disposed = true;
         }
     }

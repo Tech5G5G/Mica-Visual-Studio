@@ -17,6 +17,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private readonly IVsUIShell shell = VS.GetRequiredService<SVsUIShell, IVsUIShell>();
     private readonly IVsUIShell5 shell5 = VS.GetRequiredService<SVsUIShell, IVsUIShell5>();
+    private readonly IVsUIShell7 shell7 = VS.GetRequiredService<SVsUIShell, IVsUIShell7>();
 
     private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
     private readonly Func<DependencyObject, object> get_View_Content;
@@ -27,13 +28,11 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     private readonly Hook hook;
     private readonly List<WeakReference<FrameworkElement>> elements = [];
 
+    private readonly uint cookie;
+
     private VsWindowStyler()
     {
-#pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
-        VS.GetRequiredService<SVsUIShell, IVsUIShell7>().AdviseWindowFrameEvents(this);
-#pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
-
-        #region Functions Initialization
+        #region Function Initialization
 
         var frameViewProp = Type.GetType("Microsoft.VisualStudio.Platform.WindowManagement.WindowFrame, Microsoft.VisualStudio.Platform.WindowManagement")
                                 .GetProperty("FrameView");
@@ -81,6 +80,10 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         #endregion
 
         #region Listeners
+
+#pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
+        cookie = shell7.AdviseWindowFrameEvents(this);
+#pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
 
         EventManager.RegisterClassHandler(
             dockType,

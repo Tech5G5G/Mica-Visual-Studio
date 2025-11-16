@@ -116,9 +116,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     #region Apply To All
 
-    private void ApplyToAllWindows() => Application.Current.Windows.Cast<Window>()
-                                                                   .ToList()
-                                                                   .ForEach(ApplyToWindow);
+    private void ApplyToAllWindows() => WindowManager.AllWindows.ForEach(ApplyToWindow);
 
     private async Task ApplyToAllWindowPanesAsync()
     {

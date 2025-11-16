@@ -132,9 +132,7 @@
             RefreshPreferences(); //Set app theme
 
             if (WindowManager.MainWindow.Visibility == Visibility.Visible) //We're late, so add all windows
-                Application.Current.Windows.Cast<Window>()
-                                           .ToList()
-                                           .ForEach(i => AddWindow(i, WindowHelper.GetWindowType(i)));
+                WindowManager.AllWindows.ForEach(i => AddWindow(i, WindowHelper.GetWindowType(i)));
             else if (WindowManager.CurrentWindow is Window window) //Apply to start window
                 AddWindow(window, WindowType.Tool);
 

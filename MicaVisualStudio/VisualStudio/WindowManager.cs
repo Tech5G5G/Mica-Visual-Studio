@@ -13,6 +13,8 @@ public sealed class WindowManager : IDisposable
         }
     }
 
+    public static List<Window> AllWindows => [.. Application.Current.Windows.OfType<Window>()];
+
     public static WindowManager Instance { get; } = new();
 
     public Dictionary<IntPtr, (WindowType Type, Window Window)> Windows => windows;

@@ -171,8 +171,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     {
         var descendants = window.FindDescendants<FrameworkElement>();
 
-        if (descendants.FindElement<Border>("FooterBorder") is Border footer)
-            footer.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
+        //Footer
+        descendants.FindElement<Border>("FooterBorder")?
+                   .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
         if (window is DialogWindowBase &&
             descendants.FindElement<Button>("OKButton") is Button button &&
@@ -194,11 +195,12 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         var descendants = dock.FindDescendants<FrameworkElement>();
 
-        if (descendants.FindElement<Border>("PART_ContentPanel") is Border panel) //Content area
-            panel.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
+        //Content area
+        descendants.FindElement<Border>("PART_ContentPanel")?
+                   .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
-        if (descendants.FindElement<Control>("PART_Header") is Control header) //Title bar
-            header.Background = Brushes.Transparent;
+        //Title bar
+        descendants.FindElement<Control>("PART_Header")?.Background = Brushes.Transparent;
 
         if (descendants.FindElement<Border>("ToolWindowBorder") is Border border) //Body
         {
@@ -233,9 +235,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         if (descendants.FindElement<ToolBar>(string.Empty) is ToolBar bar) //Tool bar
         {
             bar.BorderBrush = bar.Background = Brushes.Transparent;
-
-            if (bar.Parent is ToolBarTray tray)
-                tray.Background = Brushes.Transparent;
+            (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
         }
 
         if (descendants.FindElement<Control>("gitWindowView") is Control gitWindow) //BONUS: Git changes window
@@ -243,12 +243,10 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             gitWindow.Background = Brushes.Transparent;
 
             foreach (var control in gitWindow.LogicalDescendants<Control>())
-            {
                 if (control is not Button && control is not TextBox)
                     control.Background = Brushes.Transparent;
             }
         }
-    }
 
     #region IVsWindowFrameEvents
 

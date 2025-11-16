@@ -34,8 +34,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
     private readonly Func<DependencyObject, object> get_View_Content;
     private readonly Func<object, bool> isDockTarget;
+    private readonly Func<object, bool> IsDockTarget;
 
-    private readonly DependencyProperty viewContentProperty;
+    private readonly DependencyProperty View_ContentProperty,
 
     #endregion
 
@@ -63,12 +64,12 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                .Property(contentProp)
                                .Compile<DependencyObject, object>(viewParam);
 
-        viewContentProperty = viewType.GetField("ContentProperty", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+        View_ContentProperty = viewType.GetField("ContentProperty", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
                                       .GetValue(null) as DependencyProperty;
 
         var dockType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.Controls.DockTarget, Microsoft.VisualStudio.Shell.ViewManager");
         var borderParam = Expression.Parameter(typeof(object));
-        isDockTarget = borderParam.TypeIs(dockType)
+        IsDockTarget = borderParam.TypeIs(dockType)
                                   .Compile<object, bool>(borderParam);
 
         #endregion
@@ -155,7 +156,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         {
             WeakReference<IVsWindowFrame> weakFrame = new(frame);
 
-            view.AddWeakOneTimePropertyChangeHandler(viewContentProperty, (s, e) =>
+            view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, e) =>
             {
                 if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
                     ApplyToWindowFrame(frame);
@@ -180,7 +181,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             buttonFooter.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
         foreach (var descendant in descendants)
-            if (descendant is Border border && isDockTarget(border))
+            if (descendant is Border border && IsDockTarget(border))
                 ApplyToDockTarget(border);
     }
 
@@ -217,7 +218,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         if (!content.IsLoaded)
             content.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, e) => ApplyToContent(s as FrameworkElement, applyToDock));
 
-        if (applyToDock && content.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), x => isDockTarget(x)) is Border dock)
+        if (applyToDock && content.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
             ApplyToDockTarget(dock, applyToContent: false);
 
         var descendants = content.FindDescendants<FrameworkElement>().Append(content);

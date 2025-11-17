@@ -75,7 +75,6 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                       .GetValue(null) as DependencyProperty;
 
         var isActiveProp = viewType.GetProperty("IsActive");
-
         get_View_IsActive = viewParam.Convert(isActiveProp.DeclaringType)
                                      .Property(isActiveProp)
                                      .Compile<DependencyObject, bool>(viewParam);
@@ -84,9 +83,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                         .GetValue(null) as DependencyProperty;
 
         var dockType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.Controls.DockTarget, Microsoft.VisualStudio.Shell.ViewManager");
-        var borderParam = Expression.Parameter(typeof(object));
-        IsDockTarget = borderParam.TypeIs(dockType)
-                                  .Compile<object, bool>(borderParam);
+        var objectParam = Expression.Parameter(typeof(object));
+        IsDockTarget = objectParam.TypeIs(dockType)
+                                  .Compile<object, bool>(objectParam);
 
         #endregion
 

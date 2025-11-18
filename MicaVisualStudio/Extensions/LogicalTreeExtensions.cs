@@ -1,6 +1,6 @@
 ﻿namespace MicaVisualStudio.Extensions;
 
-public static class TreeExtensions
+public static class LogicalTreeExtensions
 {
     public static IEnumerable<DependencyObject> LogicalDescendants(this DependencyObject parent)
     {
@@ -15,7 +15,4 @@ public static class TreeExtensions
 
     public static IEnumerable<T> LogicalDescendants<T>(this DependencyObject parent) where T : DependencyObject =>
         LogicalDescendants(parent).OfType<T>();
-
-    public static T FindElement<T>(this IEnumerable<FrameworkElement> source, string name) where T : FrameworkElement =>
-        source.FirstOrDefault(i => i is T element && element.Name == name) as T;
 }

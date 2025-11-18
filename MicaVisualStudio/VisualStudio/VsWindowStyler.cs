@@ -195,11 +195,11 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         var descendants = window.FindDescendants<FrameworkElement>();
 
         //Footer
-        descendants.FindElement<Border>("FooterBorder")?
+        descendants.FindNamedElement<Border>("FooterBorder")?
                    .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
         if (window is DialogWindowBase &&
-            descendants.FindElement<Button>("OKButton") is Button button &&
+            descendants.FindNamedElement<Button>("OKButton") is Button button &&
             button.FindAncestor<FrameworkElement>() is FrameworkElement parent &&
             parent.FindAncestor<Border>() is Border buttonFooter)
             buttonFooter.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
@@ -219,13 +219,13 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         var descendants = dock.FindDescendants<FrameworkElement>();
 
         //Content area
-        descendants.FindElement<Border>("PART_ContentPanel")?
+        descendants.FindNamedElement<Border>("PART_ContentPanel")?
                    .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
         //Title bar
-        descendants.FindElement<Control>("PART_Header")?.Background = Brushes.Transparent;
+        descendants.FindNamedElement<Control>("PART_Header")?.Background = Brushes.Transparent;
 
-        if (descendants.FindElement<Border>("ToolWindowBorder") is Border border) //Body
+        if (descendants.FindNamedElement<Border>("ToolWindowBorder") is Border border) //Body
         {
             border.Background = Brushes.Transparent;
 
@@ -233,7 +233,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 ApplyToContent(host, applyToDock: false);
         }
 
-        if (descendants.FindElement<Panel>("PART_TabPanel") is Panel tabs) //Tab strip
+        if (descendants.FindNamedElement<Panel>("PART_TabPanel") is Panel tabs) //Tab strip
             foreach (var tab in tabs.Children.OfType<TabItem>()) //Tab items
             {
                 tab.Background = Brushes.Transparent;
@@ -273,18 +273,18 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         if (!descendants.Any())
             return;
 
-        elements.RemoveAll(i => !i.TryGetTarget(out _)); //Remove redundant references
         foreach (var element in descendants.Where(i => i is ContentPresenter || i is Decorator || i is Panel))
-            if (!elements.Any(i => i.TryGetTarget(out FrameworkElement e) && e == element))
+            if (!elements.Contains(element))
                 elements.Add(new(element));
 
         if (descendants.FindElement<ToolBar>(string.Empty) is ToolBar bar) //Tool bar
+        if (descendants.FindNamedElement<ToolBar>(string.Empty) is ToolBar bar) //Tool bar
         {
             bar.BorderBrush = bar.Background = Brushes.Transparent;
             (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
         }
 
-        if (descendants.FindElement<Control>("gitWindowView") is Control gitWindow) //BONUS: Git changes window
+        if (descendants.FindNamedElement<Control>("gitWindowView") is Control gitWindow) //BONUS: Git changes window
         {
             gitWindow.Background = Brushes.Transparent;
 

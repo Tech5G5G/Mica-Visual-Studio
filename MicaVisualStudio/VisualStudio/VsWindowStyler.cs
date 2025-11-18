@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
+using System.Reflection;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Expression = System.Linq.Expressions.Expression;
 
@@ -47,7 +49,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     #endregion
 
-    private readonly Hook hook;
+    private readonly ILHook hook;
     private readonly List<WeakReference<FrameworkElement>> elements = [];
 
     private VsWindowStyler()
@@ -124,17 +126,23 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 ApplyToWindow(s);
         };
 
-        hook = new(
-            typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic),
-            new Action<Action<Visual, Visual>, Visual, Visual>((orig, instance, child) =>
+        hook = new(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), context =>
             {
-                orig(instance, child); //Invoke original method
+            ILCursor cursor = new(context) { Index = 0 };
 
-                elements.RemoveAll(i => !i.TryGetTarget(out _)); //Remove redundant references
-                if (instance is FrameworkElement content &&
-                    elements.Any(i => i.TryGetTarget(out FrameworkElement element) && element == content))
-                    ApplyToContent(content, applyToDock: false);
-            }));
+            cursor.Emit(OpCodes.Ldarg_0); //Emit parent
+            cursor.Emit(OpCodes.Ldarg_1); //Emit child
+
+            cursor.EmitDelegate(VisualChildAdded);
+        });
+
+        static void VisualChildAdded(Visual parent, Visual child)
+        {
+            if (parent is ContentPresenter or Decorator or Panel && //Avoid other types
+                parent is FrameworkElement content &&
+                Instance is VsWindowStyler styler && styler.elements.Contains(content))
+                styler.ApplyToContent(content, applyToDock: false);
+        }
 
         #endregion
 

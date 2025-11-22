@@ -48,6 +48,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     #endregion
 
     private readonly ILHook hook;
+
+    private readonly List<WeakReference<TabItem>> tabItems = [];
     private readonly List<WeakReference<FrameworkElement>> elements = [];
 
     private VsWindowStyler()
@@ -239,9 +241,14 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 if (tab.DataContext is not DependencyObject view)
                     continue;
 
-                WeakReference<TabItem> weakTab = new(tab);
-
                 ApplyTabForeground(tab, view);
+
+                if (tabItems.Contains(tab))
+                    continue;
+
+                WeakReference<TabItem> weakTab = new(tab);
+                tabItems.Add(weakTab);
+
                 tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, (s, e) =>
                 {
                     if (s is TabItem tab && tab.DataContext is DependencyObject view)

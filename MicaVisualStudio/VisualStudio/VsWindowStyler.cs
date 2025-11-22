@@ -198,12 +198,12 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         var descendants = window.FindDescendants<FrameworkElement>();
 
         //Footer
-        descendants.FindNamedElement<Border>("FooterBorder")?
+        descendants.FindElement<Border>("FooterBorder")?
                    .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
         //Warning dialog
         if (window is DialogWindowBase &&
-            descendants.FindNamedElement<Button>("OKButton") is Button button &&
+            descendants.FindElement<Button>("OKButton") is Button button &&
             button.FindAncestor<FrameworkElement>() is FrameworkElement parent &&
             parent.FindAncestor<Border>() is Border buttonFooter)
             buttonFooter.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
@@ -223,13 +223,13 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         var descendants = dock.FindDescendants<FrameworkElement>();
 
         //Content area
-        descendants.FindNamedElement<Border>("PART_ContentPanel")?
+        descendants.FindElement<Border>("PART_ContentPanel")?
                    .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
         //Title bar
-        descendants.FindNamedElement<Control>("PART_Header")?.Background = Brushes.Transparent;
+        descendants.FindElement<Control>("PART_Header")?.Background = Brushes.Transparent;
 
-        if (descendants.FindNamedElement<Border>("ToolWindowBorder") is Border border) //Body
+        if (descendants.FindElement<Border>("ToolWindowBorder") is Border border) //Body
         {
             border.Background = Brushes.Transparent;
 
@@ -237,7 +237,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 ApplyToContent(host, applyToDock: false);
         }
 
-        if (descendants.FindNamedElement<Panel>("PART_TabPanel") is Panel tabs) //Tab strip
+        if (descendants.FindElement<Panel>("PART_TabPanel") is Panel tabs) //Tab strip
             foreach (var tab in tabs.Children.OfType<TabItem>()) //Tab items
             {
                 tab.Background = Brushes.Transparent;

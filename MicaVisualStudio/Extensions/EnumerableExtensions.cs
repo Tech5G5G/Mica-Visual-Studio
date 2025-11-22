@@ -2,11 +2,8 @@
 
 public static class EnumerableExtensions
 {
-    public static T FindNamedElement<T>(this IEnumerable<FrameworkElement> source, string name) where T : FrameworkElement =>
+    public static T FindElement<T>(this IEnumerable<FrameworkElement> source, string name) where T : FrameworkElement =>
         source.FirstOrDefault(i => i is T element && element.Name == name) as T;
-
-    public static T FindTypedElement<T>(this IEnumerable<FrameworkElement> source, string typeName) where T : FrameworkElement =>
-        source.FirstOrDefault(i => i is T element && element.GetType().FullName == typeName) as T;
 
     /// <summary>
     /// Determines whether <paramref name="source"/> contains a <see cref="WeakReference{T}"/> to <paramref name="value"/>.

@@ -23,6 +23,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     private readonly ThemeResourceKey TextOnAccentFillPrimaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextOnAccentFillPrimary", ThemeResourceKeyType.BackgroundBrush);
 
+    private readonly ThemeResourceKey ScrollBarBackgroundKey =
+        new(category: new("{624ed9c3-bdfd-41fa-96c3-7c824ea32e3d}"), name: "ScrollBarBackground", ThemeResourceKeyType.BackgroundBrush);
+
     #endregion
 
     #region Shells

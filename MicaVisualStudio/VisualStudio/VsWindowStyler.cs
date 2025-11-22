@@ -201,6 +201,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         descendants.FindNamedElement<Border>("FooterBorder")?
                    .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
+        //Warning dialog
         if (window is DialogWindowBase &&
             descendants.FindNamedElement<Button>("OKButton") is Button button &&
             button.FindAncestor<FrameworkElement>() is FrameworkElement parent &&
@@ -282,7 +283,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             if (element is ContentPresenter or Decorator or Panel && !elements.Contains(element))
                 elements.Add(new(element)); //Track visual children
 
-            if (element is ListViewItem item) //Fix mouse-over background
+            if (element is ListViewItem item)
                 item.Background = item.BorderBrush = Brushes.Transparent;
             else if (element is ToolBar bar)
         {

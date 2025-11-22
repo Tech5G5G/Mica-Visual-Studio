@@ -221,6 +221,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             dock.Background = Brushes.Transparent; //Smoke layer underneath tabs
 
         var descendants = dock.FindDescendants<FrameworkElement>();
+        if (!descendants.Any())
+            return;
 
         //Content area
         descendants.FindElement<Border>("PART_ContentPanel")?

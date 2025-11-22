@@ -40,6 +40,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
     private ThemeHelper theme;
     private WindowManager manager;
 
+    private ILHook hook;
     private VsColorManager colors;
     private VsWindowStyler styler;
 
@@ -66,6 +67,15 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 return;
             }
 
+            hook = new(typeof(HwndSource).GetProperty("RootVisual").SetMethod, context =>
+            {
+                ILCursor cursor = new(context) { Index = 0 };
+
+                cursor.Emit(OpCodes.Ldarg_0); //this (HwndSource)
+                cursor.Emit(OpCodes.Ldarg_1); //value
+
+                cursor.EmitDelegate(RootVisualChanged);
+            });
             colors = VsColorManager.Instance;
 
             #region Resource Keys
@@ -166,9 +176,15 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
         void AddWindow(Window window, WindowType type)
         {
-            var handle = window.GetHandle();
             manager.AddWindow(window, type);
-            ApplyWindowPreferences(handle, window, type);
+            ApplyWindowPreferences(window.GetHandle(), window, type);
+        }
+
+        static void RootVisualChanged(HwndSource instance, Visual value)
+        {
+            if (value is not null or Popup //Avoid unnecessary
+                or Window) //and already handled values
+                instance.CompositionTarget.BackgroundColor = Colors.Transparent;
         }
     }
 
@@ -238,6 +254,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
         theme?.Dispose();
         manager?.Dispose();
 
+        hook?.Dispose();
         styler?.Dispose();
 
         if (disposing)
@@ -245,6 +262,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             theme = null;
             manager = null;
 
+            hook = null;
             colors = null;
             styler = null;
         }

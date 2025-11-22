@@ -76,51 +76,52 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
                 cursor.EmitDelegate(RootVisualChanged);
             });
+
             colors = VsColorManager.Instance;
 
             #region Resource Keys
 
             colors.AddConfigs(new()
-                {
-                    { "Background", new(translucent: true) },
+            {
+                { "Background", new(translucent: true) },
 
-                    { "SolidBackgroundFillQuaternary", new(translucent: true) },
+                { "SolidBackgroundFillQuaternary", new(translucent: true) },
 
-                    //{ "SolidBackgroundFillTertiary", ColorConfig.Default },
-                    //{ "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
+                //{ "SolidBackgroundFillTertiary", ColorConfig.Default },
+                //{ "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
 
-                    { "EnvironmentBackground", new(translucent: true) },
-                    { "EnvironmentBackgroundGradient", ColorConfig.Default },
+                { "EnvironmentBackground", new(translucent: true) },
+                { "EnvironmentBackgroundGradient", ColorConfig.Default },
 
-                    { "ActiveCaption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                    { "InactiveCaption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ActiveCaption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "InactiveCaption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
 
-                    { "MainWindowActiveCaption", ColorConfig.Default },
-                    { "MainWindowInactiveCaption", ColorConfig.Default },
+                { "MainWindowActiveCaption", ColorConfig.Default },
+                { "MainWindowInactiveCaption", ColorConfig.Default },
 
-                    { "ToolWindow", ColorConfig.Default },
-                    { "ToolWindowGroup", ColorConfig.Default },
-                    { "ToolWindowBackground", ColorConfig.Default },
-                    { "ToolWindowFloatingFrame", ColorConfig.Default },
-                    { "ToolWindowFloatingFrameInactive", ColorConfig.Default },
+                { "ToolWindow", ColorConfig.Default },
+                { "ToolWindowGroup", ColorConfig.Default },
+                { "ToolWindowBackground", ColorConfig.Default },
+                { "ToolWindowFloatingFrame", ColorConfig.Default },
+                { "ToolWindowFloatingFrameInactive", ColorConfig.Default },
 
                 { "Default", ColorConfig.Default },
 
-                    { "WindowPanel", new(translucent: true) },
+                { "WindowPanel", new(translucent: true) },
 
-                    { "CommandBarGradient", ColorConfig.Default },
+                { "CommandBarGradient", ColorConfig.Default },
 
-                    { "ListBox", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                    { "ListItemBackgroundHover", new(transparentOnGray: false, translucent: true) },
+                { "ListBox", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ListItemBackgroundHover", new(transparentOnGray: false, translucent: true) },
 
-                    { "TextBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "TextBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
 
-                    { "ScrollBarBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                    { "ScrollBarArrowBackground", ColorConfig.Default },
-                    { "ScrollBarArrowDisabledBackground", ColorConfig.Default },
+                { "ScrollBarBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ScrollBarArrowBackground", ColorConfig.Default },
+                { "ScrollBarArrowDisabledBackground", ColorConfig.Default },
 
-                    { "SelectedItemActive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                    { "SelectedItemInactive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) }
+                { "SelectedItemActive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "SelectedItemInactive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) }
             });
             colors.UpdateColors();
 

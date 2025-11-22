@@ -1,7 +1,5 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
 using System.Reflection;
+using System.Windows.Shapes;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Expression = System.Linq.Expressions.Expression;
 

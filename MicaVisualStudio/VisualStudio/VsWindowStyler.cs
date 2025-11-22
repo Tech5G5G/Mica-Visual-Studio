@@ -130,16 +130,16 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             {
             ILCursor cursor = new(context) { Index = 0 };
 
-            cursor.Emit(OpCodes.Ldarg_0); //Emit parent
-            cursor.Emit(OpCodes.Ldarg_1); //Emit child
+            cursor.Emit(OpCodes.Ldarg_0); //this (Visual)
+            cursor.Emit(OpCodes.Ldarg_1); //child
 
             cursor.EmitDelegate(VisualChildAdded);
         });
 
-        static void VisualChildAdded(Visual parent, Visual child)
+        static void VisualChildAdded(Visual instance, Visual child)
         {
-            if (parent is ContentPresenter or Decorator or Panel && //Avoid other types
-                parent is FrameworkElement content &&
+            if (instance is ContentPresenter or Decorator or Panel && //Avoid other types
+                instance is FrameworkElement content &&
                 Instance is VsWindowStyler styler && styler.elements.Contains(content))
                 styler.ApplyToContent(content, applyToDock: false);
         }

@@ -104,6 +104,8 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                     { "ToolWindowFloatingFrame", ColorConfig.Default },
                     { "ToolWindowFloatingFrameInactive", ColorConfig.Default },
 
+                { "Default", ColorConfig.Default },
+
                     { "WindowPanel", new(translucent: true) },
 
                     { "CommandBarGradient", ColorConfig.Default },

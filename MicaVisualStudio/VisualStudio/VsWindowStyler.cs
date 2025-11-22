@@ -274,28 +274,99 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         if (applyToDock && content.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
             ApplyToDockTarget(dock, applyToContent: false);
 
-        var descendants = content.FindDescendants<FrameworkElement>().Append(content);
-        if (!descendants.Any())
-            return;
-
-        foreach (var element in descendants.Where(i => i is ContentPresenter || i is Decorator || i is Panel))
-            if (!elements.Contains(element))
-                elements.Add(new(element));
-
-        if (descendants.FindElement<ToolBar>(string.Empty) is ToolBar bar) //Tool bar
-        if (descendants.FindNamedElement<ToolBar>(string.Empty) is ToolBar bar) //Tool bar
+        foreach (var element in content.FindDescendants<FrameworkElement>().Append(content))
         {
-            bar.BorderBrush = bar.Background = Brushes.Transparent;
+            if (element is ContentPresenter or Decorator or Panel && !elements.Contains(element))
+                elements.Add(new(element)); //Track visual children
+
+            if (element is ListViewItem item) //Fix mouse-over background
+                item.Background = item.BorderBrush = Brushes.Transparent;
+            else if (element is ToolBar bar)
+        {
+                bar.Background = bar.BorderBrush = Brushes.Transparent;
             (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
         }
+            else if (element is Control control)
+                switch (element.Name)
+                {
+                    //Git changes window
+                    case "gitWindowView":
+                        control.Background = Brushes.Transparent;
 
-        if (descendants.FindNamedElement<Control>("gitWindowView") is Control gitWindow) //BONUS: Git changes window
+                        foreach (var e in control.LogicalDescendants<FrameworkElement>())
+                            if (e is Control c &&
+                                (c.Name == "statusControl" || //Actions/tool bar
+                                c.Name == "thisPageControl" || //Changes
+                                c.Name == "inactiveRepoContent")) //Create repo
+                                c.Background = Brushes.Transparent;
+                        break;
+
+                    //Host of WpfTextView I guess
+                    case "WpfTextViewHost":
+                        control.Resources["outlining.chevron.expanded.background"] =
+                        control.Resources["outlining.chevron.collapsed.background"] = Brushes.Transparent;
+                        break;
+
+                    //Document, output, etc. text
+                    case "WpfTextView" when element is ContentControl:
+                        control.Background = Brushes.Transparent;
+                        control.FindDescendant<Canvas>()?.Background = Brushes.Transparent;
+                        break;
+                }
+            else if (element is Panel panel)
+            {
+                if (element is DockPanel)
+                    panel.Background = Brushes.Transparent;
+
+                switch (panel.GetType().FullName)
+                {
+                    //Editor window, root
+                    case "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost":
+                        element.Resources[ScrollBarBackgroundKey] = Brushes.Transparent;
+                        break;
+
+                    //Editor window, bottom container
+                    case "Microsoft.VisualStudio.Text.Utilities.ContainerMargin" when
+                        !panel.FindDescendants<Panel>().Any(i => i.GetType().FullName == "Microsoft.VisualStudio.Text.Utilities.ContainerMargin"):
+                        panel.SetResourceReference(Panel.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
+                        break;
+
+                    //Editor window, left side icon container
+                    case "Microsoft.VisualStudio.Text.Editor.Implementation.GlyphMarginGrid" when
+                        panel.Background is SolidColorBrush solid && solid.Color != Brushes.Transparent.Color:
+                        panel.SetResourceReference(Panel.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
+                        break;
+
+                    //Scroll bar intersection
+                    case "Microsoft.VisualStudio.Editor.Implementation.BottomRightCornerSpacerMargin":
+                        panel.Background = Brushes.Transparent;
+                        break;
+
+                    //Editor window, collapsed item backgrounds
+                    case "Microsoft.VisualStudio.Text.Editor.Implementation.AdornmentLayer":
+                        foreach (var rectangle in panel.FindDescendants<Rectangle>())
+                            rectangle.SetResourceReference(Shape.FillProperty, SolidBackgroundFillTertiaryLayeredKey);
+                        break;
+
+                    default:
+                        if (panel is Grid { Background: not null } && panel.FindAncestor<Control>() is not Button or TextBox)
+                            panel.Background = Brushes.Transparent;
+                        break;
+                }
+            }
+            else if (element is Border border)
+                switch (border.GetType().FullName)
         {
-            gitWindow.Background = Brushes.Transparent;
+                    //Output window base layer
+                    case "Microsoft.VisualStudio.PlatformUI.OutputWindow":
+                        border.Background = Brushes.Transparent;
+                        break;
 
-            foreach (var control in gitWindow.LogicalDescendants<Control>())
-                if (control is not Button && control is not TextBox)
-                    control.Background = Brushes.Transparent;
+                    //File errors container
+                    case "Microsoft.VisualStudio.UI.Text.Wpf.FileHealthIndicator.Implementation.FileHealthIndicatorMargin":
+                        border.Background = Brushes.Transparent;
+                        break;
+                }
             }
         }
 

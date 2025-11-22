@@ -346,7 +346,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                         panel.Background = Brushes.Transparent;
                         break;
 
-                    //Editor window, collapsed item backgrounds
+                    //Editor window, collapsed item container
                     case "Microsoft.VisualStudio.Text.Editor.Implementation.AdornmentLayer":
                         foreach (var rectangle in panel.FindDescendants<Rectangle>())
                             rectangle.SetResourceReference(Shape.FillProperty, SolidBackgroundFillTertiaryLayeredKey);
@@ -361,12 +361,12 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             else if (element is Border border)
                 switch (border.GetType().FullName)
         {
-                    //Output window base layer
+                    //Output window, base layer
                     case "Microsoft.VisualStudio.PlatformUI.OutputWindow":
                         border.Background = Brushes.Transparent;
                         break;
 
-                    //File errors container
+                    //Editor window, file errors container
                     case "Microsoft.VisualStudio.UI.Text.Wpf.FileHealthIndicator.Implementation.FileHealthIndicatorMargin":
                         border.Background = Brushes.Transparent;
                         break;

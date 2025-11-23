@@ -107,6 +107,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
                 { "Default", ColorConfig.Default },
 
+                { "Window", ColorConfig.Default },
                 { "WindowPanel", new(translucent: true) },
 
                 { "CommandBarGradient", ColorConfig.Default },

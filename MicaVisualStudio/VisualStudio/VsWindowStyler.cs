@@ -285,9 +285,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             if (element is ContentPresenter or Decorator or Panel && !elements.Contains(element))
                 elements.Add(new(element)); //Track visual children
 
-            if (element is ListViewItem item)
-                item.Background = item.BorderBrush = Brushes.Transparent;
-            else if (element is ToolBar bar)
+            if (element is ToolBar bar)
         {
                 bar.Background = bar.BorderBrush = Brushes.Transparent;
             (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;

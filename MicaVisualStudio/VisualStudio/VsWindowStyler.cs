@@ -298,10 +298,44 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                         control.Background = Brushes.Transparent;
 
                         foreach (var e in control.LogicalDescendants<FrameworkElement>())
-                            if (e is Control c &&
-                                (c.Name == "statusControl" || //Actions/tool bar
+                            if (e is Border { Name: "borderHeader", Style: Style bs } b) //Section header
+                                b.Style = new(bs.TargetType, bs)
+                                {
+                                    Setters = { new Setter(Border.BorderBrushProperty, Brushes.Transparent) }
+                                };
+
+                            else if (e is Control c)
+                                if (c is ItemsControl { ItemContainerStyle: Style cs }) //Changes
+                                {
+                                    c.Background = Brushes.Transparent;
+
+                                    if (!cs.IsSealed)
+                                    {
+                                        cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
+                                        cs.Setters.Add(new Setter(Control.BorderBrushProperty, Brushes.Transparent));
+                                    }
+                                }
+                                else if (c.Name == "gitAction" && //Change (list) commands
+                                    c.TryFindResource("TESectionCommandButtonStyle") is Style ss && !ss.Setters.IsSealed)
+                                {
+                                    Setter bg = new(Control.BackgroundProperty, Brushes.Transparent),
+                                        bb = new(Control.BorderBrushProperty, Brushes.Transparent);
+
+                                    ss.Setters.Add(bg);
+                                    ss.Setters.Add(bb);
+
+                                    if (ss.Triggers.OfType<Trigger>()
+                                                   .FirstOrDefault(i => i.Property == System.Windows.UIElement.IsEnabledProperty) is Trigger t)
+                                    {
+                                        t.Setters.Add(bg);
+                                        t.Setters.Add(bb);
+                                    }
+                                }
+
+                                else if (c.Name == "statusControl" || //Actions/tool bar
                                 c.Name == "thisPageControl" || //Changes
-                                c.Name == "inactiveRepoContent")) //Create repo
+                                        c.Name == "inactiveRepoContent" || //Create repo
+                                        c is CheckBox { Name: "amendCheckBox" }) //Checkbox... for amending...
                                 c.Background = Brushes.Transparent;
                         break;
 

@@ -204,22 +204,23 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private void ApplyToWindow(Window window)
     {
-        var descendants = window.FindDescendants<FrameworkElement>();
+        foreach (var element in window.FindDescendants<FrameworkElement>())
 
+            //Warning dialog, footer
+            if (window is DialogWindowBase && element is Button { Name: "OKButton" } button &&
+                button.FindAncestor<FrameworkElement>()?.FindAncestor<Border>() is Border buttonFooter)
+                buttonFooter.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
+
+            else if (element is Border border)
+            {
         //Footer
-        descendants.FindElement<Border>("FooterBorder")?
-                   .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
+                if (border.Name == "FooterBorder")
+                    border.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
-        //Warning dialog
-        if (window is DialogWindowBase &&
-            descendants.FindElement<Button>("OKButton") is Button button &&
-            button.FindAncestor<FrameworkElement>() is FrameworkElement parent &&
-            parent.FindAncestor<Border>() is Border buttonFooter)
-            buttonFooter.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
-
-        foreach (var descendant in descendants)
-            if (descendant is Border border && IsDockTarget(border))
+                //Dock target
+                else if (IsDockTarget(border))
                 ApplyToDockTarget(border);
+    }
     }
 
     private void ApplyToDockTarget(Border dock, bool applyToContent = true)

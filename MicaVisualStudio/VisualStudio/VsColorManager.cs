@@ -53,22 +53,6 @@ public sealed class VsColorManager
         };
     }
 
-    private ColorConfig GetConfig(object key)
-    {
-        if (key is ThemeResourceKey theme &&
-            (theme.KeyType == ThemeResourceKeyType.BackgroundColor || theme.KeyType == ThemeResourceKeyType.BackgroundBrush))
-            return configs.TryGetValue(theme.Name, out ColorConfig config) ? config : null;
-        else if (key is string str)
-            return configs.TryGetValue(str.Replace("VsBrush.", null).Replace("VsColor.", null), out ColorConfig config) ? config : null;
-        else
-            return null;
-    }
-
-    private Color DetermineColor(Color color, ColorConfig config) =>
-        !config.IsTranslucent || (config.TransparentOnGray && color.R == color.G && color.G == color.B) ?
-        (vsTheme == Theme.Light ? TransparentWhite : TranslucentBlack) :
-        Color.FromArgb(Math.Min(config.Opacity, color.A), color.R, color.G, color.B);
-
     public void UpdateColors()
     {
         foreach (var dictionary in Application.Current.Resources.MergedDictionaries.OfType<DeferredResourceDictionaryBase>())
@@ -124,7 +108,23 @@ public sealed class VsColorManager
             RemoveConfig(key);
     }
 
+    private ColorConfig GetConfig(object key)
+    {
+        if (key is ThemeResourceKey theme &&
+            (theme.KeyType == ThemeResourceKeyType.BackgroundColor || theme.KeyType == ThemeResourceKeyType.BackgroundBrush))
+            return configs.TryGetValue(theme.Name, out ColorConfig config) ? config : null;
+        else if (key is string str)
+            return configs.TryGetValue(str.Replace("VsBrush.", null).Replace("VsColor.", null), out ColorConfig config) ? config : null;
+        else
+            return null;
+    }
+
     #endregion
+
+    private Color DetermineColor(Color color, ColorConfig config) =>
+        !config.IsTranslucent || (config.TransparentOnGray && color.R == color.G && color.G == color.B) ?
+        (vsTheme == Theme.Light ? TransparentWhite : TranslucentBlack) :
+        Color.FromArgb(Math.Min(config.Opacity, color.A), color.R, color.G, color.B);
 }
 
 public class ColorConfig(bool transparentOnGray = true, bool translucent = false, byte opacity = 0x38)

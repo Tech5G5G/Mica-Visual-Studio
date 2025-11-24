@@ -363,9 +363,6 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 }
             else if (element is Panel panel)
             {
-                if (element is DockPanel)
-                    panel.Background = Brushes.Transparent;
-
                 switch (panel.GetType().FullName)
                 {
                     //Editor window, root
@@ -397,7 +394,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                         break;
 
                     default:
-                        if (panel is Grid { Background: not null } && panel.FindAncestor<Control>() is not Button or TextBox)
+                        if (panel is DockPanel || (panel is Grid { Background: not null } && panel.FindAncestor<Control>() is not Button or TextBox))
                             panel.Background = Brushes.Transparent;
                         break;
                 }

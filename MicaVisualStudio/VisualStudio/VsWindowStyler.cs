@@ -355,7 +355,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                         control.Resources["outlining.chevron.collapsed.background"] = Brushes.Transparent;
                         break;
 
-                    //Document, output, etc. text
+                    //Editor, output, etc. text
                     case "WpfTextView" when element is ContentControl:
                         control.Background = Brushes.Transparent;
                         control.FindDescendant<Canvas>()?.Background = Brushes.Transparent;

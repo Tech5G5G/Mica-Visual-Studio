@@ -323,7 +323,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                     }
                                 }
                                 else if (c.Name == "gitAction" && //Change (list) commands
-                                    c.TryFindResource("TESectionCommandButtonStyle") is Style ss && !ss.Setters.IsSealed)
+                                    c.TryFindResource("TESectionCommandButtonStyle") is Style { Setters.IsSealed: false } ss)
                                 {
                                     Setter bg = new(Control.BackgroundProperty, Brushes.Transparent),
                                         bb = new(Control.BorderBrushProperty, Brushes.Transparent);

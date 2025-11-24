@@ -123,6 +123,15 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             FrameworkElement.LoadedEvent,
             new RoutedEventHandler((s, e) => ApplyToDockTarget(s as Border)));
 
+        if (AppDomain.CurrentDomain.GetAssemblies()
+                                   .FirstOrDefault(i => i.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
+                                   .GetTypes()
+                                   .FirstOrDefault(i => i.FullName == "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost") is Type hostType)
+            EventManager.RegisterClassHandler(
+                hostType,
+                FrameworkElement.LoadedEvent,
+                new RoutedEventHandler((s, e) => ApplyToContent(s as DockPanel, applyToDock: false)));
+
         WindowManager.Instance.WindowOpened += (s, e) =>
         {
             if (s is not null)

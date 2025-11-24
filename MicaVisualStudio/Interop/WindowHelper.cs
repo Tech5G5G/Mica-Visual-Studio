@@ -292,7 +292,12 @@ public static class WindowHelper
 
     #endregion
 
-    #region Interop
+    #region Utilities
+
+    [DllImport("user32.dll")]
+    private static extern bool IsWindow(IntPtr hWnd);
+
+    public static bool IsAlive(IntPtr hWnd) => IsWindow(hWnd);
 
     public static IntPtr GetHandle(this Window window)
     {

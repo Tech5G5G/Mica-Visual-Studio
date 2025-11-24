@@ -52,9 +52,6 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private readonly ILHook hook;
 
-    private readonly List<WeakReference<TabItem>> tabItems = [];
-    private readonly List<WeakReference<FrameworkElement>> elements = [];
-
     private VsWindowStyler()
     {
         #region Function Initialization
@@ -150,9 +147,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         static void VisualChildAdded(Visual instance, Visual child)
         {
-            if (instance is ContentPresenter or Decorator or Panel && //Avoid other types
+            if (instance is ContentPresenter or Decorator or Panel && //Avoid unnecessary work
                 instance is FrameworkElement content &&
-                Instance is VsWindowStyler styler && styler.elements.Contains(content))
+                GetIsTracked(content) && Instance is VsWindowStyler styler)
                 styler.ApplyToContent(content, applyToDock: false);
         }
 
@@ -259,11 +256,11 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
                 ApplyTabForeground(tab, view);
 
-                if (tabItems.Contains(tab))
+                if (GetIsTracked(tab))
                     continue;
 
+                SetIsTracked(tab, value: true);
                 WeakReference<TabItem> weakTab = new(tab);
-                tabItems.Add(weakTab);
 
                 tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, (s, e) =>
                 {
@@ -292,8 +289,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         foreach (var element in content.FindDescendants<FrameworkElement>().Append(content))
         {
-            if (element is ContentPresenter or Decorator or Panel && !elements.Contains(element))
-                elements.Add(new(element)); //Track visual children
+            if (element is ContentPresenter or Decorator or Panel && !GetIsTracked(element))
+                SetIsTracked(element, value: true); //Track visual children
 
             if (element is ToolBar bar)
         {
@@ -414,6 +411,19 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 }
             }
         }
+
+    #region IsTrackedProperty
+
+    public static bool GetIsTracked(FrameworkElement target) =>
+        (bool)target.GetValue(IsTrackedProperty);
+
+    public static void SetIsTracked(FrameworkElement target, bool value) =>
+        target.SetValue(IsTrackedProperty, value);
+
+    public static readonly DependencyProperty IsTrackedProperty =
+        DependencyProperty.RegisterAttached("IsTracked", typeof(bool), typeof(VsWindowStyler), new(defaultValue: false));
+
+    #endregion
 
     #region IVsWindowFrameEvents
 

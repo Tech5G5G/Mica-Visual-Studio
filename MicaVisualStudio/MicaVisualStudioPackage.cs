@@ -137,11 +137,11 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
             if (WindowManager.MainWindow.Visibility == Visibility.Visible) //We're late, so add all windows
             {
-                WindowManager.AllWindows.ForEach(i => AddWindow(i, WindowHelper.GetWindowType(i)));
+                WindowManager.AllWindows.ForEach(AddWindow);
                 WindowManager.MainWindow.Loaded -= Window_Loaded;
             }
             else if (WindowManager.CurrentWindow is Window window) //Apply to start window
-                AddWindow(window, WindowType.Tool);
+                AddWindow(window);
 
             manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, s, e.WindowType);
             //windows.WindowClosed += (s, e) => { };
@@ -178,10 +178,13 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 ApplyWindowPreferences(entry.Key, entry.Value.Window, entry.Value.Type, firstTime: false, general);
         }
 
-        void AddWindow(Window window, WindowType type)
+        void AddWindow(Window window)
         {
-            manager.AddWindow(window, type);
-            ApplyWindowPreferences(window.GetHandle(), window, type);
+            manager.AppendWindow(window);
+            ApplyWindowPreferences(
+                window.GetHandle(),
+                window,
+                WindowHelper.GetWindowType(window));
         }
 
         static void RootVisualChanged(HwndSource instance, Visual value)

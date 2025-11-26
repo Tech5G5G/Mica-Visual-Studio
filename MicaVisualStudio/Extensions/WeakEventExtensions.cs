@@ -28,13 +28,13 @@ public class PropertyChangeNotifier : DependencyObject, IDisposable
     /// Gets the source from which property changes occur.
     /// </summary>
     /// <remarks>
-    /// If the source is unavailable, this gets <see langword="null"/>
+    /// If the source is unavailable, this returns <see langword="null"/>.
     /// </remarks>
     public DependencyObject PropertySource =>
         propertySource.TryGetTarget(out DependencyObject source) ? source : null;
 
     /// <summary>
-    /// Gets or set the value of the property.
+    /// Gets or sets the value of the property.
     /// </summary>
     public object Value
     {

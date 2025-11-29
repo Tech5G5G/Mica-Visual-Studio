@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.OLE.Interop;
+﻿using System.Drawing;
+using Microsoft.VisualStudio.OLE.Interop;
 
 namespace MicaVisualStudio.Interop;
 
@@ -304,7 +305,12 @@ public static class WindowHelper
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
     [DllImport("user32.dll")]
+    private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+
+    [DllImport("user32.dll")]
     private static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
+
+    private const uint LWA_ALPHA = 0x00000002;
 
     private delegate bool EnumChildProc(IntPtr hwnd, IntPtr lParam);
 
@@ -314,6 +320,16 @@ public static class WindowHelper
     {
         GetWindowThreadProcessId(hWnd, out uint procId);
         return (int)procId;
+    }
+
+    public static void MakeLayered(IntPtr hWnd)
+    {
+        SetExtendedWindowStyles(hWnd, GetExtendedWindowStyles(hWnd) | WindowStylesEx.Layered);
+        SetLayeredWindowAttributes(
+            hWnd,
+            (uint)ColorTranslator.ToWin32(System.Drawing.Color.Black),
+            0xFF,
+            LWA_ALPHA); //Set opactiy to 100%
     }
 
     public static IEnumerable<IntPtr> GetChildren(IntPtr hWnd)

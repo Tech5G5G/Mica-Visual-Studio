@@ -1,8 +1,8 @@
 ﻿namespace MicaVisualStudio.VisualStudio;
 
-public sealed class WindowManager : IDisposable
+public sealed class WindowObserver : IDisposable
 {
-    public static WindowManager Instance { get; } = new();
+    public static WindowObserver Instance { get; } = new();
 
     #region Static Properties
 
@@ -41,12 +41,14 @@ public sealed class WindowManager : IDisposable
     public event WindowChangedEventHandler WindowOpened;
     public event WindowChangedEventHandler WindowClosed;
 
+    private readonly int procId;
     private readonly WinEventHook hook;
+
     private readonly HashSet<IntPtr> handles = [];
 
-    private WindowManager()
+    private WindowObserver()
     {
-        hook = new(Event.Foreground, EventFlags.OutOfContext, Process.GetCurrentProcess().Id);
+        hook = new(Event.Foreground, EventFlags.OutOfContext, procId = Process.GetCurrentProcess().Id);
         hook.EventOccurred += EventOccurred;
 
         EventManager.RegisterClassHandler(
@@ -102,7 +104,9 @@ public sealed class WindowManager : IDisposable
         handles.Add(handle);
 
     private void CleanHandles() => 
-        handles.RemoveWhere(i => !WindowHelper.IsAlive(i));
+        handles.RemoveWhere(i =>
+            !WindowHelper.IsAlive(i) || //Check if alive
+            WindowHelper.GetProcessId(i) != procId); //and belongs to current process
 
     #region Dispose
 

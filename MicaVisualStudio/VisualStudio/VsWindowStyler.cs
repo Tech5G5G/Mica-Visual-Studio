@@ -129,7 +129,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 FrameworkElement.LoadedEvent,
                 new RoutedEventHandler((s, e) => ApplyToContent(s as DockPanel, applyToDock: false)));
 
-        WindowManager.Instance.WindowOpened += (s, e) =>
+        WindowObserver.Instance.WindowOpened += (s, e) =>
         {
             if (s is not null)
                 ApplyToWindow(s);
@@ -161,7 +161,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     #region Apply To All
 
-    private void ApplyToAllWindows() => WindowManager.AllWindows.ForEach(ApplyToWindow);
+    private void ApplyToAllWindows() => WindowObserver.AllWindows.ForEach(ApplyToWindow);
 
     private async Task ApplyToAllWindowPanesAsync()
     {

@@ -38,7 +38,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
     #region Package Members
 
     private ThemeHelper theme;
-    private WindowManager manager;
+    private WindowObserver observer;
 
     private ILHook hook;
     private VsColorManager colors;
@@ -59,7 +59,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
         try
         {
-            WindowManager.MainWindow.Loaded += Window_Loaded;
+            WindowObserver.MainWindow.Loaded += Window_Loaded;
 
             if (Environment.OSVersion.Version.Build < 22000) //Allow Windows 11 or later
             {
@@ -131,19 +131,19 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             styler = VsWindowStyler.Instance;
 
             theme = ThemeHelper.Instance;
-            manager = WindowManager.Instance;
+            observer = WindowObserver.Instance;
 
             RefreshPreferences(); //Set app theme
 
-            if (WindowManager.MainWindow.Visibility == Visibility.Visible) //We're late, so add all windows
+            if (WindowObserver.MainWindow.Visibility == Visibility.Visible) //We're late, so add all windows
             {
-                WindowManager.AllWindows.ForEach(AddWindow);
-                WindowManager.MainWindow.Loaded -= Window_Loaded;
+                WindowObserver.AllWindows.ForEach(AddWindow);
+                WindowObserver.MainWindow.Loaded -= Window_Loaded;
             }
-            else if (WindowManager.CurrentWindow is Window window) //Apply to start window
+            else if (WindowObserver.CurrentWindow is Window window) //Apply to start window
                 AddWindow(window);
 
-            manager.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, s, e.WindowType);
+            observer.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, s, e.WindowType);
             //windows.WindowClosed += (s, e) => { };
 
             colors.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
@@ -166,7 +166,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             if (queuedInfo.Content is not null)
                 VS.InfoBar.CreateAsync(new(queuedInfo.Content, queuedInfo.Image)).Result.TryShowInfoBarUIAsync().Forget();
 
-            WindowManager.MainWindow.Loaded -= Window_Loaded;
+            WindowObserver.MainWindow.Loaded -= Window_Loaded;
         }
 
         void RefreshPreferences()
@@ -174,13 +174,13 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             General general = General.Instance;
             theme.SetAppTheme(EvaluateTheme(general.AppTheme));
 
-            foreach (var entry in manager.Windows)
+            foreach (var entry in observer.Windows)
                 ApplyWindowPreferences(entry.Key, entry.Value.Window, entry.Value.Type, firstTime: false, general);
         }
 
         void AddWindow(Window window)
         {
-            manager.AppendWindow(window);
+            observer.AppendWindow(window);
             ApplyWindowPreferences(
                 window.GetHandle(),
                 window,
@@ -259,7 +259,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
     protected override void Dispose(bool disposing)
     {
         theme?.Dispose();
-        manager?.Dispose();
+        observer?.Dispose();
 
         hook?.Dispose();
         styler?.Dispose();
@@ -267,7 +267,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
         if (disposing)
         {
             theme = null;
-            manager = null;
+            observer = null;
 
             hook = null;
             colors = null;

@@ -10,6 +10,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 {
     public static VsWindowStyler Instance { get; } = new();
 
+    private const string MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
+
     #region Keys
 
     private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
@@ -123,7 +125,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         if (AppDomain.CurrentDomain.GetAssemblies()
                                    .FirstOrDefault(i => i.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
                                    .GetTypes()
-                                   .FirstOrDefault(i => i.FullName == "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost") is Type hostType)
+                                   .FirstOrDefault(i => i.FullName == MultiViewHostTypeName) is Type hostType)
             EventManager.RegisterClassHandler(
                 hostType,
                 FrameworkElement.LoadedEvent,
@@ -297,6 +299,16 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 bar.Background = bar.BorderBrush = Brushes.Transparent;
             (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
         }
+            else if (element is HwndHost { IsLoaded: true } host)
+            {
+                var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
+                if (sources.Any(i => i.Handle == host.Handle))
+                    return;
+
+                var children = Interop.WindowHelper.GetChildren(host.Handle);
+                if (!sources.Where(i => children.Contains(i.Handle)).Any(i => i.RootVisual?.GetType().FullName == MultiViewHostTypeName))
+                    Interop.WindowHelper.MakeLayered(host.Handle);
+            }
             else if (element is Control control)
                 switch (element.Name)
                 {
@@ -363,7 +375,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 switch (panel.GetType().FullName)
                 {
                     //Editor window, root
-                    case "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost":
+                    case MultiViewHostTypeName:
                         element.Resources[ScrollBarBackgroundKey] = Brushes.Transparent;
                         break;
 

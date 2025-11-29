@@ -38,7 +38,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     #endregion
 
-    #region Dependency Properties
+    #region Functions
 
     private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
     private readonly Func<DependencyObject, object> get_View_Content;

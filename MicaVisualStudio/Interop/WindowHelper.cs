@@ -300,7 +300,16 @@ public static class WindowHelper
     [DllImport("user32.dll")]
     private static extern bool IsWindow(IntPtr hWnd);
 
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
     public static bool IsAlive(IntPtr hWnd) => IsWindow(hWnd);
+
+    public static int GetProcessId(IntPtr hWnd)
+    {
+        GetWindowThreadProcessId(hWnd, out uint procId);
+        return (int)procId;
+    }
 
     public static IntPtr GetHandle(this Window window)
     {

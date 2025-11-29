@@ -105,25 +105,6 @@ public static class WindowHelper
     [DllImport("dwmapi.dll", EntryPoint = "DwmGetWindowAttribute")]
     private static extern bool GetWindowAttribute(IntPtr hwnd, uint dwAttribute, out RECT pvAttribute, uint cbAttribute);
 
-    struct WINDOWPLACEMENT
-    {
-        public uint length;
-        public uint flags;
-        public uint showCmd;
-        public POINT ptMinPosition;
-        public POINT ptMaxPosition;
-        public RECT rcNormalPosition;
-        public RECT rcDevice;
-    }
-
-    private struct STYLESTRUCT
-    {
-#pragma warning disable 0649
-        public uint styleOld;
-        public uint styleNew;
-#pragma warning restore 0649
-    }
-
     private const int WM_NULL = 0x0,
         WM_DESTROY = 0x2,
         WM_STYLECHANGING = 0x7C,
@@ -156,6 +137,25 @@ public static class WindowHelper
     private const int VK_SPACE = 0x20;
 
     private const int DWMWA_CAPTION_BUTTON_BOUNDS = 5;
+
+    private struct WINDOWPLACEMENT
+    {
+        public uint length;
+        public uint flags;
+        public uint showCmd;
+        public POINT ptMinPosition;
+        public POINT ptMaxPosition;
+        public RECT rcNormalPosition;
+        public RECT rcDevice;
+    }
+
+    private struct STYLESTRUCT
+    {
+#pragma warning disable 0649
+        public uint styleOld;
+        public uint styleNew;
+#pragma warning restore 0649
+    }
 
     public static int GetTitleBarHeight(IntPtr hWnd)
     {

@@ -303,12 +303,30 @@ public static class WindowHelper
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
+    [DllImport("user32.dll")]
+    private static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
+
+    private delegate bool EnumChildProc(IntPtr hwnd, IntPtr lParam);
+
     public static bool IsAlive(IntPtr hWnd) => IsWindow(hWnd);
 
     public static int GetProcessId(IntPtr hWnd)
     {
         GetWindowThreadProcessId(hWnd, out uint procId);
         return (int)procId;
+    }
+
+    public static IEnumerable<IntPtr> GetChildren(IntPtr hWnd)
+    {
+        List<IntPtr> handles = [];
+        EnumChildWindows(hWnd, Proc, IntPtr.Zero);
+        return handles;
+
+        bool Proc(IntPtr hwnd, IntPtr lParam)
+        {
+            handles.Add(hwnd);
+            return true;
+        }
     }
 
     public static IntPtr GetHandle(this Window window)

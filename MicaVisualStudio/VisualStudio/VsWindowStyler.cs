@@ -306,7 +306,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                     return;
 
                 var children = Interop.WindowHelper.GetChildren(host.Handle);
-                if (!sources.Where(i => children.Contains(i.Handle)).Any(i => i.RootVisual?.GetType().FullName == MultiViewHostTypeName))
+
+                if (sources.FirstOrDefault(i => children.Contains(i.Handle)) is not HwndSource source)
                     Interop.WindowHelper.MakeLayered(host.Handle);
             }
             else if (element is Control control)

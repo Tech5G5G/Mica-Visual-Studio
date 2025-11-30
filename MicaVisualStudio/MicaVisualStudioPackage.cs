@@ -115,14 +115,46 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 { "ListBox", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
                 { "ListItemBackgroundHover", new(transparentOnGray: false, translucent: true) },
 
+                { "SelectedItemActive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "SelectedItemInactive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
+                { "Unfocused", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
+                { "Caption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
                 { "TextBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "SearchBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
+                { "Button", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ButtonFocused", ColorConfig.Default },
+
+                { "ComboBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
+                { "InfoBarBorder", ColorConfig.Default },
+
+                { "ToolWindowTabMouseOverBackgroundGradient", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
+                { "Page", ColorConfig.Default },
+                { "PageBackground", ColorConfig.Default },
 
                 { "ScrollBarBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
                 { "ScrollBarArrowBackground", ColorConfig.Default },
                 { "ScrollBarArrowDisabledBackground", ColorConfig.Default },
 
-                { "SelectedItemActive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                { "SelectedItemInactive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) }
+                { "AutoHideResizeGrip", ColorConfig.Default },
+                { "AutoHideResizeGripDisabled", ColorConfig.Default },
+
+                { "Content", ColorConfig.Default },
+                { "ContentSelected", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ContentMouseOver", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ContentInactiveSelected", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+
+                { "Wonderbar", ColorConfig.Default },
+                { "WonderbarMouseOver", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "WonderbarTreeInactiveSelected", ColorConfig.Default },
+
+                { "Details", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "BackgroundLowerRegion", ColorConfig.Default }
             });
             colors.UpdateColors();
 

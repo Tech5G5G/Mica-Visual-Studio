@@ -100,6 +100,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 { "WindowPanel", new(translucent: true) },
 
                 { "CommandBarGradient", ColorConfig.Default },
+                { "CommandBarGradientBegin", ColorConfig.Default },
 
                 { "ListBox", ColorConfig.Layered },
                 { "ListItemBackgroundHover", new(transparentOnGray: false, translucent: true) },
@@ -125,6 +126,8 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
                 { "Page", ColorConfig.Default },
                 { "PageBackground", ColorConfig.Default },
+
+                { "BrandedUIBackground", ColorConfig.Default },
 
                 { "ScrollBarBackground", ColorConfig.Layered },
                 { "ScrollBarArrowBackground", ColorConfig.Default },

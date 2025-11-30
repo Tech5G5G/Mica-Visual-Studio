@@ -170,7 +170,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         static void VisualChildAdded(Visual instance, Visual child)
         {
-            if (instance is ContentPresenter or Decorator or Panel && //Avoid unnecessary work
+            if (instance is ContentControl or ContentPresenter or Decorator or Panel && //Avoid unnecessary work
                 instance is FrameworkElement content &&
                 GetIsTracked(content) && Instance is VsWindowStyler styler)
                 styler.ApplyToContent(content, applyToDock: false);
@@ -321,7 +321,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         foreach (var element in content.FindDescendants<FrameworkElement>().Append(content))
         {
-            if (element is ContentPresenter or Decorator or Panel && !GetIsTracked(element))
+            if (element is ContentControl or ContentPresenter or Decorator or Panel && !GetIsTracked(element))
                 SetIsTracked(element, value: true); //Track visual children
 
             if (element is ToolBar bar)

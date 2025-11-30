@@ -26,15 +26,9 @@ public sealed class WindowObserver : IDisposable
         get
         {
             CleanHandles();
-            Dictionary<IntPtr, WindowInfo> dictionary = [];
+            var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
 
-            foreach (var source in PresentationSource.CurrentSources.OfType<HwndSource>())
-                if (!source.IsDisposed &&
-                    source.RootVisual is Window window &&
-                    handles.Contains(source.Handle))
-                    dictionary.Add(source.Handle, new(window));
-
-            return new(dictionary);
+            return new(handles.ToDictionary(i => i, i => new WindowInfo(sources.FirstOrDefault(x => x.Handle == i)?.RootVisual as Window)));
         }
     }
 
@@ -103,7 +97,7 @@ public sealed class WindowObserver : IDisposable
     public void AppendWindow(IntPtr handle) =>
         handles.Add(handle);
 
-    private void CleanHandles() => 
+    private void CleanHandles() =>
         handles.RemoveWhere(i =>
             !WindowHelper.IsAlive(i) || //Check if alive
             WindowHelper.GetProcessId(i) != procId); //and belongs to current process

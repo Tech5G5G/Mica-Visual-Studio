@@ -82,8 +82,8 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 { "EnvironmentBackground", new(translucent: true) },
                 { "EnvironmentBackgroundGradient", ColorConfig.Default },
 
-                { "ActiveCaption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                { "InactiveCaption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ActiveCaption", ColorConfig.Layered },
+                { "InactiveCaption", ColorConfig.Layered },
 
                 { "MainWindowActiveCaption", ColorConfig.Default },
                 { "MainWindowInactiveCaption", ColorConfig.Default },
@@ -101,32 +101,32 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
                 { "CommandBarGradient", ColorConfig.Default },
 
-                { "ListBox", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ListBox", ColorConfig.Layered },
                 { "ListItemBackgroundHover", new(transparentOnGray: false, translucent: true) },
 
-                { "SelectedItemActive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                { "SelectedItemInactive", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "SelectedItemActive", ColorConfig.Layered },
+                { "SelectedItemInactive", ColorConfig.Layered },
 
-                { "Unfocused", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "Unfocused", ColorConfig.Layered },
 
-                { "Caption", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "Caption", ColorConfig.Layered },
 
-                { "TextBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                { "SearchBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "TextBoxBackground", ColorConfig.Layered },
+                { "SearchBoxBackground", ColorConfig.Layered },
 
-                { "Button", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "Button", ColorConfig.Layered },
                 { "ButtonFocused", ColorConfig.Default },
 
-                { "ComboBoxBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ComboBoxBackground", ColorConfig.Layered },
 
                 { "InfoBarBorder", ColorConfig.Default },
 
-                { "ToolWindowTabMouseOverBackgroundGradient", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ToolWindowTabMouseOverBackgroundGradient", ColorConfig.Layered },
 
                 { "Page", ColorConfig.Default },
                 { "PageBackground", ColorConfig.Default },
 
-                { "ScrollBarBackground", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ScrollBarBackground", ColorConfig.Layered },
                 { "ScrollBarArrowBackground", ColorConfig.Default },
                 { "ScrollBarArrowDisabledBackground", ColorConfig.Default },
 
@@ -134,15 +134,15 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 { "AutoHideResizeGripDisabled", ColorConfig.Default },
 
                 { "Content", ColorConfig.Default },
-                { "ContentSelected", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                { "ContentMouseOver", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
-                { "ContentInactiveSelected", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "ContentSelected", ColorConfig.Layered },
+                { "ContentMouseOver", ColorConfig.Layered },
+                { "ContentInactiveSelected", ColorConfig.Layered },
 
                 { "Wonderbar", ColorConfig.Default },
-                { "WonderbarMouseOver", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "WonderbarMouseOver", ColorConfig.Layered },
                 { "WonderbarTreeInactiveSelected", ColorConfig.Default },
 
-                { "Details", new(transparentOnGray: false, translucent: true, opacity: 0x7F) },
+                { "Details", ColorConfig.Layered },
                 { "BackgroundLowerRegion", ColorConfig.Default }
             });
             colors.UpdateColors();

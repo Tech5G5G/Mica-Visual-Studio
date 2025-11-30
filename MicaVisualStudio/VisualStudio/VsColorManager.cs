@@ -129,7 +129,8 @@ public sealed class VsColorManager
 
 public class ColorConfig(bool transparentOnGray = true, bool translucent = false, byte opacity = 0x38)
 {
-    public static ColorConfig Default = new();
+    public static ColorConfig Default = new(),
+        Layered = new(transparentOnGray: false, translucent: true, opacity: 0x7F);
 
     public bool TransparentOnGray { get; } = transparentOnGray;
 

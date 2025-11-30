@@ -13,9 +13,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 {
     public static VsWindowStyler Instance { get; } = new();
 
-    private const string MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
-
     #region Keys
+
+    private const string MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
 
     private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
 

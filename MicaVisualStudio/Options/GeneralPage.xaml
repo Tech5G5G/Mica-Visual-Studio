@@ -41,10 +41,18 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <CheckBox x:Name="force" Content="Force transparency" VerticalContentAlignment="Center" Height="20" Margin="5,0,0,0" Click="Force_Click" />
+                    <CheckBox x:Name="force"
+                              Content="Force transparency"
+                              VerticalContentAlignment="Center"
+                              Height="20" Margin="5,0,0,0"
+                              Click="Force_Click" />
                     <TextBlock Text="Forces transparency on all elements" Margin="5,0,0,0" Grid.Row="1" />
 
-                    <CheckBox x:Name="layered" Content="Layered windows" VerticalContentAlignment="Center" Height="20" Margin="5,0,0,0" Grid.Row="3" />
+                    <CheckBox x:Name="layered"
+                              Content="Layered windows"
+                              VerticalContentAlignment="Center"
+                              Height="20" Margin="5,0,0,0"
+                              Grid.Row="3" />
                     <TextBlock Text="Make child windows layered" Margin="5,0,0,0" Grid.Row="4" />
                 </Grid>
             </GroupBox>

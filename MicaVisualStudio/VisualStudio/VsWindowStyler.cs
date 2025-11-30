@@ -36,26 +36,34 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     private readonly IVsUIShell5 shell5 = VS.GetRequiredService<SVsUIShell, IVsUIShell5>();
     private readonly IVsUIShell7 shell7 = VS.GetRequiredService<SVsUIShell, IVsUIShell7>();
 
-    private readonly uint cookie;
+    private uint cookie;
 
     #endregion
 
     #region Functions
 
-    private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
-    private readonly Func<DependencyObject, object> get_View_Content;
-    private readonly Func<DependencyObject, bool> get_View_IsActive;
-    private readonly Func<object, bool> IsDockTarget;
+    private Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
+    private Func<DependencyObject, object> get_View_Content;
+    private Func<DependencyObject, bool> get_View_IsActive;
+    private Func<object, bool> IsDockTarget;
 
-    private readonly DependencyProperty View_ContentProperty,
+    private DependencyProperty View_ContentProperty,
         View_IsActiveProperty;
 
     #endregion
 
-    private readonly ILHook hook;
+    private ILHook visualHook,
+        sourceHook;
 
-    private VsWindowStyler()
+    private bool makeLayered = true;
+
+    private VsWindowStyler() { }
+
+    public void Listen()
     {
+        if (disposed)
+            return;
+
         #region Function Initialization
 
         var frameViewProp = Type.GetType("Microsoft.VisualStudio.Platform.WindowManagement.WindowFrame, Microsoft.VisualStudio.Platform.WindowManagement")
@@ -137,7 +145,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 ApplyToWindow(s);
         };
 
-        hook = new(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), context =>
+        visualHook = new(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), context =>
             {
             ILCursor cursor = new(context) { Index = 0 };
 
@@ -145,6 +153,16 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             cursor.Emit(OpCodes.Ldarg_1); //child
 
             cursor.EmitDelegate(VisualChildAdded);
+        });
+
+        sourceHook = new(typeof(HwndSource).GetProperty("RootVisual").SetMethod, context =>
+        {
+            ILCursor cursor = new(context) { Index = 0 };
+
+            cursor.Emit(OpCodes.Ldarg_0); //this (HwndSource)
+            cursor.Emit(OpCodes.Ldarg_1); //value
+
+            cursor.EmitDelegate(RootVisualChanged);
         });
 
         static void VisualChildAdded(Visual instance, Visual child)
@@ -155,7 +173,16 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 styler.ApplyToContent(content, applyToDock: false);
         }
 
+        static void RootVisualChanged(HwndSource instance, Visual value)
+        {
+            if (value is not null or Popup //Avoid unnecessary
+                or Window) //and already handled values
+                instance.CompositionTarget.BackgroundColor = Colors.Transparent;
+        }
+
         #endregion
+
+        makeLayered = General.Instance.LayeredWindows;
 
         ApplyToAllWindows();
         ApplyToAllWindowPanesAsync().Forget();
@@ -299,7 +326,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 bar.Background = bar.BorderBrush = Brushes.Transparent;
             (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
         }
-            else if (element is HwndHost { IsLoaded: true } host)
+            else if (makeLayered && element is HwndHost { IsLoaded: true } host)
             {
                 var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
                 if (sources.Any(i => i.Handle == host.Handle))
@@ -466,17 +493,20 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     public void Dispose()
     {
-        if (!disposed)
-        {
-            hook?.Dispose();
+        if (disposed)
+            return;
+
+        visualHook?.Dispose();
+        sourceHook?.Dispose();
+        visualHook = sourceHook = null;
 
 #pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
+        if (cookie > 0)
             shell7.UnadviseWindowFrameEvents(cookie);
 #pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
 
             disposed = true;
         }
-    }
 
     #endregion
 }

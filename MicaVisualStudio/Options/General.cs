@@ -38,5 +38,8 @@
         public int DialogCornerPreference { get; set; } = 0; //CornerPreference.Default
 
         public int AppTheme { get; set; } = 0; //Theme.VisualStudio
+
+        public bool ForceTransparency { get; set; } = true;
+        public bool LayeredWindows { get; set; } = true;
     }
 }

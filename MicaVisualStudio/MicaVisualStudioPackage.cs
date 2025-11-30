@@ -40,7 +40,6 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
     private ThemeHelper theme;
     private WindowObserver observer;
 
-    private ILHook hook;
     private VsColorManager colors;
     private VsWindowStyler styler;
 
@@ -67,16 +66,6 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 return;
             }
 
-            hook = new(typeof(HwndSource).GetProperty("RootVisual").SetMethod, context =>
-            {
-                ILCursor cursor = new(context) { Index = 0 };
-
-                cursor.Emit(OpCodes.Ldarg_0); //this (HwndSource)
-                cursor.Emit(OpCodes.Ldarg_1); //value
-
-                cursor.EmitDelegate(RootVisualChanged);
-            });
-
             colors = VsColorManager.Instance;
 
             #region Resource Keys
@@ -84,7 +73,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             colors.AddConfigs(new()
             {
                 { "Background", new(translucent: true) },
-
+                
                 { "SolidBackgroundFillQuaternary", new(translucent: true) },
 
                 //{ "SolidBackgroundFillTertiary", ColorConfig.Default },
@@ -160,7 +149,8 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
             #endregion
 
-            styler = VsWindowStyler.Instance;
+            if (General.Instance.ForceTransparency)
+                (styler = VsWindowStyler.Instance).Listen();
 
             theme = ThemeHelper.Instance;
             observer = WindowObserver.Instance;
@@ -217,13 +207,6 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 window.GetHandle(),
                 window,
                 WindowHelper.GetWindowType(window));
-        }
-
-        static void RootVisualChanged(HwndSource instance, Visual value)
-        {
-            if (value is not null or Popup //Avoid unnecessary
-                or Window) //and already handled values
-                instance.CompositionTarget.BackgroundColor = Colors.Transparent;
         }
     }
 
@@ -293,7 +276,6 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
         theme?.Dispose();
         observer?.Dispose();
 
-        hook?.Dispose();
         styler?.Dispose();
 
         if (disposing)
@@ -301,7 +283,6 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             theme = null;
             observer = null;
 
-            hook = null;
             colors = null;
             styler = null;
         }

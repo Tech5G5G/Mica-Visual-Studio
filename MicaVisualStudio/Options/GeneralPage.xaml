@@ -30,6 +30,24 @@
                     </ComboBox>
                 </StackPanel>
             </GroupBox>
+
+            <GroupBox Header="Other" Padding="2,4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="4" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <CheckBox x:Name="force" Content="Force transparency" VerticalContentAlignment="Center" Height="20" Margin="5,0,0,0" Click="Force_Click" />
+                    <TextBlock Text="Forces transparency on all elements" Margin="5,0,0,0" Grid.Row="1" />
+
+                    <CheckBox x:Name="layered" Content="Layered windows" VerticalContentAlignment="Center" Height="20" Margin="5,0,0,0" Grid.Row="3" />
+                    <TextBlock Text="Make child windows layered" Margin="5,0,0,0" Grid.Row="4" />
+                </Grid>
+            </GroupBox>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

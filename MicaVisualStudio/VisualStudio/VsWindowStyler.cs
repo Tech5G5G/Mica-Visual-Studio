@@ -329,6 +329,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 bar.Background = bar.BorderBrush = Brushes.Transparent;
                 (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
             }
+
             else if (makeLayered && element is HwndHost { IsLoaded: true } host)
             {
                 var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
@@ -340,6 +341,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 if (sources.FirstOrDefault(i => children.Contains(i.Handle)) is not HwndSource source)
                     Interop.WindowHelper.MakeLayered(host.Handle);
             }
+
             else if (element is Control control)
                 switch (element.Name)
                 {
@@ -400,9 +402,25 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                         control.Background = Brushes.Transparent;
                         control.FindDescendant<Canvas>()?.Background = Brushes.Transparent;
                         break;
+
+                    default:
+                        switch (control.GetType().FullName)
+                        {
+                            //AppxManifest editor
+                            case "Microsoft.VisualStudio.AppxManifestDesigner.Designer.ManifestDesignerUserControlProxy":
+                            case "Microsoft.VisualStudio.AppxManifestDesigner.Designer.ManifestDesignerUserControl":
+                                control.Background = Brushes.Transparent;
+                                break;
+
+                            //Resource editor
+                            case "Microsoft.VisualStudio.ResourceExplorer.UI.ResourceGroupEditorControl":
+                                control.Background = Brushes.Transparent;
+                                break;
+                        }
+                        break;
                 }
+
             else if (element is Panel panel)
-            {
                 switch (panel.GetType().FullName)
                 {
                     //Editor window, root
@@ -438,7 +456,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                             panel.Background = Brushes.Transparent;
                         break;
                 }
-            }
+
             else if (element is Border border)
                 switch (border.GetType().FullName)
                 {

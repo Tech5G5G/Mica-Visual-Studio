@@ -1,6 +1,9 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Windows.Shapes;
 using Microsoft.Internal.VisualStudio.PlatformUI;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using Expression = System.Linq.Expressions.Expression;
 
 namespace MicaVisualStudio.VisualStudio;
@@ -71,20 +74,20 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         var frameParam = Expression.Parameter(typeof(IVsWindowFrame));
         get_WindowFrame_FrameView = frameParam.Convert(frameViewProp.DeclaringType)
-                                  .Property(frameViewProp)
-                                  .Convert<DependencyObject>()
-                                  .Compile<IVsWindowFrame, DependencyObject>(frameParam);
+                                              .Property(frameViewProp)
+                                              .Convert<DependencyObject>()
+                                              .Compile<IVsWindowFrame, DependencyObject>(frameParam);
 
         var viewType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.View, Microsoft.VisualStudio.Shell.ViewManager");
         var contentProp = viewType.GetProperty("Content");
 
         var viewParam = Expression.Parameter(typeof(DependencyObject));
         get_View_Content = viewParam.Convert(contentProp.DeclaringType)
-                               .Property(contentProp)
-                               .Compile<DependencyObject, object>(viewParam);
+                                    .Property(contentProp)
+                                    .Compile<DependencyObject, object>(viewParam);
 
         View_ContentProperty = viewType.GetField("ContentProperty", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
-                                      .GetValue(null) as DependencyProperty;
+                                       .GetValue(null) as DependencyProperty;
 
         var isActiveProp = viewType.GetProperty("IsActive");
         get_View_IsActive = viewParam.Convert(isActiveProp.DeclaringType)
@@ -146,7 +149,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         };
 
         visualHook = new(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), context =>
-            {
+        {
             ILCursor cursor = new(context) { Index = 0 };
 
             cursor.Emit(OpCodes.Ldarg_0); //this (Visual)
@@ -239,14 +242,14 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
             else if (element is Border border)
             {
-        //Footer
+                //Footer
                 if (border.Name == "FooterBorder")
                     border.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
                 //Dock target
                 else if (IsDockTarget(border))
-                ApplyToDockTarget(border);
-    }
+                    ApplyToDockTarget(border);
+            }
     }
 
     private void ApplyToDockTarget(Border dock, bool applyToContent = true)
@@ -305,7 +308,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 void ApplyTabForeground(TabItem item, DependencyObject view) => tab.SetResourceReference(
                     Control.ForegroundProperty,
                     tab.IsSelected && get_View_IsActive(view) ? TextOnAccentFillPrimaryKey : TextFillPrimaryKey);
-    }
+            }
     }
 
     private void ApplyToContent(FrameworkElement content, bool applyToDock = true)
@@ -322,10 +325,10 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 SetIsTracked(element, value: true); //Track visual children
 
             if (element is ToolBar bar)
-        {
+            {
                 bar.Background = bar.BorderBrush = Brushes.Transparent;
-            (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
-        }
+                (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
+            }
             else if (makeLayered && element is HwndHost { IsLoaded: true } host)
             {
                 var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
@@ -380,10 +383,10 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                 }
 
                                 else if (c.Name == "statusControl" || //Actions/tool bar
-                                c.Name == "thisPageControl" || //Changes
+                                        c.Name == "thisPageControl" || //Changes
                                         c.Name == "inactiveRepoContent" || //Create repo
                                         c is CheckBox { Name: "amendCheckBox" }) //Checkbox... for amending...
-                                c.Background = Brushes.Transparent;
+                                    c.Background = Brushes.Transparent;
                         break;
 
                     //Host of WpfTextView I guess
@@ -438,7 +441,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             }
             else if (element is Border border)
                 switch (border.GetType().FullName)
-        {
+                {
                     //Output window, base layer
                     case "Microsoft.VisualStudio.PlatformUI.OutputWindow":
                         border.Background = Brushes.Transparent;
@@ -449,8 +452,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                         border.Background = Brushes.Transparent;
                         break;
                 }
-            }
         }
+    }
 
     #region IsTrackedProperty
 
@@ -505,8 +508,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             shell7.UnadviseWindowFrameEvents(cookie);
 #pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
 
-            disposed = true;
-        }
+        disposed = true;
+    }
 
     #endregion
 }

@@ -454,6 +454,32 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                     };
                                     break;
 
+                                //Git push, pull etc. buttons
+                                case "actionButton" or
+                                    "fetchButton" or
+                                    "pullButton" or
+                                    "pushButton" or
+                                    "syncButton" or
+                                    "additionalOperationsButton" when
+                                    e is Button b:
+                                    b.Style = new(b.Style.TargetType, b.Style)
+                                    {
+                                        Triggers =
+                                        {
+                                            new Trigger
+                                            {
+                                                Property = System.Windows.UIElement.IsEnabledProperty,
+                                                Value = false,
+                                                Setters =
+                                                {
+                                                    new Setter(Control.BackgroundProperty, Brushes.Transparent),
+                                                    new Setter(Control.BorderBrushProperty, Brushes.Transparent)
+                                                }
+                                            }
+                                        }
+                                    };
+                                    break;
+
                                 //Git repository window, presenters
                                 case "detailsContent" or
                                     "detailsFullWindowContent" or

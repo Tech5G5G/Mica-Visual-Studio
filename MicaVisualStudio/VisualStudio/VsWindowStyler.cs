@@ -349,7 +349,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                         "focusedWindowView" or //Git repository window
                         "historyView" or //Commit history
                         "detailsView" or //Git commit details
-                        "focusedDetailsContainer": //Git commit details container
+                        "focusedDetailsContainer" or //Git commit details container
+                        "teamExplorerFrame" or //Team explorer window
+                        "createPullRequestView": //New PR window
                         control.Background = Brushes.Transparent;
 
                         foreach (var e in control.LogicalDescendants<FrameworkElement>().Append(control))
@@ -379,6 +381,16 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                         t.Setters.Add(bg);
                                         t.Setters.Add(bb);
                                     }
+                                    break;
+
+                                //???
+                                case "thisPageControl" when e is Control c:
+                                    c.Background = Brushes.Transparent;
+                                    break;
+
+                                //Team explorer, project selector
+                                case "navControl" when e is Control c:
+                                    c.Background = Brushes.Transparent;
                                     break;
 
                                 //Git branch selector

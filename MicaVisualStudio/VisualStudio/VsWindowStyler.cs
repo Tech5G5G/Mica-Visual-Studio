@@ -343,35 +343,32 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             }
 
             else if (element is Control control)
-                switch (element.Name)
+                switch (control.Name)
                 {
-                    //Git changes window
-                    case "gitWindowView":
+                    case "gitWindowView" or //Git changes window
+                        "focusedWindowView" or //Git repository window
+                        "historyView" or //Commit history
+                        "detailsView" or //Git commit details
+                        "focusedDetailsContainer": //Git commit details container
                         control.Background = Brushes.Transparent;
 
-                        foreach (var e in control.LogicalDescendants<FrameworkElement>())
-                            if (e is Border { Name: "borderHeader", Style: Style bs } b) //Section header
-                                b.Style = new(bs.TargetType, bs)
-                                {
-                                    Setters = { new Setter(Border.BorderBrushProperty, Brushes.Transparent) }
-                                };
-
-                            else if (e is Control c)
-                                if (c is ItemsControl { ItemContainerStyle: Style cs }) //Changes
-                                {
-                                    c.Background = Brushes.Transparent;
-
-                                    if (!cs.IsSealed)
+                        foreach (var e in control.LogicalDescendants<FrameworkElement>().Append(control))
+                            switch (e.Name)
+                            {
+                                //Section header
+                                case "borderHeader" when e is Border { Style: Style bs } b:
+                                    b.Style = new(bs.TargetType, bs)
                                     {
-                                        cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
-                                        cs.Setters.Add(new Setter(Control.BorderBrushProperty, Brushes.Transparent));
-                                    }
-                                }
-                                else if (c.Name == "gitAction" && //Change (list) commands
-                                    c.TryFindResource("TESectionCommandButtonStyle") is Style { Setters.IsSealed: false } ss)
-                                {
+                                        Setters = { new Setter(Border.BorderBrushProperty, Brushes.Transparent) }
+                                    };
+                                    break;
+
+                                //Command buttons
+                                case "gitAction" or
+                                    "detailsView" when
+                                    e.TryFindResource("TESectionCommandButtonStyle") is Style { Setters.IsSealed: false } ss:
                                     Setter bg = new(Control.BackgroundProperty, Brushes.Transparent),
-                                        bb = new(Control.BorderBrushProperty, Brushes.Transparent);
+                                    bb = new(Control.BorderBrushProperty, Brushes.Transparent);
 
                                     ss.Setters.Add(bg);
                                     ss.Setters.Add(bb);
@@ -382,13 +379,100 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                         t.Setters.Add(bg);
                                         t.Setters.Add(bb);
                                     }
-                                }
+                                    break;
 
-                                else if (c.Name == "statusControl" || //Actions/tool bar
-                                        c.Name == "thisPageControl" || //Changes
-                                        c.Name == "inactiveRepoContent" || //Create repo
-                                        c is CheckBox { Name: "amendCheckBox" }) //Checkbox... for amending...
+                                //Git branch selector
+                                case "branchesList" when e.GetVisualOrLogicalParent()
+                                                          .GetVisualOrLogicalParent()
+                                                          .GetVisualOrLogicalParent()
+                                                          .GetVisualOrLogicalParent() is Control bc:
+                                    bc.Background = Brushes.Transparent;
+                                    break;
+
+                                //Commit history
+                                case "historyView" when e.GetVisualOrLogicalParent()
+                                                         .GetVisualOrLogicalParent()
+                                                         .GetVisualOrLogicalParent() is Border hb:
+                                    hb.Background = Brushes.Transparent;
+                                    break;
+
+                                //Commit history list
+                                case "historyListView" when e is ListView { View: GridView g }:
+                                    g.ColumnHeaderContainerStyle = new(g.ColumnHeaderContainerStyle.TargetType, g.ColumnHeaderContainerStyle)
+                                    {
+                                        Setters =
+                                        {
+                                            new Setter(Control.BackgroundProperty, Brushes.Transparent),
+                                            new Setter(Control.BorderBrushProperty, Brushes.Transparent)
+                                        }
+                                    };
+
+                                    foreach (var c in g.Columns.Select(i => i.Header).OfType<Control>())
+                                    {
+                                        c.ApplyTemplate();
+                                        c.FindDescendant<Border>(i => i.Name == "HeaderBorder")?.BorderBrush = Brushes.Transparent;
+                                    }
+                                    break;
+
+                                //Commit diff
+                                case "detailsViewMainGrid" when e is Grid g && g.GetVisualOrLogicalParent()
+                                                                                .GetVisualOrLogicalParent() is Border db:
+                                    db.Background = Brushes.Transparent;
+                                    break;
+
+                                //Commit diff info
+                                case "pageContentViewer" when e.GetVisualOrLogicalParent()
+                                                               .GetVisualOrLogicalParent() is Border pb:
+                                    pb.Background = Brushes.Transparent;
+                                    break;
+
+                                //Commit diff presenter dock buttons
+                                case "dockToBottomButton" or
+                                    "dockToRightButton" or
+                                    "undockButton" or
+                                    "maximizeMinimizeButton" or
+                                    "closeButton" when
+                                    e is Button b:
+                                    b.Style = new(b.Style.TargetType, b.Style)
+                                    {
+                                        Setters =
+                                        {
+                                            new Setter(Control.BackgroundProperty, Brushes.Transparent),
+                                        }
+                                    };
+                                    break;
+
+                                //Git repository window, presenters
+                                case "detailsContent" or
+                                    "detailsFullWindowContent" or
+                                    "detailsRightContent" or
+                                    "detailsBottomContent" when
+                                    e is ContentControl c:
+                                    SetIsTracked(c, value: true);
+                                    break;
+
+                                case "statusControl" or //Actions/tool bar
+                                    "thisPageControl" or //Changes
+                                    "inactiveRepoContent" or //Create repo
+                                    "sectionContainer" or //Branches and tags
+                                    "amendCheckBox" when //Checkbox... for amending...
+                                    e is Control c:
                                     c.Background = Brushes.Transparent;
+                                    break;
+
+                                default:
+                                    if (e is ItemsControl { ItemContainerStyle: Style cs } ic) //Changes
+                                    {
+                                        ic.Background = Brushes.Transparent;
+
+                                        if (!cs.IsSealed)
+                                        {
+                                            cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
+                                            cs.Setters.Add(new Setter(Control.BorderBrushProperty, Brushes.Transparent));
+                                        }
+                                    }
+                                    break;
+                            }
                         break;
 
                     //Host of WpfTextView I guess

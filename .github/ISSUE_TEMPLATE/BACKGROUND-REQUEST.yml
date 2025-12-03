@@ -1,6 +1,7 @@
 name: 🖼️ Background removal request
 description: Report background(s) that need to be removed
-labels: ["bug", "enhancement"]
+title: "[BACKGROUND] "
+labels: ["background"]
 assignees:
   - tech5g5g
 body:

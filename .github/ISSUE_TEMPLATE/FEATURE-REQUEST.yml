@@ -8,7 +8,7 @@ body:
     attributes:
       label: "I have checked:"
       options:
-        - label: This is not a duplicate of another issue
+        - label: This is not a duplicate of another request
           required: true
         - label: This is not an bug/background removal request
           required: true

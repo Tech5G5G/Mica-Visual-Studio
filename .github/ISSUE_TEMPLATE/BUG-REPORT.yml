@@ -3,7 +3,6 @@ description: Report bugs and errors
 labels: ["bug"]
 assignees:
   - tech5g5g
-type: bug
 body:
   - type: checkboxes
     attributes:

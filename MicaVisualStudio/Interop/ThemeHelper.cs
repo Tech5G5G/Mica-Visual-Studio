@@ -2,8 +2,14 @@
 
 namespace MicaVisualStudio.Interop;
 
+/// <summary>
+/// Represents a helper for getting and receiving updates about the system theme.
+/// </summary>
 public sealed class ThemeHelper : IDisposable
 {
+    /// <summary>
+    /// Gets the singleton instance of <see cref="ThemeHelper"/>.
+    /// </summary>
     public static ThemeHelper Instance { get; } = new();
 
     #region PInvoke
@@ -26,9 +32,15 @@ public sealed class ThemeHelper : IDisposable
 
     private const string PersonalizeSettings = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
 
+    /// <summary>
+    /// Gets the current <see cref="Theme"/> used by the system.
+    /// </summary>
     public Theme SystemTheme => sysTheme;
     private Theme sysTheme;
 
+    /// <summary>
+    /// Occurs when <see cref="SystemTheme"/> has changed.
+    /// </summary>
     public event EventHandler<Theme> SystemThemeChanged;
 
     private Theme GetSystemTheme() =>
@@ -46,6 +58,11 @@ public sealed class ThemeHelper : IDisposable
     private void PreferenceChanging(object sender, UserPreferenceChangingEventArgs args) =>
         SystemThemeChanged?.Invoke(this, sysTheme = GetSystemTheme());
 
+    /// <summary>
+    /// Sets the theme of the current app.
+    /// </summary>
+    /// <remarks>Setting the app theme affects the theme of the system menu.</remarks>
+    /// <param name="theme">The <see cref="Theme"/> to set the app theme to.</param>
     public void SetAppTheme(Theme theme)
     {
         SetPreferredAppMode(theme switch
@@ -61,6 +78,10 @@ public sealed class ThemeHelper : IDisposable
 
     private bool disposed;
 
+    /// <summary>
+    /// Disposes the singleton instance of <see cref="ThemeHelper"/>.
+    /// </summary>
+    /// <remarks>Calling this method will stop the <see cref="SystemThemeChanged"/> event from occuring.</remarks>
     public void Dispose()
     {
         if (!disposed)

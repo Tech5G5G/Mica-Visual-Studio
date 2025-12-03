@@ -1,13 +1,25 @@
 ﻿namespace MicaVisualStudio.VisualStudio;
 
+/// <summary>
+/// Represents an observer that listens for opened and closed <see cref="Window"/>s.
+/// </summary>
 public sealed class WindowObserver : IDisposable
 {
+    /// <summary>
+    /// Gets the singleton instance of <see cref="WindowObserver"/>.
+    /// </summary>
     public static WindowObserver Instance { get; } = new();
 
     #region Static Properties
 
+    /// <summary>
+    /// Gets the main window of the current <see cref="Application"/>.
+    /// </summary>
     public static Window MainWindow => Application.Current.MainWindow;
 
+    /// <summary>
+    /// Gets the current, focused window of the current <see cref="Application"/>.
+    /// </summary>
     public static Window CurrentWindow
     {
         get
@@ -17,10 +29,16 @@ public sealed class WindowObserver : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets all of the windows of the current <see cref="Application"/>.
+    /// </summary>
     public static List<Window> AllWindows => [.. Application.Current.Windows.OfType<Window>()];
 
     #endregion
-
+    
+    /// <summary>
+    /// Gets a <see cref="ReadOnlyDictionary{TKey, TValue}"/> containing the <see cref="Window"/>s found that are still alive.
+    /// </summary>
     public ReadOnlyDictionary<IntPtr, WindowInfo> Windows
     {
         get
@@ -32,7 +50,13 @@ public sealed class WindowObserver : IDisposable
         }
     }
 
+    /// <summary>
+    /// Occurs when a new <see cref="Window"/> is opened.
+    /// </summary>
     public event WindowChangedEventHandler WindowOpened;
+    /// <summary>
+    /// Occurs when a <see cref="Window"/> is closed.
+    /// </summary>
     public event WindowChangedEventHandler WindowClosed;
 
     private readonly int procId;
@@ -88,12 +112,20 @@ public sealed class WindowObserver : IDisposable
         WindowOpened?.Invoke(window, new(args.WindowHandle, window));
     }
 
+    /// <summary>
+    /// Appends <paramref name="window"/> to the end of <see cref="Windows"/>.
+    /// </summary>
+    /// <param name="window">A <see cref="Window"/> to append.</param>
     public void AppendWindow(Window window)
     {
         if (window.IsLoaded)
             AppendWindow(window.GetHandle());
     }
 
+    /// <summary>
+    /// Appends a <paramref name="handle"/> to a window to the end of <see cref="Windows"/>.
+    /// </summary>
+    /// <param name="handle">A handle to a window.</param>
     public void AppendWindow(IntPtr handle) =>
         handles.Add(handle);
 
@@ -106,6 +138,10 @@ public sealed class WindowObserver : IDisposable
 
     private bool disposed;
 
+    /// <summary>
+    /// Disposes the singleton instance of <see cref="WindowObserver"/>.
+    /// </summary>
+    /// <remarks>Calling this method will stop the <see cref="WindowOpened"/> and <see cref="WindowClosed"/> events from occuring.</remarks>
     public void Dispose()
     {
         if (!disposed)
@@ -118,8 +154,18 @@ public sealed class WindowObserver : IDisposable
     #endregion
 }
 
+/// <summary>
+/// Represents the handler for the <see cref="WindowObserver.WindowOpened"/> and <see cref="WindowObserver.WindowClosed"/> events.
+/// </summary>
+/// <param name="sender">The <see cref="Window"/> that generated the event.</param>
+/// <param name="args">The <see cref="WindowActionEventArgs"/> to go along with the event.</param>
 public delegate void WindowChangedEventHandler(Window sender, WindowActionEventArgs args);
 
+/// <summary>
+/// Represents the <see cref="EventArgs"/> for the <see cref="WindowObserver.WindowOpened"/> and <see cref="WindowObserver.WindowClosed"/> events.
+/// </summary>
+/// <param name="handle">A handle to a window.</param>
+/// <param name="window">The <see cref="Window"/> that generated the event.</param>
 public class WindowActionEventArgs(IntPtr handle, Window window) : EventArgs
 {
     public IntPtr WindowHandle { get; } = handle;
@@ -127,6 +173,10 @@ public class WindowActionEventArgs(IntPtr handle, Window window) : EventArgs
     public WindowType WindowType { get; } = WindowHelper.GetWindowType(window);
 }
 
+/// <summary>
+/// Represents information about a specified <see cref="System.Windows.Window"/>.
+/// </summary>
+/// <param name="window">A <see cref="System.Windows.Window"/> to get information from.</param>
 public class WindowInfo(Window window)
 {
     public Window Window { get; } = window;

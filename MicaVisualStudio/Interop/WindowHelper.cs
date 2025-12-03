@@ -3,6 +3,9 @@ using Microsoft.VisualStudio.OLE.Interop;
 
 namespace MicaVisualStudio.Interop;
 
+/// <summary>
+/// Represents a static wrapper for various P/Invoke functions involving windows.
+/// </summary>
 public static class WindowHelper
 {
     #region DWM
@@ -43,24 +46,43 @@ public static class WindowHelper
         public bool fTransitionOnMaximized;
     }
 
+    /// <summary>
+    /// Extends the frame of the specified <paramref name="hWnd"/> into its client area.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
     public static void ExtendFrameIntoClientArea(IntPtr hWnd)
     {
         MARGINS margins = new() { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
         ExtendFrameIntoClientArea(hWnd, ref margins);
     }
 
+    /// <summary>
+    /// Enables or disables dark mode for the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="enable">Whether or not to enable dark mode.</param>
     public static void SetDarkMode(IntPtr hWnd, bool enable)
     {
         int mode = enable ? 1 : 0;
         SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(int));
     }
 
+    /// <summary>
+    /// Sets the <see cref="CornerPreference"/> of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="preference">The <see cref="CornerPreference"/> to set.</param>
     public static void SetCornerPreference(IntPtr hWnd, CornerPreference preference)
     {
         int corner = (int)preference;
         SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref corner, sizeof(int));
     }
 
+    /// <summary>
+    /// Sets the <see cref="BackdropType"/> of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="backdrop">The <see cref="BackdropType"/> to set.</param>
     public static void SetBackdropType(IntPtr hWnd, BackdropType backdrop)
     {
         int type = (int)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
@@ -69,6 +91,11 @@ public static class WindowHelper
         SetWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
     }
 
+    /// <summary>
+    /// Enables or disables transparency for the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="enable">Whether or not to enable transparency.</param>
     public static void SetWindowTransparency(IntPtr hWnd, bool enable)
     {
         DWM_BLURBEHIND bb = new()
@@ -158,12 +185,21 @@ public static class WindowHelper
 #pragma warning restore 0649
     }
 
+    /// <summary>
+    /// Gets the height, in pixels, of the specified <paramref name="hWnd"/>'s title bar.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <returns>The height of the specified <paramref name="hWnd"/>'s title bar.</returns>
     public static int GetTitleBarHeight(IntPtr hWnd)
     {
         GetWindowAttribute(hWnd, DWMWA_CAPTION_BUTTON_BOUNDS, out RECT bounds, (uint)Marshal.SizeOf<RECT>());
         return bounds.bottom - bounds.top;
     }
 
+    /// <summary>
+    /// Patches the specified <paramref name="source"/> to remove its caption buttons but retain system menu functionality.
+    /// </summary>
+    /// <param name="source">An <see cref="HwndSource"/> to patch.</param>
     public static void RemoveCaptionButtons(HwndSource source)
     {
         const int MenuSpacing = 2;
@@ -276,6 +312,11 @@ public static class WindowHelper
     private const int GWL_STYLE = -16,
         GWL_EXSTYLE = -20;
 
+    /// <summary>
+    /// Determines the <see cref="WindowType"/> of the specified <paramref name="window"/>.
+    /// </summary>
+    /// <param name="window">A <see cref="Window"/> to critique.</param>
+    /// <returns>The <see cref="WindowType"/> of the specified <paramref name="window"/>.</returns>
     public static WindowType GetWindowType(Window window)
     {
         if (window == WindowObserver.MainWindow)
@@ -288,10 +329,30 @@ public static class WindowHelper
             return WindowType.Dialog;
     }
 
+    /// <summary>
+    /// Gets the <see cref="WindowStyles"/> of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <returns>The <see cref="WindowStyles"/> of the specified <paramref name="hWnd"/>.</returns>
     public static WindowStyles GetWindowStyles(IntPtr hWnd) => (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);
+    /// <summary>
+    /// Sets the <see cref="WindowStyles"/> of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="styles">The <see cref="WindowStyles"/> to set.</param>
     public static void SetWindowStyles(IntPtr hWnd, WindowStyles styles) => SetWindowLong(hWnd, GWL_STYLE, (uint)styles);
 
+    /// <summary>
+    /// Gets the <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <returns>The <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.</returns>
     public static WindowStylesEx GetExtendedWindowStyles(IntPtr hWnd) => (WindowStylesEx)GetWindowLong(hWnd, GWL_EXSTYLE);
+    /// <summary>
+    /// Sets the <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="styles">The <see cref="WindowStylesEx"/> to set.</param>
     public static void SetExtendedWindowStyles(IntPtr hWnd, WindowStylesEx styles) => SetWindowLong(hWnd, GWL_EXSTYLE, (uint)styles);
 
     #endregion
@@ -314,24 +375,43 @@ public static class WindowHelper
 
     private delegate bool EnumChildProc(IntPtr hwnd, IntPtr lParam);
 
+    /// <summary>
+    /// Determines whether the specified <paramref name="hWnd"/> is alive; that is, whether it is still valid.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <returns><see langword="true"/> if the specified <paramref name="hWnd"/> is still alive. Otherwise, <see langword="false"/>.</returns>
     public static bool IsAlive(IntPtr hWnd) => IsWindow(hWnd);
 
+    /// <summary>
+    /// Gets the process ID associated with the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <returns>The ID of the process that owns the specified <paramref name="hWnd"/>.</returns>
     public static int GetProcessId(IntPtr hWnd)
     {
         GetWindowThreadProcessId(hWnd, out uint procId);
         return (int)procId;
     }
 
+    /// <summary>
+    /// Makes the specified <paramref name="hWnd"/> layered by adding the <see cref="WindowStylesEx.Layered"/> style.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
     public static void MakeLayered(IntPtr hWnd)
     {
         SetExtendedWindowStyles(hWnd, GetExtendedWindowStyles(hWnd) | WindowStylesEx.Layered);
         SetLayeredWindowAttributes(
             hWnd,
             (uint)ColorTranslator.ToWin32(System.Drawing.Color.Black),
-            0xFF,
-            LWA_ALPHA); //Set opactiy to 100%
+            0xFF, //Set opactiy to 100%
+            LWA_ALPHA);
     }
 
+    /// <summary>
+    /// Enumerates the children of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/> of window handles representing the children of the specified <paramref name="hWnd"/>.</returns>
     public static IEnumerable<IntPtr> GetChildren(IntPtr hWnd)
     {
         List<IntPtr> handles = [];
@@ -345,6 +425,11 @@ public static class WindowHelper
         }
     }
 
+    /// <summary>
+    /// Gets the handle of the specified <paramref name="window"/>.
+    /// </summary>
+    /// <param name="window">A <see cref="Window"/> to retrieve the handle of.</param>
+    /// <returns>The handle of the specified <paramref name="window"/>.</returns>
     public static IntPtr GetHandle(this Window window)
     {
         WindowInteropHelper interop = new(window);
@@ -357,6 +442,9 @@ public static class WindowHelper
 
 #region Enums
 
+/// <summary>
+/// Specifies the type of backdrop to use in <see cref="WindowHelper.SetBackdropType(IntPtr, BackdropType)"/>.
+/// </summary>
 public enum BackdropType
 {
     Auto,
@@ -367,6 +455,9 @@ public enum BackdropType
     Glass
 }
 
+/// <summary>
+/// Specifies the corner preference to use in <see cref="WindowHelper.SetCornerPreference(IntPtr, CornerPreference)"/>.
+/// </summary>
 public enum CornerPreference
 {
     Default,
@@ -375,13 +466,41 @@ public enum CornerPreference
     RoundSmall
 }
 
+/// <summary>
+/// Specifies the type of a <see cref="Window"/>.
+/// </summary>
 public enum WindowType
 {
+    /// <summary>
+    /// Specifies that the <see cref="Window"/> is the main window of the process.
+    /// </summary>
     Main,
+
+    /// <summary>
+    /// Specifies that the <see cref="Window"/> is an additional top-level window, meant for tooling and options.
+    /// </summary>
     Tool,
+
+    /// <summary>
+    /// Specifies that the <see cref="Window"/> is a child window, meant for responding to requests and displaying information.
+    /// </summary>
     Dialog
 }
 
+/// <summary>
+/// Specifies the style(s) of a window.
+/// </summary>
+/// <remarks>
+/// Used in:
+/// <list type="bullet">
+/// <item>
+/// <see cref="WindowHelper.GetWindowStyles(IntPtr)"/>
+/// </item>
+/// <item>
+/// <see cref="WindowHelper.SetWindowStyles(IntPtr, WindowStyles)"/>
+/// </item>
+/// </list>
+/// </remarks>
 [Flags]
 public enum WindowStyles : uint
 {
@@ -410,6 +529,20 @@ public enum WindowStyles : uint
     VScroll = 0x00200000
 }
 
+/// <summary>
+/// Specifies the extended style(s) of a window.
+/// </summary>
+/// <remarks>
+/// Used in:
+/// <list type="bullet">
+/// <item>
+/// <see cref="WindowHelper.GetExtendedWindowStyles(IntPtr)"/>
+/// </item>
+/// <item>
+/// <see cref="WindowHelper.SetExtendedWindowStyles(IntPtr, WindowStylesEx)"/>
+/// </item>
+/// </list>
+/// </remarks>
 public enum WindowStylesEx : uint
 {
     AcceptFiles = 0x00000010,

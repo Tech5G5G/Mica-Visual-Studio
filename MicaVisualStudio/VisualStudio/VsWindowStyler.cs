@@ -9,8 +9,14 @@ using Expression = System.Linq.Expressions.Expression;
 namespace MicaVisualStudio.VisualStudio;
 
 //This code is bad, but it works, so...
+/// <summary>
+/// Represents an observer that listens and styles Visual Studio windows.
+/// </summary>
 public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 {
+    /// <summary>
+    /// Gets the singleton instance of <see cref="VsWindowStyler"/>.
+    /// </summary>
     public static VsWindowStyler Instance { get; } = new();
 
     #region Keys
@@ -62,6 +68,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private VsWindowStyler() { }
 
+    /// <summary>
+    /// Tells the <see cref="VsWindowStyler"/> to start listening to and styling Visual Studio windows.
+    /// </summary>
     public void Listen()
     {
         if (disposed)
@@ -597,12 +606,25 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     #region IsTrackedProperty
 
+    /// <summary>
+    /// Gets the value of the <see cref="IsTrackedProperty"/> attached property from a given <see cref="FrameworkElement"/>.
+    /// </summary>
+    /// <param name="target">The <see cref="FrameworkElement"/> from which to read the property value.</param>
+    /// <returns>The value of the <see cref="IsTrackedProperty"/> attached property.</returns>
     public static bool GetIsTracked(FrameworkElement target) =>
         (bool)target.GetValue(IsTrackedProperty);
 
+    /// <summary>
+    /// Sets the value of the <see cref="IsTrackedProperty"/> attached property from a given <see cref="FrameworkElement"/>.
+    /// </summary>
+    /// <param name="target">The <see cref="FrameworkElement"/> on which to set the attached property.</param>
+    /// <param name="value">The property value to set.</param>
     public static void SetIsTracked(FrameworkElement target, bool value) =>
         target.SetValue(IsTrackedProperty, value);
 
+    /// <summary>
+    /// Identifies the MicaVisualStudio.VisualStudio.VsWindowStyler.IsTracked dependency property.
+    /// </summary>
     public static readonly DependencyProperty IsTrackedProperty =
         DependencyProperty.RegisterAttached("IsTracked", typeof(bool), typeof(VsWindowStyler), new(defaultValue: false));
 
@@ -634,6 +656,9 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private bool disposed;
 
+    /// <summary>
+    /// Disposes the singleton instance of <see cref="VsWindowStyler"/>.
+    /// </summary>
     public void Dispose()
     {
         if (disposed)

@@ -168,13 +168,13 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             else if (WindowObserver.CurrentWindow is Window window) //Apply to start window
                 AddWindow(window);
 
-            observer.WindowOpened += (s, e) => ApplyWindowPreferences(e.WindowHandle, s, e.WindowType);
-            //windows.WindowClosed += (s, e) => { };
+            observer.WindowOpened += WindowOpened;
+            //windows.WindowClosed += WindowClosed;
 
-            colors.VisualStudioThemeChanged += (s, e) => RefreshPreferences();
-            theme.SystemThemeChanged += (s, e) => RefreshPreferences();
+            colors.VisualStudioThemeChanged += ThemeChanged;
+            theme.SystemThemeChanged += ThemeChanged;
 
-            General.Saved += (s) => RefreshPreferences();
+            General.Saved += GeneralSaved;
         }
         catch (Exception ex)
         {
@@ -194,15 +194,6 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             WindowObserver.MainWindow.Loaded -= Window_Loaded;
         }
 
-        void RefreshPreferences()
-        {
-            General general = General.Instance;
-            theme.SetAppTheme(EvaluateTheme(general.AppTheme));
-
-            foreach (var entry in observer.Windows)
-                ApplyWindowPreferences(entry.Key, entry.Value.Window, entry.Value.Type, firstTime: false, general);
-        }
-
         void AddWindow(Window window)
         {
             observer.AppendWindow(window);
@@ -212,6 +203,27 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 WindowHelper.GetWindowType(window));
         }
     }
+
+    #region Event Handlers
+
+    private void WindowOpened(Window sender, WindowActionEventArgs args) => ApplyWindowPreferences(args.WindowHandle, sender, args.WindowType);
+
+    //private void WindowClosed(Window sender, WindowActionEventArgs args) { }
+
+    private void ThemeChanged(object sender, Theme args) => RefreshPreferences();
+
+    private void GeneralSaved(General sender) => RefreshPreferences();
+
+    private void RefreshPreferences()
+    {
+        General general = General.Instance;
+        theme.SetAppTheme(EvaluateTheme(general.AppTheme));
+
+        foreach (var entry in observer.Windows)
+            ApplyWindowPreferences(entry.Key, entry.Value.Window, entry.Value.Type, firstTime: false, general);
+    }
+
+    #endregion
 
     private void ApplyWindowPreferences(
         IntPtr handle,
@@ -283,6 +295,14 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
         if (disposing)
         {
+            observer.WindowOpened -= WindowOpened;
+            //windows.WindowClosed -= WindowClosed;
+
+            colors.VisualStudioThemeChanged -= ThemeChanged;
+            theme.SystemThemeChanged -= ThemeChanged;
+
+            General.Saved -= GeneralSaved;
+
             theme = null;
             observer = null;
 

@@ -41,7 +41,7 @@ body:
     attributes:
       label: Extension name
       description: If third-party, name of the extension.
-      placeholder: "Example: Tech5G5G.MicaVisualStudio"
+      placeholder: "Tech5G5G.MicaVisualStudio"
     validations:
       required: false
   - type: textarea

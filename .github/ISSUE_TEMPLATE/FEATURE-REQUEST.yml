@@ -1,5 +1,6 @@
 name: ⭐ Feature request
 description: Suggest an idea
+title: "[FEATURE] "
 labels: ["enhancement"]
 assignees:
   - tech5g5g

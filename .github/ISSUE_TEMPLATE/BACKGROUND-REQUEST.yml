@@ -47,7 +47,7 @@ body:
   - type: textarea
     attributes:
       label: Addtional context
-      description: Any other context about request or background.
+      description: Any other context about the request or background.
     validations:
       required: false
       

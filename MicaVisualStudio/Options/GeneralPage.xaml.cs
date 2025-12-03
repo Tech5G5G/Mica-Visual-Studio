@@ -1,11 +1,7 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using Community.VisualStudio.Toolkit;
-
-namespace MicaVisualStudio.Options
+﻿namespace MicaVisualStudio.Options
 {
     /// <summary>
-    /// Interaction logic for GeneralWpf.xaml
+    /// Interaction logic for GeneralPage.xaml
     /// </summary>
     public partial class GeneralPage : UserControl
     {
@@ -13,31 +9,16 @@ namespace MicaVisualStudio.Options
         {
             InitializeComponent();
 
-            var general = General.Instance;
+            General general = General.Instance;
+            windowOptions.SetOptionModel(general);
 
-            InitializeComboBox(backdrop, general, nameof(General.Backdrop));
-            InitializeComboBox(cornerPreference, general, nameof(General.CornerPreference));
+            WindowOptions.InitializeComboBox(theme, nameof(General.AppTheme), general);
+            WindowOptions.InitializeCheckBox(force, nameof(General.ForceTransparency), general);
+            WindowOptions.InitializeCheckBox(layered, nameof(General.LayeredWindows), general);
 
-            InitializeComboBox(toolBackdrop, general, nameof(General.ToolBackdrop)); 
-            InitializeComboBox(toolCornerPreference, general, nameof(General.ToolCornerPreference));
-
-            toolWindowsGrid.Visibility = (toolWindows.IsChecked = general.ToolWindows) == true ? Visibility.Visible : Visibility.Collapsed;
-            toolWindows.Click += (s, e) =>
-            {
-                toolWindowsGrid.Visibility = (General.Instance.ToolWindows = toolWindows.IsChecked == true) ? Visibility.Visible : Visibility.Collapsed;
-                General.Instance.Save();    
-            };
+            Force_Click(this, new());
         }
 
-        private void InitializeComboBox<T>(ComboBox box, T model, string propertyName) where T : BaseOptionModel<T>, new()
-        {
-            var prop = model.GetType().GetProperty(propertyName);
-            box.SelectedIndex = (int)prop.GetValue(model);
-            box.SelectionChanged += (s, e) =>
-            {
-                prop.SetValue(General.Instance, box.SelectedIndex);
-                General.Instance.Save();
-            };
-        }
+        private void Force_Click(object sender, RoutedEventArgs args) => layered.IsEnabled = force.IsChecked == true;
     }
 }

@@ -7,7 +7,7 @@ type: bug
 body:
   - type: checkboxes
     attributes:
-      label: I have checked:
+      label: "I have checked:"
       options:
         - label: This is not a duplicate of another issue
           required: true

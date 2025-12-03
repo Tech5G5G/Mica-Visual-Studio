@@ -295,11 +295,11 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
         if (disposing)
         {
-            observer.WindowOpened -= WindowOpened;
-            //windows.WindowClosed -= WindowClosed;
+            observer?.WindowOpened -= WindowOpened;
+            //windows?.WindowClosed -= WindowClosed;
 
-            colors.VisualStudioThemeChanged -= ThemeChanged;
-            theme.SystemThemeChanged -= ThemeChanged;
+            colors?.VisualStudioThemeChanged -= ThemeChanged;
+            theme?.SystemThemeChanged -= ThemeChanged;
 
             General.Saved -= GeneralSaved;
 

@@ -1,0 +1,39 @@
+name: ⭐ Feature request
+description: Suggest an idea
+labels: ["enhancement"]
+assignees:
+  - tech5g5g
+body:
+  - type: checkboxes
+    attributes:
+      label: "I have checked:"
+      options:
+        - label: This is not a duplicate of another issue
+          required: true
+        - label: This is not an bug/background removal request
+          required: true
+  - type: textarea
+    attributes:
+      label: "Describe the feature you'd like"
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of what the problem is.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Addtional context
+      description: Any other context about the feature request.
+    validations:
+      required: false
+      

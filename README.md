@@ -16,7 +16,7 @@ Official documentation of these materials can be found here (excluding Glass): [
 
 ## Compatibility
 
-In order to use Mica Visual Studio, you must be using:
+Mica Visual Studio is meant to be used with:
 * Visual Studio 2026 or later
 * Windows 11 or later
 

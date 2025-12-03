@@ -8,7 +8,7 @@ public sealed class WindowObserver : IDisposable
     /// <summary>
     /// Gets the singleton instance of <see cref="WindowObserver"/>.
     /// </summary>
-    public static WindowObserver Instance { get; } = new();
+    public static WindowObserver Instance => field ??= new();
 
     #region Static Properties
 

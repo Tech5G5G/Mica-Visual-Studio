@@ -8,16 +8,16 @@ using Expression = System.Linq.Expressions.Expression;
 
 namespace MicaVisualStudio.VisualStudio;
 
-//This code is bad, but it works, so...
 /// <summary>
 /// Represents an observer that listens and styles Visual Studio windows.
 /// </summary>
+//This code is bad, but it works, so...
 public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 {
     /// <summary>
     /// Gets the singleton instance of <see cref="VsWindowStyler"/>.
     /// </summary>
-    public static VsWindowStyler Instance { get; } = new();
+    public static VsWindowStyler Instance => field ??= new();
 
     #region Keys
 

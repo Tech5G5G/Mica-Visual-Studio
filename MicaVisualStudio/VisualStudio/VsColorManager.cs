@@ -11,7 +11,7 @@ public sealed class VsColorManager
     /// <summary>
     /// Gets the singleton instance of <see cref="VsColorManager"/>.
     /// </summary>
-    public static VsColorManager Instance { get; } = new();
+    public static VsColorManager Instance => field ??= new();
 
     private static Color TransparentWhite = Colors.Transparent,
         TranslucentBlack = Color.FromArgb(0x01, 0x00, 0x00, 0x00); //Slight alpha to change icon foreground (basically invisible)

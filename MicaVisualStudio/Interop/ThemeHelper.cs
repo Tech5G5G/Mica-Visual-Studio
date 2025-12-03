@@ -10,7 +10,7 @@ public sealed class ThemeHelper : IDisposable
     /// <summary>
     /// Gets the singleton instance of <see cref="ThemeHelper"/>.
     /// </summary>
-    public static ThemeHelper Instance { get; } = new();
+    public static ThemeHelper Instance => field ??= new();
 
     #region PInvoke
 

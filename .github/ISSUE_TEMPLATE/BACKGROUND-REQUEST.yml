@@ -1,0 +1,45 @@
+name: 🖼️ Background removal request
+description: Report background(s) that need to be removed
+labels: ["bug", "enhancement"]
+assignees:
+  - tech5g5g
+body:
+  - type: checkboxes
+    attributes:
+      label: "I have checked:"
+      options:
+        - label: This is not a duplicate of another issue
+          required: true
+        - label: This is not an bug/feature request
+          required: true
+  - type: textarea
+    attributes:
+      label: What background?
+      description: A clear and concise description of which background and where to find it. Be sure to include an image!
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Expected background
+      description: What background is expected here.
+      options:
+        - Transparent
+        - Layered (half translucent)
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Origin
+      description: Where does the background originate from?
+      options:
+        - First-party (Visual Studio)
+        - Third-party (Extension)
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Addtional context
+      description: Any other context about request or background.
+    validations:
+      required: false
+      

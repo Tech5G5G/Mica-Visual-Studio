@@ -1,4 +1,4 @@
-![Mica Visual Studio showcase image](https://tech5g5g.gallerycdn.vsassets.io/extensions/tech5g5g/micavisualstudio/1.0.1/1742596589608/image__2.png)
+![Mica Visual Studio showcase image](https://github.com/user-attachments/assets/84393113-b591-46fd-9472-dd197f869326)
 
 ## Overview
 

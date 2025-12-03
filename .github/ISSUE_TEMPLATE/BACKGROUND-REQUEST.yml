@@ -24,7 +24,7 @@ body:
       description: What background is expected here.
       options:
         - Transparent
-        - Layered (half translucent background)
+        - Layered (half translucent)
     validations:
       required: true
   - type: dropdown

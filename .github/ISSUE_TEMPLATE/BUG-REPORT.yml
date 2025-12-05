@@ -1,5 +1,6 @@
 name: 🪲 Bug report
 description: Report bugs and errors
+title: "[BUG] "
 labels: ["bug"]
 assignees:
   - tech5g5g

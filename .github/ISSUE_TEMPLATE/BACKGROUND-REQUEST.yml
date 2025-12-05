@@ -1,6 +1,7 @@
 name: 🖼️ Background removal request
 description: Report background(s) that need to be removed
-labels: ["bug", "enhancement"]
+title: "[BACKGROUND] "
+labels: ["background"]
 assignees:
   - tech5g5g
 body:
@@ -40,13 +41,13 @@ body:
     attributes:
       label: Extension name
       description: If third-party, name of the extension.
-      placeholder: "Example: Tech5G5G.MicaVisualStudio"
+      placeholder: "Tech5G5G.MicaVisualStudio"
     validations:
       required: false
   - type: textarea
     attributes:
       label: Addtional context
-      description: Any other context about request or background.
+      description: Any other context about the request or background.
     validations:
       required: false
       

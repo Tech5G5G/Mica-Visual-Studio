@@ -191,7 +191,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         {
             if (value is not null or Popup //Avoid unnecessary
                 or Window) //and already handled values
-                instance.CompositionTarget.BackgroundColor = Colors.Transparent;
+                instance.CompositionTarget?.BackgroundColor = Colors.Transparent;
         }
 
         #endregion

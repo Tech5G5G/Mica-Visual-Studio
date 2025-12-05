@@ -159,7 +159,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         visualHook = new(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), context =>
         {
-            ILCursor cursor = new(context) { Index = 0 };
+            ILCursor cursor = new(context);
+            cursor.Index = cursor.Instrs.Count - 1; //Move cursor to end, but before return
 
             cursor.Emit(OpCodes.Ldarg_0); //this (Visual)
             cursor.Emit(OpCodes.Ldarg_1); //child
@@ -169,7 +170,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         sourceHook = new(typeof(HwndSource).GetProperty("RootVisual").SetMethod, context =>
         {
-            ILCursor cursor = new(context) { Index = 0 };
+            ILCursor cursor = new(context);
+            cursor.Index = cursor.Instrs.Count - 1;
 
             cursor.Emit(OpCodes.Ldarg_0); //this (HwndSource)
             cursor.Emit(OpCodes.Ldarg_1); //value

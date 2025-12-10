@@ -105,9 +105,6 @@
     <PackageReference Include="Community.VisualStudio.Toolkit.17">
       <Version>17.0.545</Version>
     </PackageReference>
-    <PackageReference Include="Lib.Harmony">
-      <Version>2.4.2</Version>
-    </PackageReference>
     <PackageReference Include="MessagePack">
       <Version>3.1.4</Version>
     </PackageReference>
@@ -117,6 +114,9 @@
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120" NoWarn="NU1604">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="MonoMod.RuntimeDetour">
+      <Version>25.3.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

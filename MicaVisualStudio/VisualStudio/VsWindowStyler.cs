@@ -345,7 +345,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             {
                 var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
                 if (sources.Any(i => i.Handle == host.Handle))
-                    return;
+                    continue;
 
                 var children = Interop.WindowHelper.GetChildren(host.Handle);
 

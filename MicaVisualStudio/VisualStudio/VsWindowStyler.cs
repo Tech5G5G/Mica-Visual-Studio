@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
+using System.Reflection.Emit;
 using System.Windows.Shapes;
 using Microsoft.Internal.VisualStudio.PlatformUI;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
+using HarmonyLib;
 using Expression = System.Linq.Expressions.Expression;
 
 namespace MicaVisualStudio.VisualStudio;
@@ -19,9 +18,15 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     /// </summary>
     public static VsWindowStyler Instance => field ??= new();
 
-    #region Keys
+    #region Constants
+
+    private const string HarmonyId = "com.tech5g5g.micavisualstudio";
 
     private const string MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
+
+    #endregion
+
+    #region Keys
 
     private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
 
@@ -61,8 +66,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     #endregion
 
-    private ILHook visualHook,
-        sourceHook;
+    private Harmony harmony;
 
     private bool makeLayered = true;
 
@@ -157,34 +161,47 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 ApplyToWindow(s);
         };
 
-        visualHook = new(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), context =>
+        harmony = new(HarmonyId);
+
+        harmony.Patch(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), transpiler: new(VisualTranspiler));
+        harmony.Patch(typeof(HwndSource).GetProperty("RootVisual").SetMethod, transpiler: new(SourceTranspiler));
+
+        static IEnumerable<CodeInstruction> VisualTranspiler(IEnumerable<CodeInstruction> instructions)
         {
-            ILCursor cursor = new(context);
-            cursor.Index = cursor.Instrs.Count - 1; //Move cursor to end, but before return
+            var list = instructions.ToList();
+            var action = VisualChildAdded;
 
-            cursor.Emit(OpCodes.Ldarg_0); //this (Visual)
-            cursor.Emit(OpCodes.Ldarg_1); //child
+            list.InsertRange(
+                list.Count - 2, //Adjust for index and final return
+                [
+                    new(OpCodes.Ldarg_0), //Load this (Visual)
+                    new(OpCodes.Call, action.Method)
+                ]);
 
-            cursor.EmitDelegate(VisualChildAdded);
-        });
+            return list;
+        }
 
-        sourceHook = new(typeof(HwndSource).GetProperty("RootVisual").SetMethod, context =>
-        {
-            ILCursor cursor = new(context);
-            cursor.Index = cursor.Instrs.Count - 1;
-
-            cursor.Emit(OpCodes.Ldarg_0); //this (HwndSource)
-            cursor.Emit(OpCodes.Ldarg_1); //value
-
-            cursor.EmitDelegate(RootVisualChanged);
-        });
-
-        static void VisualChildAdded(Visual instance, Visual child)
+        static void VisualChildAdded(Visual instance)
         {
             if (instance is ContentControl or ContentPresenter or Decorator or Panel && //Avoid unnecessary work
-                instance is FrameworkElement content &&
-                GetIsTracked(content) && Instance is VsWindowStyler styler)
-                styler.ApplyToContent(content, applyToDock: false);
+                instance is FrameworkElement content && GetIsTracked(content))
+                Instance?.ApplyToContent(content, applyToDock: false);
+        }
+
+        static IEnumerable<CodeInstruction> SourceTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var list = instructions.ToList();
+            var action = RootVisualChanged;
+
+            list.InsertRange(
+                list.Count - 2,
+                [
+                    new(OpCodes.Ldarg_0), //Load this (HwndSource)
+                    new(OpCodes.Ldarg_1), //Load value
+                    new(OpCodes.Call, action.Method)
+                ]);
+
+            return list;
         }
 
         static void RootVisualChanged(HwndSource instance, Visual value)
@@ -666,9 +683,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         if (disposed)
             return;
 
-        visualHook?.Dispose();
-        sourceHook?.Dispose();
-        visualHook = sourceHook = null;
+        harmony?.UnpatchAll();
+        harmony = null;
 
 #pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
         if (cookie > 0)

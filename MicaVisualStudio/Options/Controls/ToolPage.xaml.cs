@@ -1,4 +1,4 @@
-﻿namespace MicaVisualStudio.Options
+﻿namespace MicaVisualStudio.Options.Controls
 {
     /// <summary>
     /// Interaction logic for ToolPage.xaml

@@ -102,11 +102,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Mono.Cecil">
+      <Version>0.11.6</Version>
+    </PackageReference>
     <PackageReference Include="Community.VisualStudio.Toolkit.17">
       <Version>17.0.545</Version>
-    </PackageReference>
-    <PackageReference Include="MessagePack">
-      <Version>3.1.4</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime" NoWarn="NU1604">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -115,9 +115,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MonoMod.RuntimeDetour">
-      <Version>25.3.3</Version>
-    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoMod\MonoMod\src\MonoMod.Utils\MonoMod.Utils.csproj" />
+    <ProjectReference Include="..\MonoMod\MonoMod\src\MonoMod.RuntimeDetour\MonoMod.RuntimeDetour.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Options\DialogPage.xaml">

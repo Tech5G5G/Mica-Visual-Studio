@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
+  <Extern href="stdidcmd.h"/>
+
+  <!--This header contains the command ids for the menus provided by the shell. -->
+  <Extern href="vsshlids.h"/>
+
+  <!--The Commands section is where commands, menus, and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+  <Commands package="guidMicaVisualStudioPackage">
+    <Menus>
+      <Menu guid="guidMicaVisualStudioPackageCmdSet" id="BackdropSubMenu" priority="0x0100" type="Menu">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="MVSMenuGroup"/>
+        <Strings>
+          <ButtonText>Backdrop</ButtonText>
+          <CommandName>Backdrop</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
+    
+    <Groups>
+      <Group guid="guidMicaVisualStudioPackageCmdSet" id="MVSMenuGroup" priority="0x0100">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      </Group>
+
+      <Group guid="guidMicaVisualStudioPackageCmdSet" id="MaterialsSubmenuGroup" priority="0x0000">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="BackdropSubMenu"/>
+      </Group>
+
+      <Group guid="guidMicaVisualStudioPackageCmdSet" id="MoreSubmenuGroup" priority="0x0000">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="BackdropSubMenu"/>
+      </Group>
+    </Groups>
+
+    <!--Buttons section. -->
+    <!--This section defines the elements the user can interact with, like a menu command or a button
+        or combo box in a toolbar. -->
+    <Buttons>
+      <Button guid="guidMicaVisualStudioPackageCmdSet" id="NoneCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="MaterialsSubmenuGroup" />
+        <Strings>
+          <ButtonText>None</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidMicaVisualStudioPackageCmdSet" id="MicaCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="MaterialsSubmenuGroup" />
+        <Strings>
+          <ButtonText>Mica</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidMicaVisualStudioPackageCmdSet" id="TabbedCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="MaterialsSubmenuGroup" />
+        <Strings>
+          <ButtonText>Tabbed</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidMicaVisualStudioPackageCmdSet" id="AcrylicCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="MaterialsSubmenuGroup" />
+        <Strings>
+          <ButtonText>Acrylic</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidMicaVisualStudioPackageCmdSet" id="GlassCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="MaterialsSubmenuGroup" />
+        <Strings>
+          <ButtonText>Glass</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidMicaVisualStudioPackageCmdSet" id="MoreCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidMicaVisualStudioPackageCmdSet" id="MoreSubmenuGroup" />
+        <Icon guid="imageCatalog" id="settings" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>More options...</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <Symbols>
+    <!-- Package guid. -->
+    <GuidSymbol name="guidMicaVisualStudioPackage" value="{1a10bdf6-6cb0-415e-8ddd-f16d897f1e4a}" />
+
+    <GuidSymbol name="guidMicaVisualStudioPackageCmdSet" value="{89c88597-b045-43a5-bc13-8d34202031e8}">
+      <IDSymbol name="MVSMenuGroup" value="0x1020" />
+      <IDSymbol name="BackdropSubMenu" value="0x1100" />
+      
+      <IDSymbol name="MaterialsSubmenuGroup" value="0x1150" />
+      <IDSymbol name="MoreSubmenuGroup" value="0x1200" />
+
+      <IDSymbol name="NoneCommandId" value="0x0100" />
+      <IDSymbol name="MicaCommandId" value="0x0105" />
+      <IDSymbol name="TabbedCommandId" value="0x0110" />
+      <IDSymbol name="AcrylicCommandId" value="0x0115" />
+      <IDSymbol name="GlassCommandId" value="0x0120" />
+
+      <IDSymbol name="MoreCommandId" value="0x0125" />
+    </GuidSymbol>
+
+    <GuidSymbol name="imageCatalog" value="{ae27a6b0-e345-4288-96df-5eaf394ee369}">
+      <IDSymbol name="settings" value="2767" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

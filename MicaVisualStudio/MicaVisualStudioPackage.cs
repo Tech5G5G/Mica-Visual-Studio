@@ -28,6 +28,7 @@
 [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.EmptySolution, PackageAutoLoadFlags.BackgroundLoad)]
+[ProvideMenuResource("Menus.ctmenu", 1)]
 public sealed class MicaVisualStudioPackage : AsyncPackage
 {
     /// <summary>
@@ -157,6 +158,8 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
             theme = ThemeHelper.Instance;
             observer = WindowObserver.Instance;
+
+            await BackdropCommands.InitializeAsync(package: this);
 
             RefreshPreferences(); //Set app theme
 
@@ -296,18 +299,12 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
         if (disposing)
         {
             observer?.WindowOpened -= WindowOpened;
-            //windows?.WindowClosed -= WindowClosed;
+            //observer?.WindowClosed -= WindowClosed;
 
             colors?.VisualStudioThemeChanged -= ThemeChanged;
             theme?.SystemThemeChanged -= ThemeChanged;
 
             General.Saved -= GeneralSaved;
-
-            theme = null;
-            observer = null;
-
-            colors = null;
-            styler = null;
         }
 
         base.Dispose(disposing);

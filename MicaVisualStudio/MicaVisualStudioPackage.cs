@@ -147,7 +147,9 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 { "WonderbarTreeInactiveSelected", ColorConfig.Default },
 
                 { "Details", ColorConfig.Layered },
-                { "BackgroundLowerRegion", ColorConfig.Default }
+
+                { "BackgroundLowerRegion", ColorConfig.Default },
+                { "WizardBackgroundLowerRegion", ColorConfig.Default }
             });
             colors.UpdateColors();
 

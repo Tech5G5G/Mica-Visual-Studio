@@ -244,6 +244,13 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private void ApplyToWindow(Window window)
     {
+        //Wizards (e.g. packaged app creation wizard)
+        if (window.GetType().FullName == "Microsoft.VisualStudio.WizardFrameworkWpf.WizardBase")
+        {
+            ApplyToContent(window, applyToDock: false);
+            return;
+        }
+
         foreach (var element in window.FindDescendants<FrameworkElement>())
 
             //Warning dialog, footer
@@ -510,14 +517,14 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                     break;
 
                                 default:
-                                    if (e is ItemsControl { ItemContainerStyle: Style cs } ic) //Changes
+                                    if (e is ItemsControl { ItemContainerStyle: Style ics } ic) //Changes
                                     {
                                         ic.Background = Brushes.Transparent;
 
-                                        if (!cs.IsSealed)
+                                        if (!ics.IsSealed)
                                         {
-                                            cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
-                                            cs.Setters.Add(new Setter(Control.BorderBrushProperty, Brushes.Transparent));
+                                            ics.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
+                                            ics.Setters.Add(new Setter(Control.BorderBrushProperty, Brushes.Transparent));
                                         }
                                     }
                                     break;
@@ -534,6 +541,14 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                     case "WpfTextView" when element is ContentControl:
                         control.Background = Brushes.Transparent;
                         control.FindDescendant<Canvas>()?.Background = Brushes.Transparent;
+                        break;
+
+                    //Packaged app configurations list
+                    case "PackageConfigurationsList" when control is DataGrid grid:
+                        grid.Background = grid.RowBackground = Brushes.Transparent;
+
+                        if (grid.CellStyle is Style { Setters.IsSealed: false } cs)
+                            cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
                         break;
 
                     default:

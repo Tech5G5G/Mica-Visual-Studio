@@ -551,6 +551,14 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                             cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
                         break;
 
+                    //VSIX manfiest editor
+                    case "VsixEditorControl":
+                        control.Background = Brushes.Transparent;
+
+                        foreach (var tab in control.FindDescendants<TabItem>())
+                            tab.Background = Brushes.Transparent;
+                        break;
+
                     default:
                         switch (control.GetType().FullName)
                         {

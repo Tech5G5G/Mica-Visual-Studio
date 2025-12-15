@@ -412,6 +412,54 @@ public static class WindowHelper
 
     #endregion
 
+    #region Windowing
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+    private const uint SWP_NOSIZE = 0x0001,
+        SWP_NOZORDER = 0x0004,
+        SWP_NOACTIVATE = 0x0010;
+
+    /// <summary>
+    /// Gets the current position of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <returns>A <see cref="System.Drawing.Point"/> representing the position in screen coordinates.</returns>
+    public static System.Drawing.Point GetWindowPosition(IntPtr hWnd)
+    {
+        RECT rect = new();
+        GetWindowRect(hWnd, ref rect);
+        return new(rect.left, rect.top);
+    }
+
+    /// <summary>
+    /// Moves the specified <paramref name="hWnd"/> the specified <paramref name="location"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="location">A <see cref="System.Drawing.Point"/> in screen coordinates.</param>
+    public static void MoveWindow(IntPtr hWnd, System.Drawing.Point location) => SetWindowPos(
+        hWnd, IntPtr.Zero,
+        location.X, location.Y,
+        0, 0,
+        SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+
+    /// <summary>
+    /// Offsets the specified <paramref name="hWnd"/> by the specified <paramref name="offset"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="offset">A <see cref="System.Drawing.Point"/> in screen coordinates.</param>
+    public static void OffsetWindow(IntPtr hWnd, System.Drawing.Point offset)
+    {
+        var pos = GetWindowPosition(hWnd);
+        MoveWindow(hWnd, location: new(pos.X + offset.X, pos.Y + offset.Y));
+    }
+
+    #endregion
+
     #region Utilities
 
     [DllImport("user32.dll")]

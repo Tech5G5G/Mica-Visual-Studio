@@ -56,21 +56,26 @@ namespace MicaVisualStudio
             this.package = package ?? throw new ArgumentNullException(nameof(package));
             this.commandService = commandService;
 
-            selection = (BackdropType)General.Instance.Backdrop switch
-            {
-                BackdropType.None => NoneCommandId,
-                BackdropType.Tabbed => TabbedCommandId,
-                BackdropType.Acrylic => AcrylicCommandId,
-                BackdropType.Glass => GlassCommandId,
-                _ => MicaCommandId
-            };
+            UpdateSelection(General.Instance);
+            General.Saved += UpdateSelection;
 
             foreach (var id in new int[] { NoneCommandId, MicaCommandId, TabbedCommandId, AcrylicCommandId, GlassCommandId })
                 RegisterCommand(id);
 
+            //Add additional "More options..." command
             commandService.AddCommand(new(
                 (s, e) => VS.Settings.OpenAsync<OptionsProvider.GeneralOptions>().Forget(),
                 new(CommandSet, MoreCommandId)));
+
+            void UpdateSelection(General general) =>
+                selection = (BackdropType)general.Backdrop switch
+                {
+                    BackdropType.None => NoneCommandId,
+                    BackdropType.Tabbed => TabbedCommandId,
+                    BackdropType.Acrylic => AcrylicCommandId,
+                    BackdropType.Glass => GlassCommandId,
+                    _ => MicaCommandId
+                };
         }
 
         /// <summary>

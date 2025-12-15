@@ -278,7 +278,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
         void ApplyWindowAttributes(int theme, CornerPreference corner, BackdropType backdrop)
         {
-            WindowHelper.SetDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
+            WindowHelper.EnableDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
             WindowHelper.SetCornerPreference(handle, corner);
             WindowHelper.SetBackdropType(handle, window is not null || backdrop != BackdropType.Glass ? backdrop : BackdropType.None);
         }

@@ -61,7 +61,7 @@ public static class WindowHelper
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <param name="enable">Whether or not to enable dark mode.</param>
-    public static void SetDarkMode(IntPtr hWnd, bool enable)
+    public static void EnableDarkMode(IntPtr hWnd, bool enable)
     {
         int mode = enable ? 1 : 0;
         SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(int));
@@ -88,7 +88,7 @@ public static class WindowHelper
         int type = (int)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
         SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
 
-        SetWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
+        EnableWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public static class WindowHelper
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <param name="enable">Whether or not to enable transparency.</param>
-    public static void SetWindowTransparency(IntPtr hWnd, bool enable)
+    public static void EnableWindowTransparency(IntPtr hWnd, bool enable)
     {
         DWM_BLURBEHIND bb = new()
         {

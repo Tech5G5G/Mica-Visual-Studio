@@ -267,8 +267,9 @@ public static class WindowHelper
             switch (msg)
             {
                 case WM_DESTROY:
-                    source.RemoveHook(Hook); //Avoid memory leaks
+                    HwndSource.FromHwnd(hWnd)?.RemoveHook(Hook); //Avoid memory leaks
                     break;
+
                 case WM_STYLECHANGING when (int)wParam == GWL_STYLE:
                     STYLESTRUCT structure = Marshal.PtrToStructure<STYLESTRUCT>(lParam);
 
@@ -281,6 +282,7 @@ public static class WindowHelper
                     Marshal.StructureToPtr(structure, lParam, fDeleteOld: true);
                     handled = true;
                     break;
+
                 case WM_NCRBUTTONUP when (int)wParam == HTCAPTION:
                     ShowMenu(
                         hWnd,
@@ -289,6 +291,7 @@ public static class WindowHelper
                         keyboard: false);
                     handled = true;
                     break;
+
                 case WM_SYSKEYDOWN when (int)wParam == VK_SPACE && IsAltPressed(lParam):
                     int height = GetTitleBarHeight(hWnd);
 

@@ -22,6 +22,9 @@ public static class WindowHelper
     [DllImport("gdi32.dll")]
     private static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowCompositionAttribute(IntPtr hwnd, ref WINDOWCOMPOSITIONATTRIBDATA pwcad);
+
     private const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
         DWMWA_WINDOW_CORNER_PREFERENCE = 33;
@@ -29,6 +32,11 @@ public static class WindowHelper
     private const uint DWM_BB_ENABLE = 0x1,
         DWM_BB_BLURREGION = 0x2,
         DWM_BB_TRANSITIONONMAXIMIZED = 0x4;
+
+    private const int WCA_ACCENT_POLICY = 19;
+
+    private const int ACCENT_DISABLED = 0,
+        ACCENT_ENABLE_ACRYLICBLURBEHIND = 4;
 
     private struct MARGINS
     {
@@ -44,6 +52,23 @@ public static class WindowHelper
         public bool fEnable;
         public IntPtr hRgnBlur;
         public bool fTransitionOnMaximized;
+    }
+
+    private struct WINDOWCOMPOSITIONATTRIBDATA
+    {
+        public int Attrib;
+        public IntPtr pvData;
+        public uint cbData;
+    }
+
+    private struct AccentPolicy
+    {
+        public int AccentState;
+#pragma warning disable 0649
+        public int AccentFlags;
+        public int GradientColor;
+        public int AnimationId;
+#pragma warning restore 0649
     }
 
     /// <summary>
@@ -106,6 +131,33 @@ public static class WindowHelper
             dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION | DWM_BB_TRANSITIONONMAXIMIZED
         };
         _ = EnableBlurBehindWindow(hWnd, ref bb);
+    }
+
+    /// <summary>
+    /// Enables or disables a blur effect used as the specified <paramref name="hWnd"/>'s background.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="enable">Whether or not to enable blurring.</param>
+    public static void EnableWindowBlur(IntPtr hWnd, bool enable)
+    {
+        AccentPolicy policy = new()
+        {
+            AccentState = enable ? ACCENT_ENABLE_ACRYLICBLURBEHIND : ACCENT_DISABLED
+        };
+
+        var size = Marshal.SizeOf<AccentPolicy>();
+        var ptr = Marshal.AllocHGlobal(size);
+        Marshal.StructureToPtr(policy, ptr, fDeleteOld: false);
+
+        WINDOWCOMPOSITIONATTRIBDATA data = new()
+        {
+            Attrib = WCA_ACCENT_POLICY,
+            pvData = ptr,
+            cbData = (uint)size
+        };
+
+        SetWindowCompositionAttribute(hWnd, ref data);
+        Marshal.FreeHGlobal(ptr);
     }
 
     #endregion

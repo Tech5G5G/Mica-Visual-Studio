@@ -28,6 +28,7 @@
 [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.EmptySolution, PackageAutoLoadFlags.BackgroundLoad)]
+[ProvideMenuResource("Menus.ctmenu", 1)]
 public sealed class MicaVisualStudioPackage : AsyncPackage
 {
     /// <summary>
@@ -146,7 +147,9 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 { "WonderbarTreeInactiveSelected", ColorConfig.Default },
 
                 { "Details", ColorConfig.Layered },
-                { "BackgroundLowerRegion", ColorConfig.Default }
+
+                { "BackgroundLowerRegion", ColorConfig.Default },
+                { "WizardBackgroundLowerRegion", ColorConfig.Default }
             });
             colors.UpdateColors();
 
@@ -157,6 +160,8 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
             theme = ThemeHelper.Instance;
             observer = WindowObserver.Instance;
+
+            await BackdropCommands.InitializeAsync(package: this);
 
             RefreshPreferences(); //Set app theme
 
@@ -273,7 +278,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
 
         void ApplyWindowAttributes(int theme, CornerPreference corner, BackdropType backdrop)
         {
-            WindowHelper.SetDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
+            WindowHelper.EnableDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
             WindowHelper.SetCornerPreference(handle, corner);
             WindowHelper.SetBackdropType(handle, window is not null || backdrop != BackdropType.Glass ? backdrop : BackdropType.None);
         }
@@ -296,18 +301,12 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
         if (disposing)
         {
             observer?.WindowOpened -= WindowOpened;
-            //windows?.WindowClosed -= WindowClosed;
+            //observer?.WindowClosed -= WindowClosed;
 
             colors?.VisualStudioThemeChanged -= ThemeChanged;
             theme?.SystemThemeChanged -= ThemeChanged;
 
             General.Saved -= GeneralSaved;
-
-            theme = null;
-            observer = null;
-
-            colors = null;
-            styler = null;
         }
 
         base.Dispose(disposing);

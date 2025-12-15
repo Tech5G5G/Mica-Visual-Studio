@@ -22,6 +22,9 @@ public static class WindowHelper
     [DllImport("gdi32.dll")]
     private static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowCompositionAttribute(IntPtr hwnd, ref WINDOWCOMPOSITIONATTRIBDATA pwcad);
+
     private const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
         DWMWA_WINDOW_CORNER_PREFERENCE = 33;
@@ -29,6 +32,11 @@ public static class WindowHelper
     private const uint DWM_BB_ENABLE = 0x1,
         DWM_BB_BLURREGION = 0x2,
         DWM_BB_TRANSITIONONMAXIMIZED = 0x4;
+
+    private const int WCA_ACCENT_POLICY = 19;
+
+    private const int ACCENT_DISABLED = 0,
+        ACCENT_ENABLE_ACRYLICBLURBEHIND = 4;
 
     private struct MARGINS
     {
@@ -46,6 +54,23 @@ public static class WindowHelper
         public bool fTransitionOnMaximized;
     }
 
+    private struct WINDOWCOMPOSITIONATTRIBDATA
+    {
+        public int Attrib;
+        public IntPtr pvData;
+        public uint cbData;
+    }
+
+    private struct AccentPolicy
+    {
+        public int AccentState;
+#pragma warning disable 0649
+        public int AccentFlags;
+        public int GradientColor;
+        public int AnimationId;
+#pragma warning restore 0649
+    }
+
     /// <summary>
     /// Extends the frame of the specified <paramref name="hWnd"/> into its client area.
     /// </summary>
@@ -61,7 +86,7 @@ public static class WindowHelper
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <param name="enable">Whether or not to enable dark mode.</param>
-    public static void SetDarkMode(IntPtr hWnd, bool enable)
+    public static void EnableDarkMode(IntPtr hWnd, bool enable)
     {
         int mode = enable ? 1 : 0;
         SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(int));
@@ -88,7 +113,7 @@ public static class WindowHelper
         int type = (int)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
         SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
 
-        SetWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
+        EnableWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
     }
 
     /// <summary>
@@ -96,7 +121,7 @@ public static class WindowHelper
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <param name="enable">Whether or not to enable transparency.</param>
-    public static void SetWindowTransparency(IntPtr hWnd, bool enable)
+    public static void EnableWindowTransparency(IntPtr hWnd, bool enable)
     {
         DWM_BLURBEHIND bb = new()
         {
@@ -106,6 +131,33 @@ public static class WindowHelper
             dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION | DWM_BB_TRANSITIONONMAXIMIZED
         };
         _ = EnableBlurBehindWindow(hWnd, ref bb);
+    }
+
+    /// <summary>
+    /// Enables or disables a blur effect used as the specified <paramref name="hWnd"/>'s background.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="enable">Whether or not to enable blurring.</param>
+    public static void EnableWindowBlur(IntPtr hWnd, bool enable)
+    {
+        AccentPolicy policy = new()
+        {
+            AccentState = enable ? ACCENT_ENABLE_ACRYLICBLURBEHIND : ACCENT_DISABLED
+        };
+
+        var size = Marshal.SizeOf<AccentPolicy>();
+        var ptr = Marshal.AllocHGlobal(size);
+        Marshal.StructureToPtr(policy, ptr, fDeleteOld: false);
+
+        WINDOWCOMPOSITIONATTRIBDATA data = new()
+        {
+            Attrib = WCA_ACCENT_POLICY,
+            pvData = ptr,
+            cbData = (uint)size
+        };
+
+        SetWindowCompositionAttribute(hWnd, ref data);
+        Marshal.FreeHGlobal(ptr);
     }
 
     #endregion
@@ -215,8 +267,9 @@ public static class WindowHelper
             switch (msg)
             {
                 case WM_DESTROY:
-                    source.RemoveHook(Hook); //Avoid memory leaks
+                    HwndSource.FromHwnd(hWnd)?.RemoveHook(Hook); //Avoid memory leaks
                     break;
+
                 case WM_STYLECHANGING when (int)wParam == GWL_STYLE:
                     STYLESTRUCT structure = Marshal.PtrToStructure<STYLESTRUCT>(lParam);
 
@@ -229,6 +282,7 @@ public static class WindowHelper
                     Marshal.StructureToPtr(structure, lParam, fDeleteOld: true);
                     handled = true;
                     break;
+
                 case WM_NCRBUTTONUP when (int)wParam == HTCAPTION:
                     ShowMenu(
                         hWnd,
@@ -237,6 +291,7 @@ public static class WindowHelper
                         keyboard: false);
                     handled = true;
                     break;
+
                 case WM_SYSKEYDOWN when (int)wParam == VK_SPACE && IsAltPressed(lParam):
                     int height = GetTitleBarHeight(hWnd);
 
@@ -354,6 +409,54 @@ public static class WindowHelper
     /// <param name="hWnd">A handle to a window.</param>
     /// <param name="styles">The <see cref="WindowStylesEx"/> to set.</param>
     public static void SetExtendedWindowStyles(IntPtr hWnd, WindowStylesEx styles) => SetWindowLong(hWnd, GWL_EXSTYLE, (uint)styles);
+
+    #endregion
+
+    #region Windowing
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+    private const uint SWP_NOSIZE = 0x0001,
+        SWP_NOZORDER = 0x0004,
+        SWP_NOACTIVATE = 0x0010;
+
+    /// <summary>
+    /// Gets the current position of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <returns>A <see cref="System.Drawing.Point"/> representing the position in screen coordinates.</returns>
+    public static System.Drawing.Point GetWindowPosition(IntPtr hWnd)
+    {
+        RECT rect = new();
+        GetWindowRect(hWnd, ref rect);
+        return new(rect.left, rect.top);
+    }
+
+    /// <summary>
+    /// Moves the specified <paramref name="hWnd"/> the specified <paramref name="location"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="location">A <see cref="System.Drawing.Point"/> in screen coordinates.</param>
+    public static void MoveWindow(IntPtr hWnd, System.Drawing.Point location) => SetWindowPos(
+        hWnd, IntPtr.Zero,
+        location.X, location.Y,
+        0, 0,
+        SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+
+    /// <summary>
+    /// Offsets the specified <paramref name="hWnd"/> by the specified <paramref name="offset"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="offset">A <see cref="System.Drawing.Point"/> in screen coordinates.</param>
+    public static void OffsetWindow(IntPtr hWnd, System.Drawing.Point offset)
+    {
+        var pos = GetWindowPosition(hWnd);
+        MoveWindow(hWnd, location: new(pos.X + offset.X, pos.Y + offset.Y));
+    }
 
     #endregion
 

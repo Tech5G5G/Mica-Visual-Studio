@@ -17,7 +17,7 @@
         [ComVisible(true)]
         public class DialogOptions : UIElementDialogPage
         {
-            protected override UIElement Child => new Options.DialogPage();
+            protected override UIElement Child => new Options.Controls.DialogPage();
         }
     }
 

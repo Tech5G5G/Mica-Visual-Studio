@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace MicaVisualStudio.Options
+namespace MicaVisualStudio.Options.Controls
 {
     /// <summary>
     /// Interaction logic for WindowOptions.xaml
@@ -112,13 +112,25 @@ namespace MicaVisualStudio.Options
             var instanceProp = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy);
             var prop = type.GetProperty(propertyName);
 
-            box.SelectedIndex = (int)prop.GetValue(model);
-            box.SelectionChanged += (s, e) =>
+            UpdateIndex();
+            box.SelectionChanged += SelectionChanged;
+
+            type.GetEvent("Saved", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+                .AddEventHandler(target: null, new Action<T>(m =>
+                {
+                    box.SelectionChanged -= SelectionChanged;
+                    UpdateIndex();
+                    box.SelectionChanged += SelectionChanged;
+                }));
+
+            void UpdateIndex() => box.SelectedIndex = (int)prop.GetValue(model);
+
+            void SelectionChanged(object sender, RoutedEventArgs args)
             {
-                var instance = (T)instanceProp.GetValue(null);
+                var instance = (T)instanceProp.GetValue(obj: null);
                 prop.SetValue(instance, box.SelectedIndex);
                 instance.Save();
-            };
+            }
         }
 
         /// <summary>

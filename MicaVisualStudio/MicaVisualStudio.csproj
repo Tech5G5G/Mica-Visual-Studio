@@ -46,6 +46,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Options\BackdropCommands.cs" />
     <Compile Include="Extensions\ExpressionExtensions.cs" />
     <Compile Include="Extensions\TreeExtensions.cs" />
     <Compile Include="GlobalUsings.cs" />
@@ -56,17 +57,17 @@
     <Compile Include="VisualStudio\EnumFramesExtensions.cs" />
     <Compile Include="VisualStudio\WindowObserver.cs" />
     <Compile Include="Interop\WinEventHook.cs" />
-    <Compile Include="Options\DialogPage.xaml.cs">
+    <Compile Include="Options\Controls\DialogPage.xaml.cs">
       <DependentUpon>DialogPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\General.cs" />
-    <Compile Include="Options\GeneralPage.xaml.cs">
+    <Compile Include="Options\Controls\GeneralPage.xaml.cs">
       <DependentUpon>GeneralPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Options\ToolPage.xaml.cs">
+    <Compile Include="Options\Controls\ToolPage.xaml.cs">
       <DependentUpon>ToolPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Options\WindowOptions.xaml.cs">
+    <Compile Include="Options\Controls\WindowOptions.xaml.cs">
       <DependentUpon>WindowOptions.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,11 +76,18 @@
     <Compile Include="VisualStudio\VsWindowStyler.cs" />
   </ItemGroup>
   <ItemGroup>
+    <VSCTCompile Include="MicaVisualStudioPackage.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
     <Content Include="Resources\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\license.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\third-party-notices.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -102,11 +110,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Mono.Cecil">
+      <Version>0.11.6</Version>
+    </PackageReference>
     <PackageReference Include="Community.VisualStudio.Toolkit.17">
       <Version>17.0.545</Version>
-    </PackageReference>
-    <PackageReference Include="MessagePack">
-      <Version>3.1.4</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime" NoWarn="NU1604">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -115,24 +123,25 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MonoMod.RuntimeDetour">
-      <Version>25.3.3</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Options\DialogPage.xaml">
+    <ProjectReference Include="..\MonoMod\MonoMod\src\MonoMod.Utils\MonoMod.Utils.csproj" />
+    <ProjectReference Include="..\MonoMod\MonoMod\src\MonoMod.RuntimeDetour\MonoMod.RuntimeDetour.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Options\Controls\DialogPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\GeneralPage.xaml">
+    <Page Include="Options\Controls\GeneralPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\ToolPage.xaml">
+    <Page Include="Options\Controls\ToolPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\WindowOptions.xaml">
+    <Page Include="Options\Controls\WindowOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

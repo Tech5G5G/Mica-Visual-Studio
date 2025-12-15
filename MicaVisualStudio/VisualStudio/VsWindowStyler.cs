@@ -23,7 +23,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private const string MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
 
-    private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
+    private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered",
+        PopupBackgroundLayeredKey = "VsBrush.PopupBackgroundLayered";
 
     private readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundColor);
@@ -61,8 +62,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     #endregion
 
-    private ILHook visualHook,
-        sourceHook;
+    private ILHook visualHook, sourceHook;
 
     private bool makeLayered = true;
 
@@ -113,20 +113,30 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         #endregion
 
-        #region Layered Brush
+        #region Layered Brushes
 
-        AddLayeredBrush();
-        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (s, e) => AddLayeredBrush();
+        AddLayeredBrushes();
+        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (s, e) => AddLayeredBrushes();
 
-        void AddLayeredBrush()
+        void AddLayeredBrushes()
         {
             var color = shell5?.GetThemedWPFColor(SolidBackgroundFillTertiaryKey) ?? default;
-            color.A = 0xFF / 2; //50% opacity
 
-            SolidColorBrush brush = new(color);
+            SolidColorBrush halfBrush = new(color with { A = 0xFF / 2 }); //50% opacity
+            SolidColorBrush quarterBrush = new(color with { A = 0xFF / 4 }); //25% opacity
+
             foreach (var dictionary in Application.Current.Resources.MergedDictionaries.OfType<DeferredResourceDictionaryBase>())
+            {
                 if (!dictionary.Contains(SolidBackgroundFillTertiaryLayeredKey))
-                    dictionary.Add(SolidBackgroundFillTertiaryLayeredKey, brush);
+                    dictionary.Add(SolidBackgroundFillTertiaryLayeredKey, halfBrush);
+
+                if (!dictionary.Contains(PopupBackgroundLayeredKey))
+                    if (VsColorManager.Instance.VisualStudioTheme == Theme.Light ||
+                        (quarterBrush.Color.R != quarterBrush.Color.G && quarterBrush.Color.G != quarterBrush.Color.B))
+                        dictionary.Add(PopupBackgroundLayeredKey, quarterBrush);
+                    else //Full acrylic experience for those who can handle it
+                        dictionary.Add(PopupBackgroundLayeredKey, new SolidColorBrush(Colors.Transparent with { A = 0x01 }));
+            }
         }
 
         #endregion
@@ -157,29 +167,15 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 ApplyToWindow(s);
         };
 
-        visualHook = new(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), context =>
-        {
-            ILCursor cursor = new(context);
-            cursor.Index = cursor.Instrs.Count - 1; //Move cursor to end, but before return
+        visualHook = CreatePostfix<Visual, Visual>(
+            typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic),
+            AddVisualChild);
 
-            cursor.Emit(OpCodes.Ldarg_0); //this (Visual)
-            cursor.Emit(OpCodes.Ldarg_1); //child
+        sourceHook = CreatePostfix<HwndSource, Visual>(
+            typeof(HwndSource).GetProperty("RootVisual").SetMethod,
+            RootVisualChanged);
 
-            cursor.EmitDelegate(VisualChildAdded);
-        });
-
-        sourceHook = new(typeof(HwndSource).GetProperty("RootVisual").SetMethod, context =>
-        {
-            ILCursor cursor = new(context);
-            cursor.Index = cursor.Instrs.Count - 1;
-
-            cursor.Emit(OpCodes.Ldarg_0); //this (HwndSource)
-            cursor.Emit(OpCodes.Ldarg_1); //value
-
-            cursor.EmitDelegate(RootVisualChanged);
-        });
-
-        static void VisualChildAdded(Visual instance, Visual child)
+        static void AddVisualChild(Visual instance, Visual child)
         {
             if (instance is ContentControl or ContentPresenter or Decorator or Panel && //Avoid unnecessary work
                 instance is FrameworkElement content &&
@@ -189,9 +185,43 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         static void RootVisualChanged(HwndSource instance, Visual value)
         {
-            if (value is not null or Popup //Avoid unnecessary
-                or Window) //and already handled values
-                instance.CompositionTarget?.BackgroundColor = Colors.Transparent;
+            if (value is null || instance.CompositionTarget is null)
+                return;
+
+            //Visual Studio popup
+            if (value is FrameworkElement element &&
+                element.Parent is Popup && //Check if root of popup
+                element.FindDescendant<FrameworkElement>(i => i.Name == "DropShadowBorder") is Border drop)
+            {
+                //Remove current border and update background to be translucent
+                drop.BorderBrush = Brushes.Transparent;
+                drop.SetResourceReference(Border.BackgroundProperty, PopupBackgroundLayeredKey);
+
+                //Get left-side offset to move window by
+                var offset = GetPopupOffset(element);
+
+                if (offset == default) //Get if any offset already cached
+                    if (element.FindDescendant<ToolTip>() is ToolTip tip)
+                    {
+                        SetPopupOffset(element, offset = new(tip.Margin.Left, tip.Margin.Top));
+                        tip.Margin = default;
+                    }
+                    else
+                    {
+                        SetPopupOffset(element, offset = new(drop.Margin.Left, drop.Margin.Top));
+                        drop.Margin = default;
+                    }
+
+                //Get and update window position
+                var deviceOffset = instance.CompositionTarget.TransformToDevice.Transform(offset);
+                Interop.WindowHelper.OffsetWindow(instance.Handle, offset: new((int)deviceOffset.X, (int)deviceOffset.Y));
+
+                //Add acrylic, shadow, and border
+                Interop.WindowHelper.EnableWindowBlur(instance.Handle, enable: true);
+                Interop.WindowHelper.SetCornerPreference(instance.Handle, CornerPreference.Round);
+            }
+            else if (value is not Window) //Avoid already handled values
+                instance.CompositionTarget.BackgroundColor = Colors.Transparent;
         }
 
         #endregion
@@ -244,6 +274,13 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private void ApplyToWindow(Window window)
     {
+        //Wizards (e.g. packaged app creation wizard)
+        if (window.GetType().FullName == "Microsoft.VisualStudio.WizardFrameworkWpf.WizardBase")
+        {
+            ApplyToContent(window, applyToDock: false);
+            return;
+        }
+
         foreach (var element in window.FindDescendants<FrameworkElement>())
 
             //Warning dialog, footer
@@ -345,7 +382,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             {
                 var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
                 if (sources.Any(i => i.Handle == host.Handle))
-                    return;
+                    continue;
 
                 var children = Interop.WindowHelper.GetChildren(host.Handle);
 
@@ -510,14 +547,14 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                                     break;
 
                                 default:
-                                    if (e is ItemsControl { ItemContainerStyle: Style cs } ic) //Changes
+                                    if (e is ItemsControl { ItemContainerStyle: Style ics } ic) //Changes
                                     {
                                         ic.Background = Brushes.Transparent;
 
-                                        if (!cs.IsSealed)
+                                        if (!ics.IsSealed)
                                         {
-                                            cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
-                                            cs.Setters.Add(new Setter(Control.BorderBrushProperty, Brushes.Transparent));
+                                            ics.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
+                                            ics.Setters.Add(new Setter(Control.BorderBrushProperty, Brushes.Transparent));
                                         }
                                     }
                                     break;
@@ -534,6 +571,22 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                     case "WpfTextView" when element is ContentControl:
                         control.Background = Brushes.Transparent;
                         control.FindDescendant<Canvas>()?.Background = Brushes.Transparent;
+                        break;
+
+                    //Packaged app configurations list
+                    case "PackageConfigurationsList" when control is DataGrid grid:
+                        grid.Background = grid.RowBackground = Brushes.Transparent;
+
+                        if (grid.CellStyle is Style { Setters.IsSealed: false } cs)
+                            cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
+                        break;
+
+                    //VSIX manfiest editor
+                    case "VsixEditorControl":
+                        control.Background = Brushes.Transparent;
+
+                        foreach (var tab in control.FindDescendants<TabItem>())
+                            tab.Background = Brushes.Transparent;
                         break;
 
                     default:
@@ -606,6 +659,18 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         }
     }
 
+    private static ILHook CreatePostfix<T0, T1>(MethodInfo info, Action<T0, T1> action) =>
+        new(info, context =>
+        {
+            ILCursor cursor = new(context);
+            cursor.Index = cursor.Instrs.Count - 1; //Move cursor to end, but before return
+
+            cursor.Emit(OpCodes.Ldarg_0); //this
+            cursor.Emit(OpCodes.Ldarg_1); //First parameter
+
+            cursor.EmitDelegate(action);
+        });
+
     #region IsTrackedProperty
 
     /// <summary>
@@ -629,6 +694,32 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
     /// </summary>
     public static readonly DependencyProperty IsTrackedProperty =
         DependencyProperty.RegisterAttached("IsTracked", typeof(bool), typeof(VsWindowStyler), new(defaultValue: false));
+
+    #endregion
+
+    #region PopupOffsetProperty
+
+    /// <summary>
+    /// Gets the value of the <see cref="PopupOffsetProperty"/> attached property from a given <see cref="FrameworkElement"/>.
+    /// </summary>
+    /// <param name="target">The <see cref="FrameworkElement"/> from which to read the property value.</param>
+    /// <returns>The value of the <see cref="PopupOffsetProperty"/> attached property.</returns>
+    public static Point GetPopupOffset(FrameworkElement target) =>
+        (Point)target.GetValue(PopupOffsetProperty);
+
+    /// <summary>
+    /// Sets the value of the <see cref="PopupOffsetProperty"/> attached property from a given <see cref="FrameworkElement"/>.
+    /// </summary>
+    /// <param name="target">The <see cref="FrameworkElement"/> on which to set the attached property.</param>
+    /// <param name="value">The property value to set.</param>
+    public static void SetPopupOffset(FrameworkElement target, Point value) =>
+        target.SetValue(PopupOffsetProperty, value);
+
+    /// <summary>
+    /// Identifies the MicaVisualStudio.VisualStudio.VsWindowStyler.IsTracked dependency property.
+    /// </summary>
+    public static readonly DependencyProperty PopupOffsetProperty =
+        DependencyProperty.RegisterAttached("PopupOffset", typeof(Point), typeof(VsWindowStyler), new(defaultValue: default(Point)));
 
     #endregion
 

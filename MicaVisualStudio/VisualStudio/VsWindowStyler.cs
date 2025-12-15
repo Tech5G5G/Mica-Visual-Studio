@@ -157,27 +157,13 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 ApplyToWindow(s);
         };
 
-        visualHook = new(typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic), context =>
-        {
-            ILCursor cursor = new(context);
-            cursor.Index = cursor.Instrs.Count - 1; //Move cursor to end, but before return
+        visualHook = CreatePostfix<Visual, Visual>(
+            typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic),
+            AddVisualChild);
 
-            cursor.Emit(OpCodes.Ldarg_0); //this (Visual)
-            cursor.Emit(OpCodes.Ldarg_1); //child
-
-            cursor.EmitDelegate(VisualChildAdded);
-        });
-
-        sourceHook = new(typeof(HwndSource).GetProperty("RootVisual").SetMethod, context =>
-        {
-            ILCursor cursor = new(context);
-            cursor.Index = cursor.Instrs.Count - 1;
-
-            cursor.Emit(OpCodes.Ldarg_0); //this (HwndSource)
-            cursor.Emit(OpCodes.Ldarg_1); //value
-
-            cursor.EmitDelegate(RootVisualChanged);
-        });
+        sourceHook = CreatePostfix<HwndSource, Visual>(
+            typeof(HwndSource).GetProperty("RootVisual").SetMethod,
+            RootVisualChanged);
 
         static void VisualChildAdded(Visual instance, Visual child)
         {
@@ -628,6 +614,18 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 }
         }
     }
+
+    private static ILHook CreatePostfix<T0, T1>(MethodInfo info, Action<T0, T1> action) =>
+        new(info, context =>
+        {
+            ILCursor cursor = new(context);
+            cursor.Index = cursor.Instrs.Count - 1; //Move cursor to end, but before return
+
+            cursor.Emit(OpCodes.Ldarg_0); //this
+            cursor.Emit(OpCodes.Ldarg_1); //First parameter
+
+            cursor.EmitDelegate(action);
+        });
 
     #region IsTrackedProperty
 

@@ -14,6 +14,8 @@ With Mica Visual Studio, you can choose between four materials to apply as your 
 
 Official documentation of these materials can be found here (excluding Glass): [Materials in Windows (learn.microsoft.com)](https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/materials)
 
+To switch which material you use as your backdrop, use the **Tools > Backdrop** submenu.
+
 ## Compatibility
 
 Mica Visual Studio is meant to be used with:
@@ -24,4 +26,4 @@ Mica Visual Studio is meant to be used with:
 
 Additional information and documentation about Mica Visual Studio and its settings are available on its [wiki](https://github.com/Tech5G5G/Mica-Visual-Studio/wiki).
 
-If you find a bug with Mica Visual Studio, or have an idea to improve it, please [create an issue](https://github.com/Tech5G5G/Mica-Visual-Studio/issues) using the appropriate template.
+If you find a bug with Mica Visual Studio, or have an idea to improve it, please [file an issue](https://github.com/Tech5G5G/Mica-Visual-Studio/issues) using the appropriate template.

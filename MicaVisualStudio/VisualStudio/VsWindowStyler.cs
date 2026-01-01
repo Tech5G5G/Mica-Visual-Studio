@@ -141,7 +141,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         #endregion
 
-        #region Listeners
+        #region Events
 
 #pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
         cookie = shell7.AdviseWindowFrameEvents(this);
@@ -166,6 +166,10 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
             if (s is not null)
                 ApplyToWindow(s);
         };
+
+        #endregion
+
+        #region Hooks
 
         visualHook = CreatePostfix<Visual, Visual>(
             typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic),

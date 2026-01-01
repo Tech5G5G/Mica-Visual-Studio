@@ -745,32 +745,6 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     #endregion
 
-    #region PopupOffsetProperty
-
-    /// <summary>
-    /// Gets the value of the <see cref="PopupOffsetProperty"/> attached property from a given <see cref="FrameworkElement"/>.
-    /// </summary>
-    /// <param name="target">The <see cref="FrameworkElement"/> from which to read the property value.</param>
-    /// <returns>The value of the <see cref="PopupOffsetProperty"/> attached property.</returns>
-    public static Point GetPopupOffset(FrameworkElement target) =>
-        (Point)target.GetValue(PopupOffsetProperty);
-
-    /// <summary>
-    /// Sets the value of the <see cref="PopupOffsetProperty"/> attached property from a given <see cref="FrameworkElement"/>.
-    /// </summary>
-    /// <param name="target">The <see cref="FrameworkElement"/> on which to set the attached property.</param>
-    /// <param name="value">The property value to set.</param>
-    public static void SetPopupOffset(FrameworkElement target, Point value) =>
-        target.SetValue(PopupOffsetProperty, value);
-
-    /// <summary>
-    /// Identifies the MicaVisualStudio.VisualStudio.VsWindowStyler.IsTracked dependency property.
-    /// </summary>
-    public static readonly DependencyProperty PopupOffsetProperty =
-        DependencyProperty.RegisterAttached("PopupOffset", typeof(Point), typeof(VsWindowStyler), new(defaultValue: default(Point)));
-
-    #endregion
-
     #region IVsWindowFrameEvents
 
     public void OnFrameCreated(IVsWindowFrame frame) { }

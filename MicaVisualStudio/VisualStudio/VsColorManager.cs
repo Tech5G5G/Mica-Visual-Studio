@@ -154,7 +154,7 @@ public sealed class VsColorManager
     #endregion
 
     private Color DetermineColor(Color color, ColorConfig config) =>
-        !config.IsTranslucent || (config.TransparentOnGray && color.R == color.G && color.G == color.B) ?
+        !config.IsTranslucent || (config.TransparentOnGray && color.IsGray()) ?
         (vsTheme == Theme.Light ? TransparentWhite : TranslucentBlack) :
         Color.FromArgb(Math.Min(config.Opacity, color.A), color.R, color.G, color.B);
 }

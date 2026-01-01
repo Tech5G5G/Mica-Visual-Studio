@@ -131,11 +131,11 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                     dictionary.Add(SolidBackgroundFillTertiaryLayeredKey, halfBrush);
 
                 if (!dictionary.Contains(PopupBackgroundLayeredKey))
-                    if (VsColorManager.Instance.VisualStudioTheme == Theme.Light ||
-                        (quarterBrush.Color.R != quarterBrush.Color.G && quarterBrush.Color.G != quarterBrush.Color.B))
-                        dictionary.Add(PopupBackgroundLayeredKey, quarterBrush);
-                    else //Full acrylic experience for those who can handle it
-                        dictionary.Add(PopupBackgroundLayeredKey, new SolidColorBrush(Colors.Transparent with { A = 0x01 }));
+                    dictionary.Add(
+                        PopupBackgroundLayeredKey,
+                        VsColorManager.Instance.VisualStudioTheme == Theme.Dark && color.IsGray() ?
+                        new SolidColorBrush(Color.FromArgb(0x01, 0x00, 0x00, 0x00)) : //Full acrylic experience for those who can handle it
+                        quarterBrush);
             }
         }
 

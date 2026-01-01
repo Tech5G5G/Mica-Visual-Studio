@@ -63,8 +63,8 @@ public static class WindowHelper
 
     private struct AccentPolicy
     {
-        public int AccentState;
 #pragma warning disable 0649
+        public int AccentState;
         public int AccentFlags;
         public int GradientColor;
         public int AnimationId;
@@ -137,12 +137,14 @@ public static class WindowHelper
     /// Enables or disables a blur effect used as the specified <paramref name="hWnd"/>'s background.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="fallback">A fallback <see cref="System.Drawing.Color"/> to use if blurring is not available.</param>
     /// <param name="enable">Whether or not to enable blurring.</param>
-    public static void EnableWindowBlur(IntPtr hWnd, bool enable)
+    public static void EnableWindowBlur(IntPtr hWnd, System.Drawing.Color fallback, bool enable)
     {
         AccentPolicy policy = new()
         {
-            AccentState = enable ? ACCENT_ENABLE_ACRYLICBLURBEHIND : ACCENT_DISABLED
+            AccentState = enable ? ACCENT_ENABLE_ACRYLICBLURBEHIND : ACCENT_DISABLED,
+            GradientColor = ColorTranslator.ToWin32(fallback)
         };
 
         var size = Marshal.SizeOf<AccentPolicy>();

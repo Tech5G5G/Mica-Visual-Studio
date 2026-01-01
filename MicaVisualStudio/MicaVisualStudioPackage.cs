@@ -94,6 +94,11 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 { "ToolWindowBackground", ColorConfig.Default },
                 { "ToolWindowFloatingFrame", ColorConfig.Default },
                 { "ToolWindowFloatingFrameInactive", ColorConfig.Default },
+                { "ToolWindowTabMouseOverBackgroundGradient", ColorConfig.Layered },
+
+                { "ToolWindowContentGrid", ColorConfig.Layered },
+
+                { "PopupBackground", ColorConfig.Default },
 
                 { "Default", ColorConfig.Default },
 
@@ -122,8 +127,6 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
                 { "ComboBoxBackground", ColorConfig.Layered },
 
                 { "InfoBarBorder", ColorConfig.Default },
-
-                { "ToolWindowTabMouseOverBackgroundGradient", ColorConfig.Layered },
 
                 { "Page", ColorConfig.Default },
                 { "PageBackground", ColorConfig.Default },
@@ -161,7 +164,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
             theme = ThemeHelper.Instance;
             observer = WindowObserver.Instance;
 
-            await BackdropCommands.InitializeAsync(package: this);
+            await BackdropCommands.InitializeAsync(package: this); 
 
             RefreshPreferences(); //Set app theme
 
@@ -239,8 +242,11 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
     {
         general ??= General.Instance;
 
+        if (window?.AllowsTransparency == true) //Don't apply to transparent windows
+            return;
+
         if (firstTime && //Remove caption buttons once
-            window is not null &&
+            window is not null && //Check that window is WPF
             HwndSource.FromHwnd(handle) is HwndSource source)
         {
             WindowHelper.ExtendFrameIntoClientArea(handle);

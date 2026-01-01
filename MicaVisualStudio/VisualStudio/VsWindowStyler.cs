@@ -685,7 +685,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                         break;
 
                     default:
-                        if (panel is DockPanel || (panel is Grid { Background: not null } && panel.FindAncestor<Control>() is not Button or TextBox))
+                        if (panel is DockPanel || (panel is Grid { Background: not null } && panel.FindAncestor<Control>() is not (Button or TextBox)))
                             panel.Background = Brushes.Transparent;
                         break;
                 }

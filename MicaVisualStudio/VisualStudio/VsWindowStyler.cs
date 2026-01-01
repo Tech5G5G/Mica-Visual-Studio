@@ -183,8 +183,8 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         {
             if (instance is ContentControl or ContentPresenter or Decorator or Panel && //Avoid unnecessary work
                 instance is FrameworkElement content &&
-                GetIsTracked(content) && Instance is VsWindowStyler styler)
-                styler.ApplyToContent(content, applyToDock: false);
+                GetIsTracked(content))
+                Instance?.ApplyToContent(content, applyToDock: false);
         }
 
         static void RootVisualChanged(HwndSource instance, Visual value)

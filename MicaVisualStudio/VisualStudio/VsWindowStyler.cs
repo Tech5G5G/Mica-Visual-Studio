@@ -425,16 +425,18 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                 (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
             }
 
-            else if (makeLayered && element is HwndHost { IsLoaded: true } host)
+            else if (layeredWindows && element is HwndHost { IsLoaded: true, Handle: IntPtr handle })
             {
-                var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
-                if (sources.Any(i => i.Handle == host.Handle))
+                var sources = PresentationSource.CurrentSources.OfType<HwndSource>()
+                                                               .Select(i => i.Handle)
+                                                               .ToArray();
+
+                if (sources.Any(i => i == handle))
                     continue;
 
-                var children = Interop.WindowHelper.GetChildren(host.Handle);
-
-                if (sources.FirstOrDefault(i => children.Contains(i.Handle)) is not HwndSource source)
-                    Interop.WindowHelper.MakeLayered(host.Handle);
+                var children = Interop.WindowHelper.GetChildren(handle);
+                if (!sources.Any(children.Contains))
+                    Interop.WindowHelper.MakeLayered(handle);
             }
 
             else if (element is Control control)

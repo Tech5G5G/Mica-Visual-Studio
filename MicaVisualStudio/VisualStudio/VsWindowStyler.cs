@@ -681,6 +681,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                     //Editor window, collapsed item container
                     case "Microsoft.VisualStudio.Text.Editor.Implementation.AdornmentLayer":
                         foreach (var rectangle in panel.FindDescendants<Rectangle>())
+                            if (rectangle.RadiusX > 0 || rectangle.StrokeThickness <= 0) //Check for selected line highlight from fluent redesign
                             rectangle.SetResourceReference(Shape.FillProperty, SolidBackgroundFillTertiaryLayeredKey);
                         break;
 

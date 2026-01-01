@@ -64,7 +64,7 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
     private ILHook visualHook, sourceHook;
 
-    private bool makeLayered = true;
+    private bool layeredWindows = true, acrylicMenus = true;
 
     private VsWindowStyler() { }
 
@@ -189,48 +189,26 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 
         static void RootVisualChanged(HwndSource instance, Visual value)
         {
-            if (value is null || instance.CompositionTarget is null)
-                return;
-
-            //Visual Studio popup
-            if (value is FrameworkElement element &&
-                element.Parent is Popup && //Check if root of popup
-                element.FindDescendant<FrameworkElement>(i => i.Name == "DropShadowBorder") is Border drop)
+            if (value is not null && instance.CompositionTarget is not null)
             {
-                //Remove current border and update background to be translucent
-                drop.BorderBrush = Brushes.Transparent;
-                drop.SetResourceReference(Border.BackgroundProperty, PopupBackgroundLayeredKey);
+                if (value is FrameworkElement root &&
+                    root.Parent is Popup popup) //Check if owned by popup (popups use separate element as root of HwndSource)
+                    Instance?.ApplyToPopup(instance, popup, root);
 
-                //Get left-side offset to move window by
-                var offset = GetPopupOffset(element);
-
-                if (offset == default) //Get if any offset already cached
-                    if (element.FindDescendant<ToolTip>() is ToolTip tip)
-                    {
-                        SetPopupOffset(element, offset = new(tip.Margin.Left, tip.Margin.Top));
-                        tip.Margin = default;
-                    }
-                    else
-                    {
-                        SetPopupOffset(element, offset = new(drop.Margin.Left, drop.Margin.Top));
-                        drop.Margin = default;
-                    }
-
-                //Get and update window position
-                var deviceOffset = instance.CompositionTarget.TransformToDevice.Transform(offset);
-                Interop.WindowHelper.OffsetWindow(instance.Handle, offset: new((int)deviceOffset.X, (int)deviceOffset.Y));
-
-                //Add acrylic, shadow, and border
-                Interop.WindowHelper.EnableWindowBlur(instance.Handle, enable: true);
-                Interop.WindowHelper.SetCornerPreference(instance.Handle, CornerPreference.Round);
-            }
             else if (value is not Window) //Avoid already handled values
                 instance.CompositionTarget.BackgroundColor = Colors.Transparent;
+        }
         }
 
         #endregion
 
-        makeLayered = General.Instance.LayeredWindows;
+        #region Settings
+
+        var general = General.Instance;
+        layeredWindows = general.LayeredWindows;
+        acrylicMenus = general.AcrylicMenus;
+
+        #endregion
 
         ApplyToAllWindows();
         ApplyToAllWindowPanesAsync().Forget();
@@ -361,6 +339,71 @@ public sealed class VsWindowStyler : IVsWindowFrameEvents, IDisposable
                     Control.ForegroundProperty,
                     tab.IsSelected && get_View_IsActive(view) ? TextOnAccentFillPrimaryKey : TextFillPrimaryKey);
             }
+    }
+
+    private void ApplyToPopup(HwndSource source, Popup popup, FrameworkElement root)
+    {
+        if (!acrylicMenus || //Only proceed if acrylic menus are enabled
+            root.FindDescendant<Border>(i => i.Name == "DropShadowBorder") is not Border drop) //Shadow host
+            return;
+
+        //Remove margin
+        (root.FindDescendant<ToolTip>() is ToolTip tip ? //Tool tips use themselves for margins
+            tip : drop as FrameworkElement).Margin = default;
+
+        //If menu has custom placement (and doesn't have its callback already overridden)...
+        if (popup.Placement == PlacementMode.Custom && !GetIsTracked(popup))
+        {
+            const int LeftAlignedPlacementIndex = 1;
+
+            var callback = popup.CustomPopupPlacementCallback;
+            var originalXOffset = popup.HorizontalOffset;
+
+            popup.CustomPopupPlacementCallback = (popupSize, targetSize, offset) =>
+            {
+                var placement = callback(popupSize, targetSize, offset).ToList();
+
+                if (placement.Count >= LeftAlignedPlacementIndex + 1)
+                {
+                    //... replace left-aligned placement and add back X-axis margin accountment
+                    var leftAlignedPlacement = placement[LeftAlignedPlacementIndex];
+
+                    placement.Insert(
+                        LeftAlignedPlacementIndex,
+                        new(
+                            point: new(
+                                x: leftAlignedPlacement.Point.X + (originalXOffset * 2), //idk why 2x is needed
+                                y: leftAlignedPlacement.Point.Y),
+                            leftAlignedPlacement.PrimaryAxis));
+                    placement.RemoveAt(LeftAlignedPlacementIndex + 1); //Remove replaced placement
+                }
+
+                return [.. placement];
+            };
+
+            SetIsTracked(popup, value: true);
+    }
+
+        //Remove popup margin accountment
+        popup.HorizontalOffset = popup.VerticalOffset = 0;
+        popup.UpdateLayout();
+
+        //Remove current border and update background to be translucent
+        drop.BorderBrush = Brushes.Transparent;
+        drop.SetResourceReference(Border.BackgroundProperty, PopupBackgroundLayeredKey);
+
+        //Add shadow, border, and acrylic
+        Interop.WindowHelper.SetCornerPreference(source.Handle, CornerPreference.Round);
+
+        //Current popup background color
+        var color = (drop.Background as SolidColorBrush)?.Color ?? default;
+        Interop.WindowHelper.EnableWindowBlur(
+            source.Handle,
+            fallback: VsColorManager.Instance.VisualStudioTheme == Theme.Dark && color.IsGray() ?
+                System.Drawing.Color.FromArgb(0x2C, 0x2C, 0x2C) : //Dark mode acrylic fallback
+                System.Drawing.Color.FromArgb(color.R, color.G, color.B),
+            enable: true);
+
     }
 
     private void ApplyToContent(FrameworkElement content, bool applyToDock = true)

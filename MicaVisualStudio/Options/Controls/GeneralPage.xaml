@@ -39,6 +39,9 @@
                         <RowDefinition Height="4" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="4" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <CheckBox x:Name="force"
@@ -54,6 +57,13 @@
                               Height="20" Margin="5,0,0,0"
                               Grid.Row="3" />
                     <TextBlock Text="Make child windows layered" Margin="5,0,0,0" Grid.Row="4" />
+
+                    <CheckBox x:Name="menus"
+                              Content="Acrylic menus"
+                              VerticalContentAlignment="Center"
+                              Height="20" Margin="5,0,0,0"
+                              Grid.Row="6" />
+                    <TextBlock Text="Add acrylic behind popups and menus" Margin="5,0,0,0" Grid.Row="7" />
                 </Grid>
             </GroupBox>
         </StackPanel>

@@ -97,5 +97,10 @@
         /// </summary>
         /// <remarks>Used by <see cref="VsWindowStyler"/>.</remarks>
         public bool LayeredWindows { get; set; } = true;
+        /// <summary>
+        /// Gets or sets whether popups are acrylicized.
+        /// </summary>
+        /// <remarks>Used by <see cref="VsWindowStyler"/>.</remarks>
+        public bool AcrylicMenus { get; set; } = true;
     }
 }

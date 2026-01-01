@@ -56,6 +56,10 @@
     <Compile Include="Extensions\WeakEventExtensions.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="VisualStudio\EnumFramesExtensions.cs" />
+    <Compile Include="VisualStudio\VsWindowStyler.Brushes.cs" />
+    <Compile Include="VisualStudio\VsWindowStyler.IL.cs" />
+    <Compile Include="VisualStudio\VsWindowStyler.FrameEvents.cs" />
+    <Compile Include="VisualStudio\VsWindowStyler.Style.cs" />
     <Compile Include="VisualStudio\WindowObserver.cs" />
     <Compile Include="Interop\WinEventHook.cs" />
     <Compile Include="Options\Controls\DialogPage.xaml.cs">

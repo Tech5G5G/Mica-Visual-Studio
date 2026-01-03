@@ -127,43 +127,43 @@ public partial class VsWindowStyler
         (root.FindDescendant<ToolTip>() is ToolTip tip ? //Tool tips use themselves for margins
             tip : drop as FrameworkElement).Margin = default;
 
-        //If menu has custom placement (and doesn't have its callback already overridden)...
-        if (popup.Placement == PlacementMode.Custom && !GetIsTracked(popup))
+        //Remove popup margin accountment
+        if (popup.HorizontalOffset == -12)
         {
-            const int LeftAlignedPlacementIndex = 1;
-
-            var callback = popup.CustomPopupPlacementCallback;
-            var originalXOffset = popup.HorizontalOffset;
-
-            popup.CustomPopupPlacementCallback = (popupSize, targetSize, offset) =>
+            //If menu has custom placement...
+            if (popup.Placement == PlacementMode.Custom)
             {
-                var placement = callback(popupSize, targetSize, offset).ToList();
+                const int LeftAlignedPlacementIndex = 1;
 
-                if (placement.Count >= LeftAlignedPlacementIndex + 1)
+                var callback = popup.CustomPopupPlacementCallback;
+                var originalXOffset = popup.HorizontalOffset;
+
+                popup.CustomPopupPlacementCallback = (popupSize, targetSize, offset) =>
                 {
-                    //... replace left-aligned placement and add back X-axis margin accountment
-                    var leftAlignedPlacement = placement[LeftAlignedPlacementIndex];
+                    var placement = callback(popupSize, targetSize, offset).ToList();
 
-                    placement.Insert(
-                        LeftAlignedPlacementIndex,
-                        new(
-                            point: new(
-                                x: leftAlignedPlacement.Point.X + (originalXOffset * 2), //idk why 2x is needed
-                                y: leftAlignedPlacement.Point.Y),
-                            leftAlignedPlacement.PrimaryAxis));
-                    placement.RemoveAt(LeftAlignedPlacementIndex + 1); //Remove replaced placement
-                }
+                    if (placement.Count >= LeftAlignedPlacementIndex + 1)
+                    {
+                        //... replace left-aligned placement and add back X-axis margin accountment
+                        var leftAlignedPlacement = placement[LeftAlignedPlacementIndex];
 
-                return [.. placement];
-            };
+                        placement.Insert(
+                            LeftAlignedPlacementIndex,
+                            new(
+                                point: new(
+                                    x: leftAlignedPlacement.Point.X + (originalXOffset * 2), //idk why 2x is needed
+                                    y: leftAlignedPlacement.Point.Y),
+                                leftAlignedPlacement.PrimaryAxis));
+                        placement.RemoveAt(LeftAlignedPlacementIndex + 1); //Remove replaced placement
+                    }
 
-            SetIsTracked(popup, value: true);
+                    return [.. placement];
+                };
+            }
+
+            popup.HorizontalOffset = 0;
+            popup.UpdateLayout();
         }
-
-        //Remove popup margin accountment (if not IntelliSense popup)
-        if (drop.FindDescendant<Control>(i => i.Name == "CompletionControl") is null)
-            popup.HorizontalOffset = popup.VerticalOffset = 0;
-        popup.UpdateLayout();
 
         //Replace border and update background to be translucent
         drop.CornerRadius = new(uniformRadius: 7);

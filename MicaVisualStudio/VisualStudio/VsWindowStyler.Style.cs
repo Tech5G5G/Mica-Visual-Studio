@@ -160,8 +160,9 @@ public partial class VsWindowStyler
             SetIsTracked(popup, value: true);
         }
 
-        //Remove popup margin accountment
-        popup.HorizontalOffset = popup.VerticalOffset = 0;
+        //Remove popup margin accountment (if not IntelliSense popup)
+        if (drop.FindDescendant<Control>(i => i.Name == "CompletionControl") is null)
+            popup.HorizontalOffset = popup.VerticalOffset = 0;
         popup.UpdateLayout();
 
         //Remove current border and update background to be translucent

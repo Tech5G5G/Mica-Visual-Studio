@@ -165,22 +165,24 @@ public partial class VsWindowStyler
             popup.HorizontalOffset = popup.VerticalOffset = 0;
         popup.UpdateLayout();
 
-        //Remove current border and update background to be translucent
-        drop.BorderBrush = Brushes.Transparent;
+        //Replace border and update background to be translucent
+        drop.CornerRadius = new(uniformRadius: 7);
+        drop.SetResourceReference(Border.BorderBrushProperty, PopupBorderOnAcrylicKey);
         drop.SetResourceReference(Border.BackgroundProperty, PopupBackgroundLayeredKey);
 
-        //Add shadow, border, and acrylic
-        WindowHelper.SetCornerPreference(source.Handle, CornerPreference.Round);
+        WindowHelper.SetCornerPreference(source.Handle, CornerPreference.Round); //Add shadow and corners
+        WindowHelper.EnableWindowBorder(source.Handle, enable: false); //Remove border (we have our own)
 
         //Current popup background color
         var color = (drop.Background as SolidColorBrush)?.Color ?? default;
+
+        //Enable acrylic
         WindowHelper.EnableWindowBlur(
             source.Handle,
             fallback: VsColorManager.Instance.VisualStudioTheme == Theme.Dark && color.IsGray() ?
                 System.Drawing.Color.FromArgb(0x2C, 0x2C, 0x2C) : //Dark mode acrylic fallback
                 System.Drawing.Color.FromArgb(color.R, color.G, color.B),
             enable: true);
-
     }
 
     #endregion

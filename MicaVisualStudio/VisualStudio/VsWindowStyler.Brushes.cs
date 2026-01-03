@@ -7,7 +7,8 @@ public partial class VsWindowStyler
     #region Keys
 
     private const string SolidBackgroundFillTertiaryLayeredKey = "VsBrush.SolidBackgroundFillTertiaryLayered",
-        PopupBackgroundLayeredKey = "VsBrush.PopupBackgroundLayered";
+        PopupBackgroundLayeredKey = "VsBrush.PopupBackgroundLayered",
+        PopupBorderOnAcrylicKey = "VsBrush.PopupBorderOnAcrylic";
 
     private readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundColor);
@@ -44,6 +45,13 @@ public partial class VsWindowStyler
                     VsColorManager.Instance.VisualStudioTheme == Theme.Dark && color.IsGray() ?
                     new SolidColorBrush(Color.FromArgb(0x01, 0x00, 0x00, 0x00)) : //Full acrylic experience for those who can handle it
                     quarterBrush);
+
+            if (!dictionary.Contains(PopupBorderOnAcrylicKey))
+                dictionary.Add(
+                   PopupBorderOnAcrylicKey,
+                   new SolidColorBrush(VsColorManager.Instance.VisualStudioTheme == Theme.Dark ?
+                   Color.FromArgb(0x55, 0x000, 0x00, 0x00) :
+                   Color.FromArgb(0x20, 0x000, 0x00, 0x00)));
         }
     }
 }

@@ -14,7 +14,7 @@ public static class WindowHelper
     private static extern int ExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
 
     [DllImport("dwmapi.dll", EntryPoint = "DwmSetWindowAttribute")]
-    private static extern int SetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
+    private static extern int SetWindowAttribute(IntPtr hwnd, int dwAttribute, ref uint pvAttribute, int cbAttribute);
 
     [DllImport("dwmapi.dll", EntryPoint = "DwmEnableBlurBehindWindow")]
     private static extern int EnableBlurBehindWindow(IntPtr hWnd, ref DWM_BLURBEHIND pBlurBehind);
@@ -27,7 +27,11 @@ public static class WindowHelper
 
     private const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
-        DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+        DWMWA_WINDOW_CORNER_PREFERENCE = 33,
+        DWMWA_BORDER_COLOR = 34;
+
+    private const uint DWMWA_COLOR_NONE = 0xFFFFFFFE,
+        DWMWA_COLOR_DEFAULT = 0xFFFFFFFF;
 
     private const uint DWM_BB_ENABLE = 0x1,
         DWM_BB_BLURREGION = 0x2,
@@ -88,8 +92,8 @@ public static class WindowHelper
     /// <param name="enable">Whether or not to enable dark mode.</param>
     public static void EnableDarkMode(IntPtr hWnd, bool enable)
     {
-        int mode = enable ? 1 : 0;
-        SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(int));
+        uint mode = enable ? 1u : 0;
+        SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(uint));
     }
 
     /// <summary>
@@ -99,8 +103,8 @@ public static class WindowHelper
     /// <param name="preference">The <see cref="CornerPreference"/> to set.</param>
     public static void SetCornerPreference(IntPtr hWnd, CornerPreference preference)
     {
-        int corner = (int)preference;
-        SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref corner, sizeof(int));
+        uint corner = (uint)preference;
+        SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref corner, sizeof(uint));
     }
 
     /// <summary>
@@ -110,10 +114,21 @@ public static class WindowHelper
     /// <param name="backdrop">The <see cref="BackdropType"/> to set.</param>
     public static void SetBackdropType(IntPtr hWnd, BackdropType backdrop)
     {
-        int type = (int)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
-        SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(int));
+        uint type = (uint)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
+        SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(uint));
 
         EnableWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
+    }
+
+    /// <summary>
+    /// Shows or hides the border of the specified <paramref name="hWnd"/>.
+    /// </summary>
+    /// <param name="hWnd">A handle to a window.</param>
+    /// <param name="enable">Whether or not to show the border.</param>
+    public static void EnableWindowBorder(IntPtr hWnd, bool enable)
+    {
+        uint color = enable ? DWMWA_COLOR_DEFAULT : DWMWA_COLOR_NONE;
+        SetWindowAttribute(hWnd, DWMWA_BORDER_COLOR, ref color, sizeof(uint));
     }
 
     /// <summary>

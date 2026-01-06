@@ -18,6 +18,8 @@
 /// </para>
 /// </remarks>
 [PackageRegistration(AllowsBackgroundLoading = true, UseManagedResourcesOnly = true)]
+[InstalledProductRegistration("Mica Visual Studio", "Enhance your Visual Studio experience with Windows materials", "2.1.4")]
+[ProvideMenuResource("Menus.ctmenu", 1)]
 [Guid(PackageGuidString)]
 [ProvideOptionPage(typeof(OptionsProvider.GeneralOptions), "Mica Visual Studio", "General", 0, 0, true, SupportsProfiles = true)]
 [ProvideProfile(typeof(OptionsProvider.GeneralOptions), "Mica Visual Studio", "General", 0, 0, true)]
@@ -28,7 +30,6 @@
 [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.EmptySolution, PackageAutoLoadFlags.BackgroundLoad)]
-[ProvideMenuResource("Menus.ctmenu", 1)]
 public sealed class MicaVisualStudioPackage : AsyncPackage
 {
     /// <summary>

@@ -119,10 +119,20 @@ public partial class VsWindowStyler
 
     private void ApplyToPopup(HwndSource source, Popup popup, FrameworkElement root)
     {
-        if (!acrylicMenus || //Only proceed if acrylic menus are enabled
-            root.FindDescendant<Border>(i => i.Name == "DropShadowBorder") is not Border drop) //Shadow host
-            return;
+        if (acrylicMenus && //Only proceed if acrylic menus are enabled
+            root.FindDescendant<Border>(i => i.Name == "DropShadowBorder") is Border drop) //Shadow host
+            AddAcrylicToPopup(source, popup, root, drop);
 
+        //Pointing popup (e.g. CodeLens references popup)
+        else if (root.FindDescendant<FrameworkElement>()?
+                     .FindDescendant<FrameworkElement>()?
+                     .FindDescendant<Decorator>() is Decorator callout &&
+                 callout.GetType().FullName == "Microsoft.VisualStudio.Language.Intellisense.CodeLensCalloutBorder")
+            callout.SetResourceReference(Panel.BackgroundProperty, SolidBackgroundFillTertiaryKey);
+    }
+
+    private void AddAcrylicToPopup(HwndSource source, Popup popup, FrameworkElement root, Border drop)
+    {
         //Remove margin
         (root.FindDescendant<ToolTip>() is ToolTip tip ? //Tool tips use themselves for margins
             tip : drop as FrameworkElement).Margin = default;

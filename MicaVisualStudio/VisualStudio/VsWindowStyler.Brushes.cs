@@ -11,7 +11,7 @@ public partial class VsWindowStyler
         PopupBorderOnAcrylicKey = "VsBrush.PopupBorderOnAcrylic";
 
     private readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
-        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundColor);
+        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundBrush);
 
     private readonly ThemeResourceKey TextFillPrimaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextFillPrimary", ThemeResourceKeyType.BackgroundBrush);

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Mica Visual Studio")]
-[assembly: AssemblyCopyright("© 2025 Ignacy Tomczyk")]
+[assembly: AssemblyCopyright("© 2026 Ignacy Tomczyk")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

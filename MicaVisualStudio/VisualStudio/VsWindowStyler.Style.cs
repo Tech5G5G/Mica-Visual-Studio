@@ -21,8 +21,7 @@ public partial class VsWindowStyler
 
         if (AppDomain.CurrentDomain.GetAssemblies()
                                    .FirstOrDefault(i => i.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
-                                   .GetTypes()
-                                   .FirstOrDefault(i => i.FullName == MultiViewHostTypeName) is Type hostType)
+                                   .GetType(MultiViewHostTypeName) is Type hostType)
             EventManager.RegisterClassHandler(
                 hostType,
                 FrameworkElement.LoadedEvent,

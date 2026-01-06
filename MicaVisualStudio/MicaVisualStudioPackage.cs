@@ -53,7 +53,10 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
     /// </summary>
     /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
     /// <param name="progress">A provider for progress updates.</param>
-    /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
+    /// <returns>
+    /// A task representing the async work of package initialization, or an already completed task if there is none.
+    /// Do not return null from this method.
+    /// </returns>
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
         await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);

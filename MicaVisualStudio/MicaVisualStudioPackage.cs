@@ -41,7 +41,7 @@ namespace MicaVisualStudio;
 [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.EmptySolution, PackageAutoLoadFlags.BackgroundLoad)]
-public sealed class MicaVisualStudioPackage : AsyncPackage
+public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisualStudioPackage>
 {
     private ThemeHelper theme;
     private WindowObserver observer;

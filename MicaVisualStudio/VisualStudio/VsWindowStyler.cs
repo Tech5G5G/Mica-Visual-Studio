@@ -1,9 +1,15 @@
-﻿namespace MicaVisualStudio.VisualStudio;
+﻿using System;
+using System.Windows;
+using Microsoft.VisualStudio.Threading;
+using Microsoft.VisualStudio.Shell.Interop;
+using Community.VisualStudio.Toolkit;
+
+namespace MicaVisualStudio.VisualStudio;
 
 /// <summary>
 /// Represents an observer that listens and styles Visual Studio windows.
 /// </summary>
-//This code is bad, but it works, so...
+// This code is bad, but it works, so...
 public sealed partial class VsWindowStyler : IVsWindowFrameEvents, IDisposable
 {
     /// <summary>

@@ -1,4 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Interop;
+using System.Windows.Media;
+using MicaVisualStudio.Extensions;
+using Microsoft.VisualStudio.Shell.Interop;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;

@@ -1,4 +1,12 @@
-﻿namespace MicaVisualStudio.VisualStudio;
+﻿using System;
+using System.Linq;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Interop;
+using MicaVisualStudio.Interop;
+
+namespace MicaVisualStudio.VisualStudio;
 
 /// <summary>
 /// Represents an observer that listens for opened and closed <see cref="Window"/>s.
@@ -39,14 +47,14 @@ public sealed class WindowObserver : IDisposable
     /// <summary>
     /// Gets a <see cref="ReadOnlyDictionary{TKey, TValue}"/> containing the <see cref="Window"/>s found that are still alive.
     /// </summary>
-    public ReadOnlyDictionary<IntPtr, WindowInfo> Windows
+    public IReadOnlyDictionary<IntPtr, WindowInfo> Windows
     {
         get
         {
             CleanHandles();
             var sources = PresentationSource.CurrentSources.OfType<HwndSource>().ToArray();
 
-            return new(handles.ToDictionary(i => i, i => new WindowInfo(sources.FirstOrDefault(x => x.Handle == i)?.RootVisual as Window)));
+            return handles.ToDictionary(i => i, i => new WindowInfo(sources.FirstOrDefault(x => x.Handle == i)?.RootVisual as Window));
         }
     }
 

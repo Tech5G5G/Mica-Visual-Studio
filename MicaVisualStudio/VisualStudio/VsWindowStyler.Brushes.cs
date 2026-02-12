@@ -1,4 +1,10 @@
-﻿using Microsoft.Internal.VisualStudio.PlatformUI;
+﻿using System.Linq;
+using System.Windows;
+using System.Windows.Media;
+using System.Collections.Specialized;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.Internal.VisualStudio.PlatformUI;
+using MicaVisualStudio.Options;
 
 namespace MicaVisualStudio.VisualStudio;
 

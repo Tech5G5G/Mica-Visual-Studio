@@ -1,5 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Windows;
+using System.Windows.Media;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Internal.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Community.VisualStudio.Toolkit;
+using MicaVisualStudio.Options;
 
 namespace MicaVisualStudio.VisualStudio;
 
@@ -19,7 +30,7 @@ public sealed class VsColorManager
     /// <summary>
     /// Gets a <see cref="ReadOnlyDictionary{TKey, TValue}"/> containing all the <see cref="ColorConfig"/>s currently in effect.
     /// </summary>
-    public ReadOnlyDictionary<string, ColorConfig> Configs => new(configs);
+    public IReadOnlyDictionary<string, ColorConfig> Configs => configs;
     private readonly Dictionary<string, ColorConfig> configs = [];
 
     #region Visual Studio Theme

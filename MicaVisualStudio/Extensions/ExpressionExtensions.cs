@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Linq.Expressions;
 using Expression = System.Linq.Expressions.Expression;
 
@@ -72,7 +73,10 @@ namespace MicaVisualStudio.Extensions
         /// <summary>
         /// Compiles <paramref name="body"/> into executable code and produces a <see cref="Func{T, TResult}"/> that represents it.
         /// </summary>
-        /// <remarks>Equivalent to <see cref="Expression.Lambda(Expression, ParameterExpression[])"/> followed with <see cref="Expression{TDelegate}.Compile()"/>.</remarks>
+        /// <remarks>
+        /// Equivalent to <see cref="Expression.Lambda(Expression, ParameterExpression[])"/>
+        /// followed with <see cref="Expression{TDelegate}.Compile()"/>.
+        /// </remarks>
         /// <typeparam name="T">The type of the parameter used by <paramref name="body"/>.</typeparam>
         /// <typeparam name="TResult">The type of the value returned by <paramref name="body"/>.</typeparam>
         /// <param name="body">The <see cref="Expression"/> to compile into executable code.</param>

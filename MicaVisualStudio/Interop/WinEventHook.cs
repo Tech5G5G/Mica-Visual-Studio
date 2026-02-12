@@ -1,4 +1,7 @@
-﻿namespace MicaVisualStudio.Interop;
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace MicaVisualStudio.Interop;
 
 /// <summary>
 /// Represents an event hook for Windows events.

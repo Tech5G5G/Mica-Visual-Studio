@@ -1,4 +1,9 @@
-﻿namespace MicaVisualStudio.VisualStudio;
+﻿using System.Collections.Generic;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+namespace MicaVisualStudio.VisualStudio;
 
 /// <summary>
 /// Contains extensions for dealing with <see cref="IEnumWindowFrames"/>.

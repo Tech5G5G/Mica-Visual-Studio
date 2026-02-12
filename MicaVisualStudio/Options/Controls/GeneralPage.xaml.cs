@@ -1,4 +1,7 @@
-﻿namespace MicaVisualStudio.Options.Controls
+﻿using System.Windows;
+using System.Windows.Controls;
+
+namespace MicaVisualStudio.Options.Controls
 {
     /// <summary>
     /// Interaction logic for GeneralPage.xaml

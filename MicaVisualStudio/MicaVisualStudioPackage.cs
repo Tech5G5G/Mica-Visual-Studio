@@ -1,4 +1,25 @@
-﻿namespace MicaVisualStudio;
+﻿using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.Threading;
+using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
+using Community.VisualStudio.Toolkit;
+using Community.VisualStudio.Toolkit.DependencyInjection.Microsoft;
+using MicaVisualStudio.Interop;
+using MicaVisualStudio.Options;
+using MicaVisualStudio.Services;
+using MicaVisualStudio.Contracts;
+using MicaVisualStudio.VisualStudio;
 
 /// <summary>
 /// This is the class that implements the package exposed by this assembly.

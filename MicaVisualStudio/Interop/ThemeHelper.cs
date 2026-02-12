@@ -1,4 +1,7 @@
-﻿using Microsoft.Win32;
+﻿using System;
+using System.Runtime.InteropServices;
+using Microsoft.Win32;
+using MicaVisualStudio.Options;
 
 namespace MicaVisualStudio.Interop;
 

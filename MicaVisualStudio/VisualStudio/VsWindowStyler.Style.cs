@@ -1,4 +1,18 @@
-﻿using System.Windows.Shapes;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using System.Windows.Interop;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using MicaVisualStudio.Options;
+using MicaVisualStudio.Interop;
+using MicaVisualStudio.Extensions;
 
 namespace MicaVisualStudio.VisualStudio;
 

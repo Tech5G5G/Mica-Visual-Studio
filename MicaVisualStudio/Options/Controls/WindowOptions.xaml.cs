@@ -1,4 +1,8 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using Community.VisualStudio.Toolkit;
 
 namespace MicaVisualStudio.Options.Controls
 {

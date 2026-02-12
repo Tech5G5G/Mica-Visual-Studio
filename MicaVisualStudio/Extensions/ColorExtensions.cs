@@ -1,4 +1,6 @@
-﻿namespace MicaVisualStudio.VisualStudio;
+﻿using System.Windows.Media;
+
+namespace MicaVisualStudio.VisualStudio;
 
 /// <summary>
 /// Contains extensions for dealing with <see cref="Color"/>s.

@@ -1,4 +1,6 @@
-﻿namespace MicaVisualStudio.Options.Controls
+﻿using System.Windows.Controls;
+
+namespace MicaVisualStudio.Options.Controls
 {
     /// <summary>
     /// Interaction logic for DialogPage.xaml

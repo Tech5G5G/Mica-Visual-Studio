@@ -1,6 +1,10 @@
-﻿using System.Windows.Data;
+﻿using System;
+using System.Windows;
+using System.Windows.Data;
 
 namespace MicaVisualStudio.Extensions;
+
+// https://agsmith.wordpress.com/2008/04/07/propertydescriptor-addvaluechanged-alternative/
 
 /// <summary>
 /// Represents a notifier that observes a <see cref="DependencyProperty"/> for changes from a specificed source.

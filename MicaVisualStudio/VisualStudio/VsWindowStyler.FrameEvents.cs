@@ -1,4 +1,6 @@
-﻿namespace MicaVisualStudio.VisualStudio;
+﻿using Microsoft.VisualStudio.Shell.Interop;
+
+namespace MicaVisualStudio.VisualStudio;
 
 public partial class VsWindowStyler
 {

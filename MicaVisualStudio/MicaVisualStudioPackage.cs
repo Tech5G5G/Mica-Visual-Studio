@@ -51,16 +51,18 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
     private (string Content, ImageMoniker Image) queuedInfo;
 
-    /// <summary>
-    /// Initialization of the package; this method is called right after the package is sited, so this is the place
-    /// where you can put all the initialization code that rely on services provided by VisualStudio.
-    /// </summary>
-    /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
-    /// <param name="progress">A provider for progress updates.</param>
-    /// <returns>
-    /// A task representing the async work of package initialization, or an already completed task if there is none.
-    /// Do not return null from this method.
-    /// </returns>
+    protected override void InitializeServices(IServiceCollection services)
+    {
+        services.AddSingleton<IBackdropManager, BackdropManager>();
+
+        services.AddSingleton<NoneCommand>()
+                .AddSingleton<MicaCommand>()
+                .AddSingleton<TabbedCommand>()
+                .AddSingleton<AcrylicCommand>()
+                .AddSingleton<GlassCommand>()
+                .AddSingleton<MoreCommand>();
+    }
+
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
         await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);

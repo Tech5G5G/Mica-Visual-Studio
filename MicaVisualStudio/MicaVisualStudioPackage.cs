@@ -175,7 +175,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
             theme = ThemeHelper.Instance;
             observer = WindowObserver.Instance;
 
-            await BackdropCommands.InitializeAsync(package: this); 
+            RefreshPreferences(); // Set app theme
 
             RefreshPreferences(); //Set app theme
 

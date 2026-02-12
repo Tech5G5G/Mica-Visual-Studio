@@ -21,45 +21,28 @@ using MicaVisualStudio.Services;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.VisualStudio;
 
-/// <summary>
-/// This is the class that implements the package exposed by this assembly.
-/// </summary>
-/// <remarks>
-/// <para>
-/// The minimum requirement for a class to be considered a valid package for Visual Studio
-/// is to implement the IVsPackage interface and register itself with the shell.
-/// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-/// to do it: it derives from the Package class that provides the implementation of the
-/// IVsPackage interface and uses the registration attributes defined in the framework to
-/// register itself and its components with the shell. These attributes tell the pkgdef creation
-/// utility what data to put into .pkgdef file.
-/// </para>
-/// <para>
-/// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
-/// </para>
-/// </remarks>
+namespace MicaVisualStudio;
+
+// Information
 [PackageRegistration(AllowsBackgroundLoading = true, UseManagedResourcesOnly = true)]
-[InstalledProductRegistration("Mica Visual Studio", "Enhance your Visual Studio experience with Windows materials", "2.1.4")]
+[Guid(PackageGuids.guidMVSPackageString)]
+[InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
 [ProvideMenuResource("Menus.ctmenu", 1)]
-[Guid(PackageGuidString)]
-[ProvideOptionPage(typeof(OptionsProvider.GeneralOptions), "Mica Visual Studio", "General", 0, 0, true, SupportsProfiles = true)]
-[ProvideProfile(typeof(OptionsProvider.GeneralOptions), "Mica Visual Studio", "General", 0, 0, true)]
-[ProvideOptionPage(typeof(OptionsProvider.ToolOptions), "Mica Visual Studio", "\u200BTool Windows", 0, 0, true, SupportsProfiles = true)]
-[ProvideProfile(typeof(OptionsProvider.ToolOptions), "Mica Visual Studio", "Tool Windows", 0, 0, true)]
-[ProvideOptionPage(typeof(OptionsProvider.DialogOptions), "Mica Visual Studio", "Dialog Windows", 0, 0, true, SupportsProfiles = true)]
-[ProvideProfile(typeof(OptionsProvider.DialogOptions), "Mica Visual Studio", "Dialog Windows", 0, 0, true)]
+
+// Options
+[ProvideOptionPage(typeof(OptionsProvider.GeneralOptions), Vsix.Name, "General", 0, 0, true, SupportsProfiles = true)]
+[ProvideProfile(typeof(OptionsProvider.GeneralOptions), Vsix.Name, "General", 0, 0, true)]
+[ProvideOptionPage(typeof(OptionsProvider.ToolOptions), Vsix.Name, /* Show before Dialog Windows */ "\u200BTool Windows", 0, 0, true, SupportsProfiles = true)]
+[ProvideProfile(typeof(OptionsProvider.ToolOptions), Vsix.Name, "Tool Windows", 0, 0, true)]
+[ProvideOptionPage(typeof(OptionsProvider.DialogOptions), Vsix.Name, "Dialog Windows", 0, 0, true, SupportsProfiles = true)]
+[ProvideProfile(typeof(OptionsProvider.DialogOptions), Vsix.Name, "Dialog Windows", 0, 0, true)]
+
+// Auto load
 [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.EmptySolution, PackageAutoLoadFlags.BackgroundLoad)]
 public sealed class MicaVisualStudioPackage : AsyncPackage
 {
-    /// <summary>
-    /// MicaVisualStudioPackage GUID string.
-    /// </summary>
-    public const string PackageGuidString = "1a10bdf6-6cb0-415e-8ddd-f16d897f1e4a";
-
-    #region Package Members
-
     private ThemeHelper theme;
     private WindowObserver observer;
 

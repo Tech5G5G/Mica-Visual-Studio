@@ -35,9 +35,9 @@ public sealed partial class VsWindowStyler : IVsWindowFrameEvents, IDisposable
         if (disposed)
             return;
 
-        Compile(); //Compile hooks and functions
-        AddBrushes(); //Add layered brushes to resources
-        SubscribeToEvents(); //Subscribe to window frame, text view, and dock target creation events
+        Compile(); // Compile hooks and functions
+        AddBrushes(); // Add layered brushes to resources
+        SubscribeToEvents(); // Subscribe to window frame, text view, and dock target creation events
 
         ApplyToAllWindows();
         ApplyToAllWindowPanesAsync().Forget();

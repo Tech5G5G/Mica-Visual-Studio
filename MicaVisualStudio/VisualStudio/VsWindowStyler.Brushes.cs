@@ -37,8 +37,8 @@ public partial class VsWindowStyler
 
         var color = shell5?.GetThemedWPFColor(SolidBackgroundFillTertiaryKey) ?? default;
 
-        SolidColorBrush halfBrush = new(color with { A = 0xFF / 2 }); //50% opacity
-        SolidColorBrush quarterBrush = new(color with { A = 0xFF / 4 }); //25% opacity
+        SolidColorBrush halfBrush = new(color with { A = 0xFF / 2 }); // 50% opacity
+        SolidColorBrush quarterBrush = new(color with { A = 0xFF / 4 }); // 25% opacity
 
         foreach (var dictionary in Application.Current.Resources.MergedDictionaries.OfType<DeferredResourceDictionaryBase>())
         {
@@ -49,7 +49,7 @@ public partial class VsWindowStyler
                 dictionary.Add(
                     PopupBackgroundLayeredKey,
                     VsColorManager.Instance.VisualStudioTheme == Theme.Dark && color.IsGray() ?
-                    new SolidColorBrush(Color.FromArgb(0x01, 0x00, 0x00, 0x00)) : //Full acrylic experience for those who can handle it
+                    new SolidColorBrush(Color.FromArgb(0x01, 0x00, 0x00, 0x00)) : // Full acrylic experience for those who can handle it
                     quarterBrush);
 
             if (!dictionary.Contains(PopupBorderOnAcrylicKey))

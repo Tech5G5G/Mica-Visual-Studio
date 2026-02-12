@@ -24,9 +24,9 @@ public partial class VsWindowStyler
 
     private void SubscribeToEvents()
     {
-#pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
+#pragma warning disable VSTHRD010 // Invoke single-threaded types on Main thread
         cookie = shell7.AdviseWindowFrameEvents(this);
-#pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
+#pragma warning restore VSTHRD010 // Invoke single-threaded types on Main thread
 
         EventManager.RegisterClassHandler(
             Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.Controls.DockTarget, Microsoft.VisualStudio.Shell.ViewManager"),
@@ -54,10 +54,10 @@ public partial class VsWindowStyler
 
     private void UnsubscribeFromEvents()
     {
-#pragma warning disable VSTHRD010 //Invoke single-threaded types on Main thread
+#pragma warning disable VSTHRD010 // Invoke single-threaded types on Main thread
         if (cookie > 0)
             shell7.UnadviseWindowFrameEvents(cookie);
-#pragma warning restore VSTHRD010 //Invoke single-threaded types on Main thread
+#pragma warning restore VSTHRD010 // Invoke single-threaded types on Main thread
     }
 
     #region To All
@@ -104,7 +104,7 @@ public partial class VsWindowStyler
 
     private void ApplyToWindow(Window window)
     {
-        //Wizards (e.g. packaged app creation wizard)
+        // Wizards (e.g. packaged app creation wizard)
         if (window.GetType().FullName == "Microsoft.VisualStudio.WizardFrameworkWpf.WizardBase")
         {
             ApplyToContent(window, applyToDock: false);
@@ -113,18 +113,18 @@ public partial class VsWindowStyler
 
         foreach (var element in window.FindDescendants<FrameworkElement>())
 
-            //Warning dialog, footer
+            // Warning dialog, footer
             if (window is DialogWindowBase && element is Button { Name: "OKButton" } button &&
                 button.FindAncestor<FrameworkElement>()?.FindAncestor<Border>() is Border buttonFooter)
                 buttonFooter.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
             else if (element is Border border)
             {
-                //Footer
+                // Footer
                 if (border.Name == "FooterBorder")
                     border.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
-                //Dock target
+                // Dock target
                 else if (IsDockTarget(border))
                     ApplyToDockTarget(border);
             }
@@ -132,11 +132,11 @@ public partial class VsWindowStyler
 
     private void ApplyToPopup(HwndSource source, Popup popup, FrameworkElement root)
     {
-        if (acrylicMenus && //Only proceed if acrylic menus are enabled
-            root.FindDescendant<Border>(i => i.Name == "DropShadowBorder") is Border drop) //Shadow host
+        if (acrylicMenus && // Only proceed if acrylic menus are enabled
+            root.FindDescendant<Border>(i => i.Name == "DropShadowBorder") is Border drop) // Shadow host
             AddAcrylicToPopup(source, popup, root, drop);
 
-        //Pointing popup (e.g. CodeLens references popup)
+        // Pointing popup (e.g. CodeLens references popup)
         else if (root.FindDescendant<FrameworkElement>()?
                      .FindDescendant<FrameworkElement>()?
                      .FindDescendant<Decorator>() is Decorator callout &&
@@ -146,14 +146,14 @@ public partial class VsWindowStyler
 
     private void AddAcrylicToPopup(HwndSource source, Popup popup, FrameworkElement root, Border drop)
     {
-        //Remove margin
-        (root.FindDescendant<ToolTip>() is ToolTip tip ? //Tool tips use themselves for margins
+        // Remove margin
+        (root.FindDescendant<ToolTip>() is ToolTip tip ? // Tool tips use themselves for margins
             tip : drop as FrameworkElement).Margin = default;
 
-        //Remove popup margin accountment
+        // Remove popup margin accountment
         if (popup.HorizontalOffset == -12)
         {
-            //If menu has custom placement...
+            // If menu has custom placement...
             if (popup.Placement == PlacementMode.Custom)
             {
                 const int LeftAlignedPlacementIndex = 1;
@@ -167,17 +167,17 @@ public partial class VsWindowStyler
 
                     if (placement.Count >= LeftAlignedPlacementIndex + 1)
                     {
-                        //... replace left-aligned placement and add back X-axis margin accountment
+                        // ... replace left-aligned placement and add back X-axis margin accountment
                         var leftAlignedPlacement = placement[LeftAlignedPlacementIndex];
 
                         placement.Insert(
                             LeftAlignedPlacementIndex,
                             new(
                                 point: new(
-                                    x: leftAlignedPlacement.Point.X + (originalXOffset * 2), //idk why 2x is needed
+                                    x: leftAlignedPlacement.Point.X + (originalXOffset * 2), // idk why 2x is needed
                                     y: leftAlignedPlacement.Point.Y),
                                 leftAlignedPlacement.PrimaryAxis));
-                        placement.RemoveAt(LeftAlignedPlacementIndex + 1); //Remove replaced placement
+                        placement.RemoveAt(LeftAlignedPlacementIndex + 1); // Remove replaced placement
                     }
 
                     return [.. placement];
@@ -188,22 +188,22 @@ public partial class VsWindowStyler
             popup.UpdateLayout();
         }
 
-        //Replace border and update background to be translucent
+        // Replace border and update background to be translucent
         drop.CornerRadius = new(uniformRadius: 7);
         drop.SetResourceReference(Border.BorderBrushProperty, PopupBorderOnAcrylicKey);
         drop.SetResourceReference(Border.BackgroundProperty, PopupBackgroundLayeredKey);
 
-        WindowHelper.SetCornerPreference(source.Handle, CornerPreference.Round); //Add shadow and corners
-        WindowHelper.EnableWindowBorder(source.Handle, enable: false); //Remove border (we have our own)
+        WindowHelper.SetCornerPreference(source.Handle, CornerPreference.Round); // Add shadow and corners
+        WindowHelper.EnableWindowBorder(source.Handle, enable: false); // Remove border (we have our own)
 
-        //Current popup background color
+        // Current popup background color
         var color = (drop.Background as SolidColorBrush)?.Color ?? default;
 
-        //Enable acrylic
+        // Enable acrylic
         WindowHelper.EnableWindowBlur(
             source.Handle,
             fallback: VsColorManager.Instance.VisualStudioTheme == Theme.Dark && color.IsGray() ?
-                System.Drawing.Color.FromArgb(0x2C, 0x2C, 0x2C) : //Dark mode acrylic fallback
+                System.Drawing.Color.FromArgb(0x2C, 0x2C, 0x2C) : // Dark mode acrylic fallback
                 System.Drawing.Color.FromArgb(color.R, color.G, color.B),
             enable: true);
     }
@@ -217,20 +217,20 @@ public partial class VsWindowStyler
         if (dock.Name == "ViewFrameTarget")
             dock.SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
         else
-            dock.Background = Brushes.Transparent; //Smoke layer underneath tabs
+            dock.Background = Brushes.Transparent; // Smoke layer underneath tabs
 
         var descendants = dock.FindDescendants<FrameworkElement>();
         if (!descendants.Any())
             return;
 
-        //Content area
+        // Content area
         descendants.FindElement<Border>("PART_ContentPanel")?
                    .SetResourceReference(Border.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
 
-        //Title bar
+        // Title bar
         descendants.FindElement<Control>("PART_Header")?.Background = Brushes.Transparent;
 
-        if (descendants.FindElement<Border>("ToolWindowBorder") is Border border) //Body
+        if (descendants.FindElement<Border>("ToolWindowBorder") is Border border) // Body
         {
             border.Background = Brushes.Transparent;
 
@@ -238,8 +238,8 @@ public partial class VsWindowStyler
                 ApplyToContent(host, applyToDock: false);
         }
 
-        if (descendants.FindElement<Panel>("PART_TabPanel") is Panel tabs) //Tab strip
-            foreach (var tab in tabs.Children.OfType<TabItem>()) //Tab items
+        if (descendants.FindElement<Panel>("PART_TabPanel") is Panel tabs) // Tab strip
+            foreach (var tab in tabs.Children.OfType<TabItem>()) // Tab items
             {
                 tab.Background = Brushes.Transparent;
 
@@ -282,7 +282,7 @@ public partial class VsWindowStyler
         foreach (var element in content.FindDescendants<FrameworkElement>().Append(content))
         {
             if (element is ContentControl or ContentPresenter or Decorator or Panel && !GetIsTracked(element))
-                SetIsTracked(element, value: true); //Track visual children
+                SetIsTracked(element, value: true); // Track visual children
 
             if (element is ToolBar bar)
             {
@@ -299,27 +299,27 @@ public partial class VsWindowStyler
                 if (sources.Any(i => i == handle))
                     continue;
 
-                var children = Interop.WindowHelper.GetChildren(handle);
+                var children = WindowHelper.GetChildren(handle);
                 if (!sources.Any(children.Contains))
-                    Interop.WindowHelper.MakeLayered(handle);
+                    WindowHelper.MakeLayered(handle);
             }
 
             else if (element is Control control)
                 switch (control.Name)
                 {
-                    case "gitWindowView" or //Git changes window
-                        "focusedWindowView" or //Git repository window
-                        "historyView" or //Commit history
-                        "detailsView" or //Git commit details
-                        "focusedDetailsContainer" or //Git commit details container
-                        "teamExplorerFrame" or //Team explorer window
-                        "createPullRequestView": //New PR window
+                    case "gitWindowView" or // Git changes window
+                        "focusedWindowView" or // Git repository window
+                        "historyView" or // Commit history
+                        "detailsView" or // Git commit details
+                        "focusedDetailsContainer" or // Git commit details container
+                        "teamExplorerFrame" or // Team explorer window
+                        "createPullRequestView": // New PR window
                         control.Background = Brushes.Transparent;
 
                         foreach (var e in control.LogicalDescendants<FrameworkElement>().Append(control))
                             switch (e.Name)
                             {
-                                //Section header
+                                // Section header
                                 case "borderHeader" when e is Border { Style: Style bs } b:
                                     b.Style = new(bs.TargetType, bs)
                                     {
@@ -327,7 +327,7 @@ public partial class VsWindowStyler
                                     };
                                     break;
 
-                                //Command buttons
+                                // Command buttons
                                 case "gitAction" or
                                     "detailsView" when
                                     e.TryFindResource("TESectionCommandButtonStyle") is Style { Setters.IsSealed: false } ss:
@@ -338,24 +338,24 @@ public partial class VsWindowStyler
                                     ss.Setters.Add(bb);
 
                                     if (ss.Triggers.OfType<Trigger>()
-                                                   .FirstOrDefault(i => i.Property == System.Windows.UIElement.IsEnabledProperty) is Trigger t)
+                                                   .FirstOrDefault(i => i.Property == UIElement.IsEnabledProperty) is Trigger t)
                                     {
                                         t.Setters.Add(bg);
                                         t.Setters.Add(bb);
                                     }
                                     break;
 
-                                //???
+                                // ???
                                 case "thisPageControl" when e is Control c:
                                     c.Background = Brushes.Transparent;
                                     break;
 
-                                //Team explorer, project selector
+                                // Team explorer, project selector
                                 case "navControl" when e is Control c:
                                     c.Background = Brushes.Transparent;
                                     break;
 
-                                //Git branch selector
+                                // Git branch selector
                                 case "branchesList" when e.GetVisualOrLogicalParent()
                                                           .GetVisualOrLogicalParent()
                                                           .GetVisualOrLogicalParent()
@@ -363,14 +363,14 @@ public partial class VsWindowStyler
                                     bc.Background = Brushes.Transparent;
                                     break;
 
-                                //Commit history
+                                // Commit history
                                 case "historyView" when e.GetVisualOrLogicalParent()
                                                          .GetVisualOrLogicalParent()
                                                          .GetVisualOrLogicalParent() is Border hb:
                                     hb.Background = Brushes.Transparent;
                                     break;
 
-                                //Commit history list
+                                // Commit history list
                                 case "historyListView" when e is ListView { View: GridView g }:
                                     g.ColumnHeaderContainerStyle = new(g.ColumnHeaderContainerStyle.TargetType, g.ColumnHeaderContainerStyle)
                                     {
@@ -388,19 +388,19 @@ public partial class VsWindowStyler
                                     }
                                     break;
 
-                                //Commit diff
+                                // Commit diff
                                 case "detailsViewMainGrid" when e is Grid g && g.GetVisualOrLogicalParent()
                                                                                 .GetVisualOrLogicalParent() is Border db:
                                     db.Background = Brushes.Transparent;
                                     break;
 
-                                //Commit diff info
+                                // Commit diff info
                                 case "pageContentViewer" when e.GetVisualOrLogicalParent()
                                                                .GetVisualOrLogicalParent() is Border pb:
                                     pb.Background = Brushes.Transparent;
                                     break;
 
-                                //Commit diff presenter dock buttons
+                                // Commit diff presenter dock buttons
                                 case "dockToBottomButton" or
                                     "dockToRightButton" or
                                     "undockButton" or
@@ -416,7 +416,7 @@ public partial class VsWindowStyler
                                     };
                                     break;
 
-                                //Git push, pull etc. buttons
+                                // Git push, pull etc. buttons
                                 case "actionButton" or
                                     "fetchButton" or
                                     "pullButton" or
@@ -430,7 +430,7 @@ public partial class VsWindowStyler
                                         {
                                             new Trigger
                                             {
-                                                Property = System.Windows.UIElement.IsEnabledProperty,
+                                                Property = UIElement.IsEnabledProperty,
                                                 Value = false,
                                                 Setters =
                                                 {
@@ -442,7 +442,7 @@ public partial class VsWindowStyler
                                     };
                                     break;
 
-                                //Git repository window, presenters
+                                // Git repository window, presenters
                                 case "detailsContent" or
                                     "detailsFullWindowContent" or
                                     "detailsRightContent" or
@@ -451,17 +451,17 @@ public partial class VsWindowStyler
                                     SetIsTracked(c, value: true);
                                     break;
 
-                                case "statusControl" or //Actions/tool bar
-                                    "thisPageControl" or //Changes
-                                    "inactiveRepoContent" or //Create repo
-                                    "sectionContainer" or //Branches and tags
-                                    "amendCheckBox" when //Checkbox... for amending...
+                                case "statusControl" or // Actions/tool bar
+                                    "thisPageControl" or // Changes
+                                    "inactiveRepoContent" or // Create repo
+                                    "sectionContainer" or // Branches and tags
+                                    "amendCheckBox" when // Checkbox... for amending...
                                     e is Control c:
                                     c.Background = Brushes.Transparent;
                                     break;
 
                                 default:
-                                    if (e is ItemsControl { ItemContainerStyle: Style ics } ic) //Changes
+                                    if (e is ItemsControl { ItemContainerStyle: Style ics } ic) // Changes
                                     {
                                         ic.Background = Brushes.Transparent;
 
@@ -475,19 +475,19 @@ public partial class VsWindowStyler
                             }
                         break;
 
-                    //Host of WpfTextView I guess
+                    // Host of WpfTextView I guess
                     case "WpfTextViewHost":
                         control.Resources["outlining.chevron.expanded.background"] =
                         control.Resources["outlining.chevron.collapsed.background"] = Brushes.Transparent;
                         break;
 
-                    //Editor, output, etc. text
+                    // Editor, output, etc. text
                     case "WpfTextView" when element is ContentControl:
                         control.Background = Brushes.Transparent;
                         control.FindDescendant<Canvas>()?.Background = Brushes.Transparent;
                         break;
 
-                    //Packaged app configurations list
+                    // Packaged app configurations list
                     case "PackageConfigurationsList" when control is DataGrid grid:
                         grid.Background = grid.RowBackground = Brushes.Transparent;
 
@@ -495,7 +495,7 @@ public partial class VsWindowStyler
                             cs.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.Transparent));
                         break;
 
-                    //VSIX manfiest editor
+                    // VSIX manfiest editor
                     case "VsixEditorControl":
                         control.Background = Brushes.Transparent;
 
@@ -506,13 +506,13 @@ public partial class VsWindowStyler
                     default:
                         switch (control.GetType().FullName)
                         {
-                            //AppxManifest editor
+                            // AppxManifest editor
                             case "Microsoft.VisualStudio.AppxManifestDesigner.Designer.ManifestDesignerUserControlProxy":
                             case "Microsoft.VisualStudio.AppxManifestDesigner.Designer.ManifestDesignerUserControl":
                                 control.Background = Brushes.Transparent;
                                 break;
 
-                            //Resource editor
+                            // Resource editor
                             case "Microsoft.VisualStudio.ResourceExplorer.UI.ResourceGroupEditorControl":
                                 control.Background = Brushes.Transparent;
                                 break;
@@ -523,32 +523,32 @@ public partial class VsWindowStyler
             else if (element is Panel panel)
                 switch (panel.GetType().FullName)
                 {
-                    //Editor window, root
+                    // Editor window, root
                     case MultiViewHostTypeName:
                         element.Resources[ScrollBarBackgroundKey] = Brushes.Transparent;
                         break;
 
-                    //Editor window, bottom container
+                    // Editor window, bottom container
                     case "Microsoft.VisualStudio.Text.Utilities.ContainerMargin" when
                         !panel.FindDescendants<Panel>().Any(i => i.GetType().FullName == "Microsoft.VisualStudio.Text.Utilities.ContainerMargin"):
                         panel.SetResourceReference(Panel.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
                         break;
 
-                    //Editor window, left side icon container
+                    // Editor window, left side icon container
                     case "Microsoft.VisualStudio.Text.Editor.Implementation.GlyphMarginGrid" when
                         panel.Background is SolidColorBrush solid && solid.Color != Brushes.Transparent.Color:
                         panel.SetResourceReference(Panel.BackgroundProperty, SolidBackgroundFillTertiaryLayeredKey);
                         break;
 
-                    //Scroll bar intersection
+                    // Scroll bar intersection
                     case "Microsoft.VisualStudio.Editor.Implementation.BottomRightCornerSpacerMargin":
                         panel.Background = Brushes.Transparent;
                         break;
 
-                    //Editor window, collapsed item container
+                    // Editor window, collapsed item container
                     case "Microsoft.VisualStudio.Text.Editor.Implementation.AdornmentLayer":
                         foreach (var rectangle in panel.FindDescendants<Rectangle>())
-                            if (rectangle.RadiusX > 0 || rectangle.StrokeThickness <= 0) //Check for selected line highlight from fluent redesign
+                            if (rectangle.RadiusX > 0 || rectangle.StrokeThickness <= 0) // Check for selected line highlight from fluent redesign
                                 rectangle.SetResourceReference(Shape.FillProperty, SolidBackgroundFillTertiaryLayeredKey);
                         break;
 
@@ -561,12 +561,12 @@ public partial class VsWindowStyler
             else if (element is Border border)
                 switch (border.GetType().FullName)
                 {
-                    //Output window, base layer
+                    // Output window, base layer
                     case "Microsoft.VisualStudio.PlatformUI.OutputWindow":
                         border.Background = Brushes.Transparent;
                         break;
 
-                    //Editor window, file errors container
+                    // Editor window, file errors container
                     case "Microsoft.VisualStudio.UI.Text.Wpf.FileHealthIndicator.Implementation.FileHealthIndicatorMargin":
                         border.Background = Brushes.Transparent;
                         break;

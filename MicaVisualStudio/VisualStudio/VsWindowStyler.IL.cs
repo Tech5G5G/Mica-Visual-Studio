@@ -80,7 +80,7 @@ public partial class VsWindowStyler
 
         static void AddVisualChild(Visual instance, Visual child)
         {
-            if (instance is ContentControl or ContentPresenter or Decorator or Panel && //Avoid unnecessary work
+            if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Avoid unnecessary work
                 instance is FrameworkElement content &&
                 GetIsTracked(content))
                 Instance?.ApplyToContent(content, applyToDock: false);
@@ -91,10 +91,10 @@ public partial class VsWindowStyler
             if (value is not null && instance.CompositionTarget is not null)
             {
                 if (value is FrameworkElement root &&
-                    root.Parent is Popup popup) //Check if owned by popup (popups use separate element as root of HwndSource)
+                    root.Parent is Popup popup) // Check if owned by popup (popups use separate element as root of HwndSource)
                     Instance?.ApplyToPopup(instance, popup, root);
 
-                else if (value is not Window) //Avoid already handled values
+                else if (value is not Window) // Avoid already handled values
                     instance.CompositionTarget.BackgroundColor = Colors.Transparent;
             }
         }
@@ -113,10 +113,10 @@ public partial class VsWindowStyler
         new(info, context =>
         {
             ILCursor cursor = new(context);
-            cursor.Index = cursor.Instrs.Count - 1; //Move cursor to end, but before return
+            cursor.Index = cursor.Instrs.Count - 1; // Move cursor to end, but before return
 
-            cursor.Emit(OpCodes.Ldarg_0); //this
-            cursor.Emit(OpCodes.Ldarg_1); //First parameter
+            cursor.Emit(OpCodes.Ldarg_0); // this
+            cursor.Emit(OpCodes.Ldarg_1); // First parameter
 
             cursor.EmitDelegate(action);
         });

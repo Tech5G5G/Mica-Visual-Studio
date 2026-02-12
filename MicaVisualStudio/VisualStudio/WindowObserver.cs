@@ -110,8 +110,8 @@ public sealed class WindowObserver : IDisposable
 
     private void EventOccurred(WinEventHook sender, EventOccuredEventArgs args)
     {
-        if (!WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(WindowStyles.Caption) || //Check window for title bar
-            handles.Contains(args.WindowHandle)) //Prefer WPF over WinEventHook and avoid duplicates
+        if (!WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(WindowStyles.Caption) || // Check window for title bar
+            handles.Contains(args.WindowHandle)) // Prefer WPF over WinEventHook and avoid duplicates
             return;
 
         handles.Add(args.WindowHandle);
@@ -139,8 +139,8 @@ public sealed class WindowObserver : IDisposable
 
     private void CleanHandles() =>
         handles.RemoveWhere(i =>
-            !WindowHelper.IsAlive(i) || //Check if alive
-            WindowHelper.GetProcessId(i) != procId); //and belongs to current process
+            !WindowHelper.IsAlive(i) || // Check if alive
+            WindowHelper.GetProcessId(i) != procId); // and belongs to current process
 
     #region Dispose
 

@@ -25,7 +25,7 @@ public sealed class VsColorManager
     public static VsColorManager Instance => field ??= new();
 
     private static Color TransparentWhite = Colors.Transparent,
-        TranslucentBlack = Color.FromArgb(0x01, 0x00, 0x00, 0x00); //Slight alpha to change icon foreground (basically invisible)
+        TranslucentBlack = Color.FromArgb(0x01, 0x00, 0x00, 0x00); // Slight alpha to change icon foreground (basically invisible)
 
     /// <summary>
     /// Gets a <see cref="ReadOnlyDictionary{TKey, TValue}"/> containing all the <see cref="ColorConfig"/>s currently in effect.

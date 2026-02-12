@@ -280,27 +280,27 @@ public static class WindowHelper
         const int MenuSpacing = 2;
         WindowType type = GetWindowType(source.RootVisual as Window);
 
-        GetSystemMenu(source.Handle, bRevert: false); //Make sure window menu is created
+        GetSystemMenu(source.Handle, bRevert: false); // Make sure window menu is created
 
         source.AddHook(Hook);
-        SetWindowStyles(source.Handle, GetWindowStyles(source.Handle)); //Refresh styles
+        SetWindowStyles(source.Handle, GetWindowStyles(source.Handle)); // Refresh styles
 
         IntPtr Hook(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             switch (msg)
             {
                 case WM_DESTROY:
-                    HwndSource.FromHwnd(hWnd)?.RemoveHook(Hook); //Avoid memory leaks
+                    HwndSource.FromHwnd(hWnd)?.RemoveHook(Hook); // Avoid memory leaks
                     break;
 
                 case WM_STYLECHANGING when (int)wParam == GWL_STYLE:
                     STYLESTRUCT structure = Marshal.PtrToStructure<STYLESTRUCT>(lParam);
 
-                    if (type == WindowType.Main || //Apply WS_OVERLAPPEDWINDOW style to main window
-                        ((WindowStyles)structure.styleNew).HasFlag(WindowStyles.ThickFrame)) //or any sizable window
+                    if (type == WindowType.Main || // Apply WS_OVERLAPPEDWINDOW style to main window
+                        ((WindowStyles)structure.styleNew).HasFlag(WindowStyles.ThickFrame)) // or any sizable window
                         structure.styleNew |= (uint)WindowStyles.OverlappedWindow;
 
-                    structure.styleNew &= (uint)~WindowStyles.SystemMenu; //Remove the WS_SYSMENU style
+                    structure.styleNew &= (uint)~WindowStyles.SystemMenu; // Remove the WS_SYSMENU style
 
                     Marshal.StructureToPtr(structure, lParam, fDeleteOld: true);
                     handled = true;
@@ -310,7 +310,7 @@ public static class WindowHelper
                     ShowMenu(
                         hWnd,
                         (short)lParam,
-                        (short)((int)lParam >> 16 /*Y position shift*/),
+                        (short)((int)lParam >> 16 /* Y position shift */),
                         keyboard: false);
                     handled = true;
                     break;
@@ -358,10 +358,10 @@ public static class WindowHelper
 
             int cmd = TrackPopupMenuEx(
                 menu,
-                TPM_RETURNCMD | TPM_NONOTIFY | //Don't notify as we'll send a message later
+                TPM_RETURNCMD | TPM_NONOTIFY | // Don't notify as we'll send a message later
                 ((uint)System.Windows.Forms.SystemInformation.PopupMenuAlignment * TPM_RIGHTALIGN) |
                 (keyboard ? TPM_LEFTBUTTON : TPM_RIGHTBUTTON) |
-                (keyboard ? TPM_NOANIMATION : 0 /*Default fade animation*/),
+                (keyboard ? TPM_NOANIMATION : 0 /* Default fade animation */),
                 keyboard && placement.showCmd == SW_MAXIMIZE ? x - MenuSpacing : x,
                 y,
                 hWnd,
@@ -372,9 +372,9 @@ public static class WindowHelper
         }
 
         bool IsAltPressed(IntPtr lParam) =>
-            (((int)lParam >> 29) //Context code shift
-            & 1) //First bit mask
-            == 1; //TRUE
+            (((int)lParam >> 29) // Context code shift
+            & 1) // First bit mask
+            == 1; // TRUE
     }
 
     #endregion
@@ -399,9 +399,9 @@ public static class WindowHelper
     {
         if (window == WindowObserver.MainWindow)
             return WindowType.Main;
-        else if (window is not null && //Check if window is WPF
-            (window.WindowStyle == WindowStyle.None || //and has no style
-            window.Owner is null)) //or no owner
+        else if (window is not null && // Check if window is WPF
+            (window.WindowStyle == WindowStyle.None || // and has no style
+            window.Owner is null)) // or no owner
             return WindowType.Tool;
         else
             return WindowType.Dialog;
@@ -481,7 +481,7 @@ public static class WindowHelper
         SetLayeredWindowAttributes(
             hWnd,
             (uint)ColorTranslator.ToWin32(System.Drawing.Color.Black),
-            0xFF, //Set opactiy to 100%
+            0xFF, // Set opactiy to 100%
             LWA_ALPHA);
     }
 

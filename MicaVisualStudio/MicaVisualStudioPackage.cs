@@ -72,7 +72,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         {
             WindowObserver.MainWindow.Loaded += Window_Loaded;
 
-            if (Environment.OSVersion.Version.Build < 22000) //Allow Windows 11 or later
+            if (Environment.OSVersion.Version.Build < 22000) // Allow Windows 11 or later
             {
                 queuedInfo = ("Mica Visual Studio is not compatible with Windows 10 and earlier.", KnownMonikers.StatusWarning);
                 return;
@@ -85,11 +85,11 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
             colors.AddConfigs(new()
             {
                 { "Background", new(translucent: true) },
-                
+
                 { "SolidBackgroundFillQuaternary", new(translucent: true) },
 
-                //{ "SolidBackgroundFillTertiary", ColorConfig.Default },
-                //{ "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
+                // { "SolidBackgroundFillTertiary", ColorConfig.Default },
+                // { "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
 
                 { "EnvironmentBackground", new(translucent: true) },
                 { "EnvironmentBackgroundGradient", ColorConfig.Default },
@@ -177,18 +177,16 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
             RefreshPreferences(); // Set app theme
 
-            RefreshPreferences(); //Set app theme
-
-            if (WindowObserver.MainWindow.Visibility == Visibility.Visible) //We're late, so add all windows
+            if (WindowObserver.MainWindow.Visibility == Visibility.Visible) // We're late, so add all windows
             {
                 WindowObserver.AllWindows.ForEach(AddWindow);
                 WindowObserver.MainWindow.Loaded -= Window_Loaded;
             }
-            else if (WindowObserver.CurrentWindow is Window window) //Apply to start window
+            else if (WindowObserver.CurrentWindow is Window window) // Apply to start window
                 AddWindow(window);
 
             observer.WindowOpened += WindowOpened;
-            //windows.WindowClosed += WindowClosed;
+            // windows.WindowClosed += WindowClosed;
 
             colors.VisualStudioThemeChanged += ThemeChanged;
             theme.SystemThemeChanged += ThemeChanged;
@@ -197,9 +195,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         }
         catch (Exception ex)
         {
-#if DEBUG
             Debug.WriteLine($"Error initializing Mica Visual Studio: {ex.Message}");
-#endif
 
             progress.Report(new("Mica Visual Studio", $"Error while initializing Mica Visual Studio:\n{ex.Message}"));
             queuedInfo = ($"Error while initializing Mica Visual Studio: {ex.Message} ({ex.GetType().Name})\n{ex.StackTrace}", KnownMonikers.StatusError);
@@ -227,7 +223,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
     private void WindowOpened(Window sender, WindowActionEventArgs args) => ApplyWindowPreferences(args.WindowHandle, sender, args.WindowType);
 
-    //private void WindowClosed(Window sender, WindowActionEventArgs args) { }
+    // private void WindowClosed(Window sender, WindowActionEventArgs args) { }
 
     private void ThemeChanged(object sender, Theme args) => RefreshPreferences();
 
@@ -253,17 +249,17 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
     {
         general ??= General.Instance;
 
-        if (window?.AllowsTransparency == true) //Don't apply to transparent windows
+        if (window?.AllowsTransparency == true) // Don't apply to transparent windows
             return;
 
-        if (firstTime && //Remove caption buttons once
-            window is not null && //Check that window is WPF
+        if (firstTime && // Remove caption buttons once
+            window is not null && // Check that window is WPF
             HwndSource.FromHwnd(handle) is HwndSource source)
         {
             WindowHelper.ExtendFrameIntoClientArea(handle);
             source.CompositionTarget.BackgroundColor = Colors.Transparent;
 
-            //Don't remove caption buttons from windows that need them
+            // Don't remove caption buttons from windows that need them
             if (window.WindowStyle == WindowStyle.None || window is not DialogWindowBase)
                 WindowHelper.RemoveCaptionButtons(source);
         }
@@ -318,7 +314,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         if (disposing)
         {
             observer?.WindowOpened -= WindowOpened;
-            //observer?.WindowClosed -= WindowClosed;
+            // observer?.WindowClosed -= WindowClosed;
 
             colors?.VisualStudioThemeChanged -= ThemeChanged;
             theme?.SystemThemeChanged -= ThemeChanged;
@@ -328,6 +324,4 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
         base.Dispose(disposing);
     }
-
-    #endregion
 }

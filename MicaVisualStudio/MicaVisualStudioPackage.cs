@@ -58,6 +58,8 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
     {
         services.AddSingleton<IGeneral>(General.Instance);
 
+        services.AddSingleton<IVsWindowManager, VsWindowManager>();
+
         services.AddSingleton<NoneCommand>()
                 .AddSingleton<MicaCommand>()
                 .AddSingleton<TabbedCommand>()
@@ -70,7 +72,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
     {
         await base.InitializeAsync(cancellationToken, progress);
         await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
+        
         try
         {
             WindowObserver.MainWindow.Loaded += Window_Loaded;

@@ -69,21 +69,26 @@
       <DependentUpon>CommandTable.vsct</DependentUpon>
     </Compile>
     <Compile Include="Commands\BackdropCommands.cs" />
-    <Compile Include="Contracts\IBackdropManager.cs" />
+    <Compile Include="Contracts\IGeneral.cs" />
+    <Compile Include="Contracts\IThemeService.cs" />
+    <Compile Include="Contracts\IVsWindowManager.cs" />
     <Compile Include="Extensions\ExpressionExtensions.cs" />
     <Compile Include="Extensions\TreeExtensions.cs" />
+    <Compile Include="Interop\PInvoke.UxTheme.cs" />
+    <Compile Include="Options\ObservableOptionModel.cs" />
     <Compile Include="Options\Theme.cs" />
     <Compile Include="Interop\ThemeHelper.cs" />
     <Compile Include="Interop\WindowHelper.cs" />
     <Compile Include="Extensions\WeakEventExtensions.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
-    <Compile Include="Services\BackdropManager.cs" />
+    <Compile Include="Services\ThemeService.cs" />
+    <Compile Include="Services\VsWindowManager.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
-    <Compile Include="VisualStudio\EnumFramesExtensions.cs" />
+    <Compile Include="Extensions\EnumFramesExtensions.cs" />
     <Compile Include="VisualStudio\VsWindowStyler.Brushes.cs" />
     <Compile Include="VisualStudio\VsWindowStyler.IL.cs" />
     <Compile Include="VisualStudio\VsWindowStyler.FrameEvents.cs" />

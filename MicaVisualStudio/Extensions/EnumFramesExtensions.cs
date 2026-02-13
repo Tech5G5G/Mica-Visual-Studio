@@ -3,7 +3,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace MicaVisualStudio.VisualStudio;
+namespace MicaVisualStudio.Extensions;
 
 /// <summary>
 /// Contains extensions for dealing with <see cref="IEnumWindowFrames"/>.

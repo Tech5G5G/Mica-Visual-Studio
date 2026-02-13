@@ -1,7 +1,10 @@
-﻿using System.Windows;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using System.Windows;
 using Microsoft.VisualStudio.Shell;
 using Community.VisualStudio.Toolkit;
+using MicaVisualStudio.Interop;
+using MicaVisualStudio.Contracts;
+using MicaVisualStudio.Options;
 using MicaVisualStudio.Options.Controls;
 
 namespace MicaVisualStudio;
@@ -30,82 +33,45 @@ internal partial class OptionsProvider
 /// <summary>
 /// Represents the general options used by Mica Visual Studio.
 /// </summary>
-public class General : BaseOptionModel<General>
+public class General : ObservableOptionModel<General>, IGeneral
 {
-    /// <summary>
-    /// Gets or sets the <see cref="Options.Theme"/> used for all windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetDarkMode(IntPtr, bool)"/>.</remarks>
-    public int Theme { get; set; } = 0; // Theme.VisualStudio
-    /// <summary>
-    /// Gets or sets the <see cref="BackdropType"/> used for all windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetBackdropType(IntPtr, BackdropType)"/>.</remarks>
-    public int Backdrop { get; set; } = 2; // BackdropType.Mica
-    /// <summary>
-    /// Gets or sets the <see cref="Interop.CornerPreference"/> used for all windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetCornerPreference(IntPtr, Interop.CornerPreference)"/>.</remarks>
-    public int CornerPreference { get; set; } = 0; // CornerPreference.Default
+    [OverrideDataType(SettingDataType.Int32)]
+    public Theme Theme { get; set; } = Theme.VisualStudio;
 
-    /// <summary>
-    /// Gets or sets whether to use separate options for <see cref="WindowType.Tool"/> windows.
-    /// </summary>
+    [OverrideDataType(SettingDataType.Int32)]
+    public BackdropType Backdrop { get; set; } = BackdropType.Mica;
+
+    [OverrideDataType(SettingDataType.Int32)]
+    public CornerPreference CornerPreference { get; set; } = CornerPreference.Default;
+
     public bool ToolWindows { get; set; } = false;
-    /// <summary>
-    /// Gets or sets the <see cref="Options.Theme"/> used for <see cref="WindowType.Tool"/> windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetDarkMode(IntPtr, bool)"/>.</remarks>
-    public int ToolTheme { get; set; } = 0; // Theme.VisualStudio
-    /// <summary>
-    /// Gets or sets the <see cref="BackdropType"/> used for <see cref="WindowType.Tool"/> windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetBackdropType(IntPtr, BackdropType)"/>.</remarks>
-    public int ToolBackdrop { get; set; } = 2; // BackdropType.Mica
-    /// <summary>
-    /// Gets or sets the <see cref="Interop.CornerPreference"/> used for <see cref="WindowType.Tool"/> windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetCornerPreference(IntPtr, Interop.CornerPreference)"/>.</remarks>
-    public int ToolCornerPreference { get; set; } = 0; // CornerPreference.Default
 
-    /// <summary>
-    /// Gets or sets whether to use separate options for <see cref="WindowType.Dialog"/> windows.
-    /// </summary>
+    [OverrideDataType(SettingDataType.Int32)]
+    public Theme ToolTheme { get; set; } = Theme.VisualStudio;
+
+    [OverrideDataType(SettingDataType.Int32)]
+    public BackdropType ToolBackdrop { get; set; } = BackdropType.Mica;
+
+    [OverrideDataType(SettingDataType.Int32)]
+    public CornerPreference ToolCornerPreference { get; set; } = CornerPreference.Default;
+
     public bool DialogWindows { get; set; } = false;
-    /// <summary>
-    /// Gets or sets the <see cref="Options.Theme"/> used for <see cref="WindowType.Dialog"/> windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetDarkMode(IntPtr, bool)"/>.</remarks>
-    public int DialogTheme { get; set; } = 0; // Theme.VisualStudio
-    /// <summary>
-    /// Gets or sets the <see cref="BackdropType"/> used for <see cref="WindowType.Dialog"/> windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetBackdropType(IntPtr, BackdropType)"/>.</remarks>
-    public int DialogBackdrop { get; set; } = 2; // BackdropType.Mica
-    /// <summary>
-    /// Gets or sets the <see cref="Interop.CornerPreference"/> used for <see cref="WindowType.Dialog"/> windows.
-    /// </summary>
-    /// <remarks>Used in <see cref="WindowHelper.SetCornerPreference(IntPtr, Interop.CornerPreference)"/>.</remarks>
-    public int DialogCornerPreference { get; set; } = 0; // CornerPreference.Default
 
-    /// <summary>
-    /// Gets or sets the <see cref="Options.Theme"/> used by the app.
-    /// </summary>
-    /// <remarks>Used in <see cref="ThemeHelper.SetAppTheme(Options.Theme)"/>.</remarks>
-    public int AppTheme { get; set; } = 0; // Theme.VisualStudio
+    [OverrideDataType(SettingDataType.Int32)]
+    public Theme DialogTheme { get; set; } = Theme.VisualStudio;
 
-    /// <summary>
-    /// Gets or sets whether or not to invoke <see cref="VsWindowStyler.Listen"/>.
-    /// </summary>
+    [OverrideDataType(SettingDataType.Int32)]
+    public BackdropType DialogBackdrop { get; set; } = BackdropType.Mica;
+
+    [OverrideDataType(SettingDataType.Int32)]
+    public CornerPreference DialogCornerPreference { get; set; } = CornerPreference.Default;
+
+    [OverrideDataType(SettingDataType.Int32)]
+    public Theme AppTheme { get; set; } = Theme.VisualStudio;
+
     public bool ForceTransparency { get; set; } = true;
-    /// <summary>
-    /// Gets or sets whether child windows recieve the <see cref="WindowStylesEx.Layered"/> style via <see cref="WindowHelper.MakeLayered(IntPtr)"/>.
-    /// </summary>
-    /// <remarks>Used by <see cref="VsWindowStyler"/>.</remarks>
+
     public bool LayeredWindows { get; set; } = true;
-    /// <summary>
-    /// Gets or sets whether popups are acrylicized.
-    /// </summary>
-    /// <remarks>Used by <see cref="VsWindowStyler"/>.</remarks>
+
     public bool AcrylicMenus { get; set; } = true;
 }

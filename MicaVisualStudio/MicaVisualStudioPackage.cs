@@ -53,7 +53,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
     protected override void InitializeServices(IServiceCollection services)
     {
-        services.AddSingleton<IBackdropManager, BackdropManager>();
+        services.AddSingleton<IGeneral>(General.Instance);
 
         services.AddSingleton<NoneCommand>()
                 .AddSingleton<MicaCommand>()
@@ -270,26 +270,26 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
             case WindowType.Main:
                 ApplyWindowAttributes(
                     general.Theme,
-                    (CornerPreference)general.CornerPreference,
-                    (BackdropType)general.Backdrop);
+                    general.CornerPreference,
+                    general.Backdrop);
                 break;
 
             case WindowType.Tool when general.ToolWindows:
                 ApplyWindowAttributes(
                     general.ToolTheme,
-                    (CornerPreference)general.ToolCornerPreference,
-                    (BackdropType)general.ToolBackdrop);
+                    general.ToolCornerPreference,
+                    general.ToolBackdrop);
                 break;
 
             case WindowType.Dialog when general.DialogWindows:
                 ApplyWindowAttributes(
                     general.DialogTheme,
-                    (CornerPreference)general.DialogCornerPreference,
-                    (BackdropType)general.DialogBackdrop);
+                    general.DialogCornerPreference,
+                    general.DialogBackdrop);
                 break;
         }
 
-        void ApplyWindowAttributes(int theme, CornerPreference corner, BackdropType backdrop)
+        void ApplyWindowAttributes(Theme theme, CornerPreference corner, BackdropType backdrop)
         {
             WindowHelper.EnableDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
             WindowHelper.SetCornerPreference(handle, corner);
@@ -297,7 +297,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         }
     }
 
-    private Theme EvaluateTheme(int theme) => (Theme)theme switch
+    private Theme EvaluateTheme(Theme theme) => theme switch
     {
         Theme.VisualStudio => colors.VisualStudioTheme,
         Theme.System => this.theme.SystemTheme,

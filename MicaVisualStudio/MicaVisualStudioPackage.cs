@@ -20,6 +20,7 @@ using MicaVisualStudio.Options;
 using MicaVisualStudio.Services;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.VisualStudio;
+using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
 
 namespace MicaVisualStudio;
 
@@ -48,6 +49,8 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
     private VsColorManager colors;
     private VsWindowStyler styler;
+
+    private ServiceProvider _provider;
 
     private (string Content, ImageMoniker Image) queuedInfo;
 
@@ -304,12 +307,17 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         _ => (Theme)theme
     };
 
+    protected override IServiceProvider BuildServiceProvider(IServiceCollection serviceCollection) =>
+        _provider = base.BuildServiceProvider(serviceCollection) as ServiceProvider;
+
     protected override void Dispose(bool disposing)
     {
         theme?.Dispose();
         observer?.Dispose();
 
         styler?.Dispose();
+
+        _provider?.Dispose();
 
         if (disposing)
         {
@@ -320,6 +328,8 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
             theme?.SystemThemeChanged -= ThemeChanged;
 
             General.Saved -= GeneralSaved;
+
+            _provider = null;
         }
 
         base.Dispose(disposing);

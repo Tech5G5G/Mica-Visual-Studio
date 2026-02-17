@@ -5,12 +5,12 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace MicaVisualStudio.Contracts;
 
-public interface IVsWindowManager
+public interface IWindowManager
 {
-    IReadOnlyList<Window> Windows { get; }
+    IReadOnlyDictionary<nint, Window> Windows { get; }
 
-    event EventHandler<Window> WindowOpened;
-    event EventHandler<Window> WindowClosed;
+    event EventHandler<WindowActionEventArgs> WindowOpened;
+    event EventHandler<WindowActionEventArgs> WindowClosed;
 
     IReadOnlyList<IVsWindowFrame> WindowFrames { get; }
 
@@ -22,3 +22,10 @@ public interface IVsWindowManager
 }
 
 public delegate void WindowFrameEventHandler<TEventArgs>(IVsWindowFrame sender, TEventArgs args);
+
+public class WindowActionEventArgs(nint handle, Window window) : EventArgs
+{
+    public Window Window { get; } = window;
+
+    public nint WindowHandle { get; } = handle;
+}

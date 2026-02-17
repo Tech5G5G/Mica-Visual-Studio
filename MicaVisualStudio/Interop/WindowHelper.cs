@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
-using MicaVisualStudio.VisualStudio;
 
 namespace MicaVisualStudio.Interop;
 

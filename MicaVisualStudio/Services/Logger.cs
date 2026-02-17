@@ -1,9 +1,9 @@
-﻿using MicaVisualStudio.Contracts;
-using Microsoft.VisualStudio.Imaging.Interop;
-using Microsoft.VisualStudio.Shell.Interop;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.Reflection;
+using System.Diagnostics;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Imaging.Interop;
+using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;
 

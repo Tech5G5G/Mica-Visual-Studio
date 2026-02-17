@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.Imaging.Interop;
-using System;
+﻿using System;
+using Microsoft.VisualStudio.Imaging.Interop;
 
 namespace MicaVisualStudio.Contracts;
 

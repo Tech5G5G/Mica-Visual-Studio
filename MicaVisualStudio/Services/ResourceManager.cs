@@ -12,7 +12,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Extensions;
-using IResourceManager = MicaVisualStudio.Contracts.IResourceManager;
 
 namespace MicaVisualStudio.Services;
 

@@ -1,12 +1,11 @@
-﻿using MicaVisualStudio.Contracts;
+﻿using System.ComponentModel;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Interop;
+using Microsoft.VisualStudio.PlatformUI;
 using MicaVisualStudio.Interop;
 using MicaVisualStudio.Options;
-using Microsoft.VisualStudio.PlatformUI;
-using System;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media;
+using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;
 

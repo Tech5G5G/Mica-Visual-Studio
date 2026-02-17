@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Controls;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace MicaVisualStudio.Contracts;

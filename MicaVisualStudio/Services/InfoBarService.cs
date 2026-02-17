@@ -1,9 +1,9 @@
-﻿using Community.VisualStudio.Toolkit;
-using MicaVisualStudio.Contracts;
+﻿using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Community.VisualStudio.Toolkit;
+using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;
 

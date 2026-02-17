@@ -480,7 +480,7 @@ public static class WindowHelper
         SetExtendedWindowStyles(hWnd, GetExtendedWindowStyles(hWnd) | WindowStylesEx.Layered);
         SetLayeredWindowAttributes(
             hWnd,
-            (uint)ColorTranslator.ToWin32(System.Drawing.Color.Black),
+            (uint)ColorTranslator.ToWin32(Color.Black),
             0xFF, // Set opactiy to 100%
             LWA_ALPHA);
     }

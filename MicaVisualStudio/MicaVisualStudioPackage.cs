@@ -37,24 +37,23 @@ namespace MicaVisualStudio;
 [ProvideAutoLoad(UIContextGuids.EmptySolution, PackageAutoLoadFlags.BackgroundLoad)]
 public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisualStudioPackage>
 {
-    private ThemeHelper theme;
-    private WindowObserver observer;
-
-    private VsColorManager colors;
-    private VsWindowStyler styler;
+    private ILogger _logger;
+    private IBackdropManager _backdrop;
+    private IResourceManager _resource;
+    private IElementTransparentizer _transparentizer;
 
     private ServiceProvider _provider;
 
     private readonly Dictionary<string, ResourceConfiguration> _configs = new()
     {
-                { "Background", new(translucent: true) },
+        { "Background", new(translucent: true) },
 
-                { "SolidBackgroundFillQuaternary", new(translucent: true) },
+        { "SolidBackgroundFillQuaternary", new(translucent: true) },
 
-                // { "SolidBackgroundFillTertiary", ColorConfig.Default },
-                // { "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
+        // { "SolidBackgroundFillTertiary", ColorConfig.Default },
+        // { "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
 
-                { "EnvironmentBackground", new(translucent: true) },
+        { "EnvironmentBackground", new(translucent: true) },
         { "EnvironmentBackgroundGradient", ResourceConfiguration.Default },
 
         { "ActiveCaption", ResourceConfiguration.Layered },
@@ -77,7 +76,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         { "Default", ResourceConfiguration.Default },
 
         { "Window", ResourceConfiguration.Default },
-                { "WindowPanel", new(translucent: true) },
+        { "WindowPanel", new(translucent: true) },
 
         { "CommandBarGradient", ResourceConfiguration.Default },
         { "CommandBarGradientBegin", ResourceConfiguration.Default },
@@ -129,164 +128,85 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         { "WizardBackgroundLowerRegion", ResourceConfiguration.Default }
     };
 
-            #endregion
-
-            if (General.Instance.ForceTransparency)
-                (styler = VsWindowStyler.Instance).Listen();
-
-            theme = ThemeHelper.Instance;
-            observer = WindowObserver.Instance;
-
-            RefreshPreferences(); // Set app theme
-
-            if (WindowObserver.MainWindow.Visibility == Visibility.Visible) // We're late, so add all windows
-            {
-                WindowObserver.AllWindows.ForEach(AddWindow);
-                WindowObserver.MainWindow.Loaded -= Window_Loaded;
-            }
-            else if (WindowObserver.CurrentWindow is Window window) // Apply to start window
-                AddWindow(window);
-
-            observer.WindowOpened += WindowOpened;
-            // windows.WindowClosed += WindowClosed;
-
-            colors.VisualStudioThemeChanged += ThemeChanged;
-            theme.SystemThemeChanged += ThemeChanged;
-
-            General.Saved += GeneralSaved;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error initializing Mica Visual Studio: {ex.Message}");
-
-            progress.Report(new("Mica Visual Studio", $"Error while initializing Mica Visual Studio:\n{ex.Message}"));
-            queuedInfo = ($"Error while initializing Mica Visual Studio: {ex.Message} ({ex.GetType().Name})\n{ex.StackTrace}", KnownMonikers.StatusError);
-        }
-
-        void Window_Loaded(object sender, RoutedEventArgs args)
-        {
-            if (queuedInfo.Content is not null)
-                VS.InfoBar.CreateAsync(new(queuedInfo.Content, queuedInfo.Image)).Result.TryShowInfoBarUIAsync().Forget();
-
-            WindowObserver.MainWindow.Loaded -= Window_Loaded;
-        }
-
-        void AddWindow(Window window)
-        {
-            observer.AppendWindow(window);
-            ApplyWindowPreferences(
-                window.GetHandle(),
-                window,
-                WindowHelper.GetWindowType(window));
-        }
-    }
-
-    #region Event Handlers
-
-    private void WindowOpened(Window sender, WindowActionEventArgs args) => ApplyWindowPreferences(args.WindowHandle, sender, args.WindowType);
-
-    // private void WindowClosed(Window sender, WindowActionEventArgs args) { }
-
-    private void ThemeChanged(object sender, Theme args) => RefreshPreferences();
-
-    private void GeneralSaved(General sender) => RefreshPreferences();
-
-    private void RefreshPreferences()
+    protected override void InitializeServices(IServiceCollection services)
     {
-        General general = General.Instance;
-        theme.SetAppTheme(EvaluateTheme(general.AppTheme));
+        services.AddSingleton(VS.GetRequiredService<SVsUIShell, IVsUIShell>())
+                .AddSingleton(VS.GetRequiredService<SVsUIShell, IVsUIShell5>())
+                .AddSingleton(VS.GetRequiredService<SVsUIShell, IVsUIShell7>())
+                .AddSingleton(VS.GetRequiredService<SVsActivityLog, IVsActivityLog>());
 
-        foreach (var entry in observer.Windows)
-            ApplyWindowPreferences(entry.Key, entry.Value.Window, entry.Value.Type, firstTime: false, general);
+        services.AddSingleton<IGeneral>(General.Instance);
+
+        services.AddSingleton<ILogger, Logger>()
+                .AddSingleton<IThemeService, ThemeService>()
+                .AddSingleton<IWindowManager, WindowManager>()
+                .AddSingleton<IInfoBarService, InfoBarService>()
+                .AddSingleton<IBackdropManager, BackdropManager>()
+                .AddSingleton<IResourceManager, ResourceManager>()
+                .AddSingleton<IElementTransparentizer, ElementTransparentizer>();
+
+        services.AddSingleton<NoneCommand>()
+                .AddSingleton<MicaCommand>()
+                .AddSingleton<TabbedCommand>()
+                .AddSingleton<AcrylicCommand>()
+                .AddSingleton<GlassCommand>()
+                .AddSingleton<MoreCommand>();
     }
-
-    #endregion
-
-    private void ApplyWindowPreferences(
-        IntPtr handle,
-        Window window,
-        WindowType type,
-        bool firstTime = true,
-        General general = null)
-    {
-        general ??= General.Instance;
-
-        if (window?.AllowsTransparency == true) // Don't apply to transparent windows
-            return;
-
-        if (firstTime && // Remove caption buttons once
-            window is not null && // Check that window is WPF
-            HwndSource.FromHwnd(handle) is HwndSource source)
-        {
-            WindowHelper.ExtendFrameIntoClientArea(handle);
-            source.CompositionTarget.BackgroundColor = Colors.Transparent;
-
-            // Don't remove caption buttons from windows that need them
-            if (window.WindowStyle == WindowStyle.None || window is not DialogWindowBase)
-                WindowHelper.RemoveCaptionButtons(source);
-        }
-
-        switch (type)
-        {
-            default:
-            case WindowType.Main:
-                ApplyWindowAttributes(
-                    general.Theme,
-                    general.CornerPreference,
-                    general.Backdrop);
-                break;
-
-            case WindowType.Tool when general.ToolWindows:
-                ApplyWindowAttributes(
-                    general.ToolTheme,
-                    general.ToolCornerPreference,
-                    general.ToolBackdrop);
-                break;
-
-            case WindowType.Dialog when general.DialogWindows:
-                ApplyWindowAttributes(
-                    general.DialogTheme,
-                    general.DialogCornerPreference,
-                    general.DialogBackdrop);
-                break;
-        }
-
-        void ApplyWindowAttributes(Theme theme, CornerPreference corner, BackdropType backdrop)
-        {
-            WindowHelper.EnableDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
-            WindowHelper.SetCornerPreference(handle, corner);
-            WindowHelper.SetBackdropType(handle, window is not null || backdrop != BackdropType.Glass ? backdrop : BackdropType.None);
-        }
-    }
-
-    private Theme EvaluateTheme(Theme theme) => theme switch
-    {
-        Theme.VisualStudio => colors.VisualStudioTheme,
-        Theme.System => this.theme.SystemTheme,
-        _ => (Theme)theme
-    };
 
     protected override IServiceProvider BuildServiceProvider(IServiceCollection serviceCollection) =>
         _provider = base.BuildServiceProvider(serviceCollection) as ServiceProvider;
 
+    protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+    {
+        await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+        await base.InitializeAsync(cancellationToken, progress);
+
+        // If this fails, welp
+        _logger = ServiceProvider.GetRequiredService<ILogger>();
+
+        // Allow Windows 11 (or later)
+        if (Environment.OSVersion.Version.Build < 22000)
+        {
+            _logger.InfoBar("Mica Visual Studio is not compatible with Windows 10 and earlier.", KnownMonikers.StatusWarning);
+        }
+        else if (TryGetService(out _resource))
+        {
+            // Initialize ResourceManager first...
+            _resource.Configurations.AddRange(_configs);
+            _resource.ConfigureResources();
+
+            // So backdrop applies when it's actually visible
+            TryGetService(out _transparentizer);
+            TryGetService(out _backdrop);
+        }
+    }
+
+    private bool TryGetService<T>(out T service)
+    {
+        try
+        {
+            service = ServiceProvider.GetRequiredService<T>();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.InfoBar(ex, KnownMonikers.StatusError);
+
+            service = default;
+            return false;
+        }
+    }
+
     protected override void Dispose(bool disposing)
     {
-        theme?.Dispose();
-        observer?.Dispose();
-
-        styler?.Dispose();
-
         _provider?.Dispose();
 
         if (disposing)
         {
-            observer?.WindowOpened -= WindowOpened;
-            // observer?.WindowClosed -= WindowClosed;
-
-            colors?.VisualStudioThemeChanged -= ThemeChanged;
-            theme?.SystemThemeChanged -= ThemeChanged;
-
-            General.Saved -= GeneralSaved;
+            _logger = null;
+            _backdrop = null;
+            _resource = null;
+            _transparentizer = null;
 
             _provider = null;
         }

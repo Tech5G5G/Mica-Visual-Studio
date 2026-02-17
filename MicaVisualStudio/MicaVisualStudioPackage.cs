@@ -45,43 +45,8 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
     private ServiceProvider _provider;
 
-    private (string Content, ImageMoniker Image) queuedInfo;
-
-    protected override void InitializeServices(IServiceCollection services)
+    private readonly Dictionary<string, ResourceConfiguration> _configs = new()
     {
-        services.AddSingleton<IGeneral>(General.Instance);
-
-        services.AddSingleton<IVsWindowManager, VsWindowManager>();
-
-        services.AddSingleton<NoneCommand>()
-                .AddSingleton<MicaCommand>()
-                .AddSingleton<TabbedCommand>()
-                .AddSingleton<AcrylicCommand>()
-                .AddSingleton<GlassCommand>()
-                .AddSingleton<MoreCommand>();
-    }
-
-    protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
-    {
-        await base.InitializeAsync(cancellationToken, progress);
-        await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-        
-        try
-        {
-            WindowObserver.MainWindow.Loaded += Window_Loaded;
-
-            if (Environment.OSVersion.Version.Build < 22000) // Allow Windows 11 or later
-            {
-                queuedInfo = ("Mica Visual Studio is not compatible with Windows 10 and earlier.", KnownMonikers.StatusWarning);
-                return;
-            }
-
-            colors = VsColorManager.Instance;
-
-            #region Resource Keys
-
-            colors.AddConfigs(new()
-            {
                 { "Background", new(translucent: true) },
 
                 { "SolidBackgroundFillQuaternary", new(translucent: true) },
@@ -90,80 +55,79 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
                 // { "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
 
                 { "EnvironmentBackground", new(translucent: true) },
-                { "EnvironmentBackgroundGradient", ColorConfig.Default },
+        { "EnvironmentBackgroundGradient", ResourceConfiguration.Default },
 
-                { "ActiveCaption", ColorConfig.Layered },
-                { "InactiveCaption", ColorConfig.Layered },
+        { "ActiveCaption", ResourceConfiguration.Layered },
+        { "InactiveCaption", ResourceConfiguration.Layered },
 
-                { "MainWindowActiveCaption", ColorConfig.Default },
-                { "MainWindowInactiveCaption", ColorConfig.Default },
+        { "MainWindowActiveCaption", ResourceConfiguration.Default },
+        { "MainWindowInactiveCaption", ResourceConfiguration.Default },
 
-                { "ToolWindow", ColorConfig.Default },
-                { "ToolWindowGroup", ColorConfig.Default },
-                { "ToolWindowBackground", ColorConfig.Default },
-                { "ToolWindowFloatingFrame", ColorConfig.Default },
-                { "ToolWindowFloatingFrameInactive", ColorConfig.Default },
-                { "ToolWindowTabMouseOverBackgroundGradient", ColorConfig.Layered },
+        { "ToolWindow", ResourceConfiguration.Default },
+        { "ToolWindowGroup", ResourceConfiguration.Default },
+        { "ToolWindowBackground", ResourceConfiguration.Default },
+        { "ToolWindowFloatingFrame", ResourceConfiguration.Default },
+        { "ToolWindowFloatingFrameInactive", ResourceConfiguration.Default },
+        { "ToolWindowTabMouseOverBackgroundGradient", ResourceConfiguration.Layered },
 
-                { "ToolWindowContentGrid", ColorConfig.Layered },
+        { "ToolWindowContentGrid", ResourceConfiguration.Layered },
 
-                { "PopupBackground", ColorConfig.Default },
+        { "PopupBackground", ResourceConfiguration.Default },
 
-                { "Default", ColorConfig.Default },
+        { "Default", ResourceConfiguration.Default },
 
-                { "Window", ColorConfig.Default },
+        { "Window", ResourceConfiguration.Default },
                 { "WindowPanel", new(translucent: true) },
 
-                { "CommandBarGradient", ColorConfig.Default },
-                { "CommandBarGradientBegin", ColorConfig.Default },
+        { "CommandBarGradient", ResourceConfiguration.Default },
+        { "CommandBarGradientBegin", ResourceConfiguration.Default },
 
-                { "ListBox", ColorConfig.Layered },
-                { "ListItemBackgroundHover", new(transparentOnGray: false, translucent: true) },
+        { "ListBox", ResourceConfiguration.Layered },
+        { "ListItemBackgroundHover", new(transparentIfGray: false, translucent: true) },
 
-                { "SelectedItemActive", ColorConfig.Layered },
-                { "SelectedItemInactive", ColorConfig.Layered },
+        { "SelectedItemActive", ResourceConfiguration.Layered },
+        { "SelectedItemInactive", ResourceConfiguration.Layered },
 
-                { "Unfocused", ColorConfig.Layered },
+        { "Unfocused", ResourceConfiguration.Layered },
 
-                { "Caption", ColorConfig.Layered },
+        { "Caption", ResourceConfiguration.Layered },
 
-                { "TextBoxBackground", ColorConfig.Layered },
-                { "SearchBoxBackground", ColorConfig.Layered },
+        { "TextBoxBackground", ResourceConfiguration.Layered },
+        { "SearchBoxBackground", ResourceConfiguration.Layered },
 
-                { "Button", ColorConfig.Layered },
-                { "ButtonFocused", ColorConfig.Default },
+        { "Button", ResourceConfiguration.Layered },
+        { "ButtonFocused", ResourceConfiguration.Default },
 
-                { "ComboBoxBackground", ColorConfig.Layered },
+        { "ComboBoxBackground", ResourceConfiguration.Layered },
 
-                { "InfoBarBorder", ColorConfig.Default },
+        { "InfoBarBorder", ResourceConfiguration.Default },
 
-                { "Page", ColorConfig.Default },
-                { "PageBackground", ColorConfig.Default },
+        { "Page", ResourceConfiguration.Default },
+        { "PageBackground", ResourceConfiguration.Default },
 
-                { "BrandedUIBackground", ColorConfig.Default },
+        { "BrandedUIBackground", ResourceConfiguration.Default },
 
-                { "ScrollBarBackground", ColorConfig.Layered },
-                { "ScrollBarArrowBackground", ColorConfig.Default },
-                { "ScrollBarArrowDisabledBackground", ColorConfig.Default },
+        { "ScrollBarBackground", ResourceConfiguration.Layered },
+        { "ScrollBarArrowBackground", ResourceConfiguration.Default },
+        { "ScrollBarArrowDisabledBackground", ResourceConfiguration.Default },
 
-                { "AutoHideResizeGrip", ColorConfig.Default },
-                { "AutoHideResizeGripDisabled", ColorConfig.Default },
+        { "AutoHideResizeGrip", ResourceConfiguration.Default },
+        { "AutoHideResizeGripDisabled", ResourceConfiguration.Default },
 
-                { "Content", ColorConfig.Default },
-                { "ContentSelected", ColorConfig.Layered },
-                { "ContentMouseOver", ColorConfig.Layered },
-                { "ContentInactiveSelected", ColorConfig.Layered },
+        { "Content", ResourceConfiguration.Default },
+        { "ContentSelected", ResourceConfiguration.Layered },
+        { "ContentMouseOver", ResourceConfiguration.Layered },
+        { "ContentInactiveSelected", ResourceConfiguration.Layered },
 
-                { "Wonderbar", ColorConfig.Default },
-                { "WonderbarMouseOver", ColorConfig.Layered },
-                { "WonderbarTreeInactiveSelected", ColorConfig.Default },
+        { "Wonderbar", ResourceConfiguration.Default },
+        { "WonderbarMouseOver", ResourceConfiguration.Layered },
+        { "WonderbarTreeInactiveSelected", ResourceConfiguration.Default },
 
-                { "Details", ColorConfig.Layered },
+        { "Details", ResourceConfiguration.Layered },
 
-                { "BackgroundLowerRegion", ColorConfig.Default },
-                { "WizardBackgroundLowerRegion", ColorConfig.Default }
-            });
-            colors.UpdateColors();
+        { "BackgroundLowerRegion", ResourceConfiguration.Default },
+        { "WizardBackgroundLowerRegion", ResourceConfiguration.Default }
+    };
 
             #endregion
 

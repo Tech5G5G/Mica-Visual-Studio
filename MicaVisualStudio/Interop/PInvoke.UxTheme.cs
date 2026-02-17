@@ -15,10 +15,10 @@ internal static partial class PInvoke
         SetPreferredAppMode(mode);
         FlushMenuThemes();
     }
-}
 
-public enum PreferredAppMode
-{
-    ForceDark = 2,
-    ForceLight = 3
+    public enum PreferredAppMode
+    {
+        ForceDark = 2,
+        ForceLight = 3
+    }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Linq.Expressions;
-using Expression = System.Linq.Expressions.Expression;
 
 namespace MicaVisualStudio.Extensions
 {

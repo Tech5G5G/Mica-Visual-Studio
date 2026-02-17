@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using System.Reflection;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Community.VisualStudio.Toolkit;
 
 namespace MicaVisualStudio.Options;
@@ -10,25 +12,35 @@ public abstract class ObservableOptionModel<TSelf> : BaseOptionModel<TSelf>, INo
 {
     public event PropertyChangedEventHandler PropertyChanged;
 
+    private readonly List<PropertyInfo> _properties = [];
+
+    private object[] _originalValues;
+
+    public ObservableOptionModel() =>
+        _properties.AddRange([.. GetPropertyWrappers().OfType<OptionModelPropertyWrapper>().Select(i => i.PropertyInfo)]);
+
     public override async Task LoadAsync()
     {
-        var properties = GetPropertyWrappers().OfType<OptionModelPropertyWrapper>()
-                                              .Select(i => i.PropertyInfo)
-                                              .ToArray();
-
-        var originalValues = properties.Select(p => p.GetValue(this)).ToArray();
-
         await base.LoadAsync();
+        _originalValues = [.. _properties.Select(p => p.GetValue(this))];
+    }
 
-        for (int i = 0; i < properties.Length; ++i)
+    public override Task SaveAsync()
+    {
+        if (_originalValues is not null)
         {
-            var property = properties[i];
-
-            if (property.GetValue(this) != originalValues[i])
+            for (int i = 0; i < _properties.Count; ++i)
             {
-                OnPropertyChanged(property.Name);
+                var property = _properties[i];
+
+                if (_originalValues[i] != (_originalValues[i] = property.GetValue(this)))
+                {
+                    OnPropertyChanged(property.Name);
+                }
             }
         }
+
+        return base.SaveAsync();
     }
 
     protected virtual void OnPropertyChanged(string propertyName) =>

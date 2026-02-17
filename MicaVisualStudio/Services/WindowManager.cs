@@ -8,27 +8,23 @@ using System.Windows.Interop;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Community.VisualStudio.Toolkit;
 using MicaVisualStudio.Interop;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Extensions;
 
 namespace MicaVisualStudio.Services;
 
-public class VsWindowManager : IVsWindowManager, IVsWindowFrameEvents, IDisposable
+public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
 {
-    public IReadOnlyList<Window> Windows
+    public IReadOnlyDictionary<nint, Window> Windows
     {
         get
         {
             CleanHandles();
+            var sources = PresentationSource.CurrentSources.OfType<HwndSource>()
+                                                           .ToDictionary(s => s.Handle);
 
-            return new ReadOnlyCollection<Window>(
-                [.. PresentationSource.CurrentSources.OfType<HwndSource>()
-                                                     .Where(s => _handles.Contains(s.Handle))
-                                                     .Select(i => i.RootVisual)
-                                                     .OfType<Window>()]);
-
+            return _handles.ToDictionary(h => h, h => sources.TryGetValue(h, out var source) ? source.RootVisual as Window : null);
         }
     }
     private readonly List<nint> _handles = [];
@@ -36,8 +32,8 @@ public class VsWindowManager : IVsWindowManager, IVsWindowFrameEvents, IDisposab
     public IReadOnlyList<IVsWindowFrame> WindowFrames => new ReadOnlyCollection<IVsWindowFrame>([.. _frames]);
     private readonly WeakCollection<IVsWindowFrame> _frames = [];
 
-    public event EventHandler<Window> WindowOpened;
-    public event EventHandler<Window> WindowClosed;
+    public event EventHandler<WindowActionEventArgs> WindowOpened;
+    public event EventHandler<WindowActionEventArgs> WindowClosed;
 
     public event WindowFrameEventHandler<object> FrameCreated;
     public event WindowFrameEventHandler<object> FrameDestroyed;
@@ -45,18 +41,21 @@ public class VsWindowManager : IVsWindowManager, IVsWindowFrameEvents, IDisposab
     public event WindowFrameEventHandler<bool> FrameIsOnScreenChanged;
     public event WindowFrameEventHandler<IVsWindowFrame> ActiveFrameChanged;
 
-    private readonly IVsUIShell _shell = VS.GetRequiredService<SVsUIShell, IVsUIShell>();
-    private readonly IVsUIShell7 _shell7 = VS.GetRequiredService<SVsUIShell, IVsUIShell7>();
+    private readonly IVsUIShell _shell;
+    private readonly IVsUIShell7 _shell7;
 
     private readonly WinEventHook _hook;
     private readonly int _pid = Process.GetCurrentProcess().Id;
 
     private readonly uint _cookie;
 
-    public VsWindowManager()
+    public WindowManager(IVsUIShell shell, IVsUIShell7 shell7)
     {
+        _shell = shell;
+        _shell7 = shell7;
+
         ThreadHelper.ThrowIfNotOnUIThread();
-        _cookie = _shell7.AdviseWindowFrameEvents(this);
+        _cookie = shell7.AdviseWindowFrameEvents(this);
 
         _hook = new(Event.Foreground, EventFlags.OutOfContext, _pid);
         _hook.EventOccurred += OnEventOccurred;
@@ -99,8 +98,12 @@ public class VsWindowManager : IVsWindowManager, IVsWindowFrameEvents, IDisposab
         {
             var handle = window.GetHandle();
 
-            _handles.Add(handle);
-            WindowOpened?.Invoke(this, window);
+            if (!_handles.Contains(handle))
+            {
+                _handles.Add(handle);
+            }
+
+            WindowOpened?.Invoke(this, new(handle, window));
         }
     }
 
@@ -109,7 +112,7 @@ public class VsWindowManager : IVsWindowManager, IVsWindowFrameEvents, IDisposab
         if (sender is Window window)
         {
             CleanHandles();
-            WindowClosed?.Invoke(this, window);
+            WindowClosed?.Invoke(this, new(IntPtr.Zero, window));
         }
     }
 
@@ -121,7 +124,7 @@ public class VsWindowManager : IVsWindowManager, IVsWindowFrameEvents, IDisposab
             _handles.Add(args.WindowHandle);
 
             var window = HwndSource.FromHwnd(args.WindowHandle) is HwndSource source ? source.RootVisual as Window : null;
-            WindowOpened?.Invoke(this, window);
+            WindowOpened?.Invoke(this, new(args.WindowHandle, window));
         }
     }
 

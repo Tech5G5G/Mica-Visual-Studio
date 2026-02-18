@@ -17,6 +17,12 @@ namespace MicaVisualStudio.Services;
 
 public class ResourceManager : IResourceManager
 {
+    private static readonly ThemeResourceKey MainWindowActiveCaptionKey =
+        new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);
+
+    private static Color TransparentWhite = Colors.Transparent,
+                         TranslucentBlack = Color.FromArgb(0x01, 0x00, 0x00, 0x00); // Slight alpha to change icon foreground (basically invisible)
+
     public IDictionary<string, ResourceConfiguration> Configurations => _configs;
     private readonly Dictionary<string, ResourceConfiguration> _configs = [];
 
@@ -27,12 +33,6 @@ public class ResourceManager : IResourceManager
     private Theme _theme;
 
     public event EventHandler<Theme> VisualStudioThemeChanged;
-
-    private static readonly ThemeResourceKey MainWindowActiveCaptionKey =
-        new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);
-
-    private static Color TransparentWhite = Colors.Transparent,
-                         TranslucentBlack = Color.FromArgb(0x01, 0x00, 0x00, 0x00); // Slight alpha to change icon foreground (basically invisible)
 
     private readonly IVsUIShell5 _shell5;
 
@@ -106,7 +106,9 @@ public class ResourceManager : IResourceManager
             foreach (var pair in _resources)
             {
                 var resource = pair.Value;
-                var value = resource.Factory(_theme, _shell5.GetThemedWPFColor(resource.BaseResourceKey));
+                var value = resource.Factory(
+                    _theme,
+                    resource.BaseResourceKey is null ? default : _shell5.GetThemedWPFColor(resource.BaseResourceKey));
 
                 if (!dictionary.Contains(pair.Key))
                 {

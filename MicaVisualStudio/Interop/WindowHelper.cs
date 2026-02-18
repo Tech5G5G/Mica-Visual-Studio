@@ -396,14 +396,20 @@ public static class WindowHelper
     /// <returns>The <see cref="WindowType"/> of the specified <paramref name="window"/>.</returns>
     public static WindowType GetWindowType(Window window)
     {
-        if (window == WindowObserver.MainWindow)
+        if (window == Application.Current.MainWindow)
+        {
             return WindowType.Main;
+        }
         else if (window is not null && // Check if window is WPF
             (window.WindowStyle == WindowStyle.None || // and has no style
             window.Owner is null)) // or no owner
+        {
             return WindowType.Tool;
+        }
         else
+        {
             return WindowType.Dialog;
+        }
     }
 
     /// <summary>

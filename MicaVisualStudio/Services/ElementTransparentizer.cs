@@ -427,6 +427,12 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 control.Background = Brushes.Transparent;
                 return;
 
+            // Editor window, map scroll bar buttons
+            case "UpButton" or "DownButton"
+            when control is RepeatButton && control.FindDescendant<Border>() is { Name: "Border" } border:
+                border.Background = Brushes.Transparent;
+                return;
+
             // AppxManifest editor
             case "MainTabControl" when control.GetVisualOrLogicalParent()?
                                               .GetVisualOrLogicalParent() is Grid { Name: "LayoutRoot" } root:
@@ -638,12 +644,6 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Git window, section header
             case "borderHeader" when border is { Style: { } style }:
                 border.Style = SubclassStyle(style);
-                return;
-
-            // Editor window, map scroll bar buttons
-            case "Border"
-            when border.GetVisualOrLogicalParent() is RepeatButton { Name: "UpButton" or "DownButton" }:
-                border.Background = Brushes.Transparent;
                 return;
         }
 

@@ -575,6 +575,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             case "toolbarGrid":
                 panel.Background = Brushes.Transparent;
                 return;
+
+            // Pull request window, toolbar
+            case "targetAndSourceBranchPickers":
+                panel.Background = Brushes.Transparent;
+                return;
         }
 
         switch (panel.GetType().FullName)

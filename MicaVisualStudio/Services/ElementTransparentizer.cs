@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Interop;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -540,6 +541,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 }
                 break;
 
+            // Editor window, map scroll bar
+            case "Microsoft.VisualStudio.Text.OverviewMargin.Implementation.OverviewElement":
+                panel.Background = Brushes.Transparent;
+                break;
+
             // Commit diff view
             case "Microsoft.VisualStudio.Differencing.Package.DiffControl":
                 panel.Background = Brushes.Transparent;
@@ -569,6 +575,12 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Git window, section header
             case "borderHeader" when border is { Style: { } style }:
                 border.Style = SubclassStyle(style);
+                return;
+
+            // Editor window, map scroll bar buttons
+            case "Border"
+            when border.GetVisualOrLogicalParent() is RepeatButton { Name: "UpButton" or "DownButton" }:
+                border.Background = Brushes.Transparent;
                 return;
         }
 

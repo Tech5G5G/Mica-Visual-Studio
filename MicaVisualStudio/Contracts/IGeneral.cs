@@ -70,18 +70,19 @@ public interface IGeneral : INotifyPropertyChanged
     Theme AppTheme { get; set; }
 
     /// <summary>
-    /// Gets or sets whether or not to invoke <see cref="VsWindowStyler.Listen"/>.
+    /// Gets or sets whether to initialize <see cref="Services.ElementTransparentizer"/>.
     /// </summary>
     bool ForceTransparency { get; set; }
     /// <summary>
-    /// Gets or sets whether child windows recieve the <see cref="WindowStylesEx.Layered"/> style via <see cref="WindowHelper.MakeLayered(System.IntPtr)"/>.
+    /// Gets or sets whether child windows recieve the <see cref="WindowStylesEx.Layered"/> style via
+    /// <see cref="WindowHelper.MakeLayered(System.IntPtr)"/>.
     /// </summary>
-    /// <remarks>Used by <see cref="VisualStudio.VsWindowStyler"/>.</remarks>
+    /// <remarks>Used by <see cref="Services.ElementTransparentizer"/>.</remarks>
     bool LayeredWindows { get; set; }
     /// <summary>
     /// Gets or sets whether popups are acrylicized.
     /// </summary>
-    /// <remarks>Used by <see cref="VisualStudio.VsWindowStyler"/>.</remarks>
+    /// <remarks>Used by <see cref="Services.MenuAcrylicizer"/>.</remarks>
     bool AcrylicMenus { get; set; }
 
     public void Save();

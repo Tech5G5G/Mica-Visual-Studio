@@ -66,7 +66,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         _visualDetour = typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic)
                                       .CreateDetour<Visual, Visual>(AddVisualChild);
 
-        // Generate WindowFrame.FrameView.get function
+        // Generate function for WindowFrame.FrameView.get
         get_WindowFrame_FrameView = Type
             .GetType("Microsoft.VisualStudio.Platform.WindowManagement.WindowFrame, Microsoft.VisualStudio.Platform.WindowManagement")
             .GetProperty("FrameView")

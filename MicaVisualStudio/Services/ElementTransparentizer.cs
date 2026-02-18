@@ -377,6 +377,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 control.Background = Brushes.Transparent;
                 return;
 
+            // Copilot window, message box
+            case "ChatPrompt":
+                control.Background = Brushes.Transparent;
+                return;
             #region Git Windows
 
             case "gitWindowView" or // Git changes window

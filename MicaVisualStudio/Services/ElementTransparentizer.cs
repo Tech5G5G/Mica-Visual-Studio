@@ -130,12 +130,12 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         try
         {
-        if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Skip other types
+            if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Skip other types
             instance is FrameworkElement element && GetIsTracked(element))
-        {
-            StyleElementTree(element);
+            {
+                StyleElementTree(element);
+            }
         }
-    }
         catch (Exception ex)
         {
             _logger.Output(ex);
@@ -192,28 +192,28 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         try
         {
-        if (get_WindowFrame_FrameView(frame) is not DependencyObject view)
-        {
-            return;
-        }
-
-        if (view.GetValue(View_ContentProperty) is not Grid host)
-        {
-            WeakReference<IVsWindowFrame> weakFrame = new(frame);
-
-            view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, e) =>
+            if (get_WindowFrame_FrameView(frame) is not DependencyObject view)
             {
-                if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
+                return;
+            }
+
+            if (view.GetValue(View_ContentProperty) is not Grid host)
+            {
+                WeakReference<IVsWindowFrame> weakFrame = new(frame);
+
+                view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, e) =>
                 {
-                    StyleWindowFrame(frame);
-                }
-            });
+                    if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
+                    {
+                        StyleWindowFrame(frame);
+                    }
+                });
+            }
+            else if (host.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
+            {
+                StyleElementTree(dock);
+            }
         }
-        else if (host.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
-        {
-            StyleElementTree(dock);
-        }
-    }
         catch (Exception ex)
         {
             _logger.Output(ex);
@@ -224,7 +224,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         try
         {
-        StyleTree(element.FindDescendants<FrameworkElement>().Append(element));
+            StyleTree(element.FindDescendants<FrameworkElement>().Append(element));
         }
         catch (Exception ex)
         {
@@ -436,8 +436,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // AppxManifest editor
             case "MainTabControl" when control.GetVisualOrLogicalParent()?
                                               .GetVisualOrLogicalParent() is Grid { Name: "LayoutRoot" } root:
-                control.Background = Brushes.Transparent;
-                root.Background = Brushes.Transparent;
+                control.Background = root.Background = Brushes.Transparent;
                 return;
 
             // Resource editor
@@ -456,7 +455,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 "createPullRequestView": // New PR window
             GitWindow:
                 {
-                control.Background = Brushes.Transparent;
+                    control.Background = Brushes.Transparent;
 
                     // Git command buttons
                     if (control.TryFindResource("TESectionCommandButtonStyle") is Style style)
@@ -464,7 +463,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                         TransparentizeStyle(style);
                     }
 
-                StyleTree(control.LogicalDescendants<FrameworkElement>());
+                    StyleTree(control.LogicalDescendants<FrameworkElement>());
                 }
                 return;
 
@@ -494,7 +493,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 return;
 
             // Commit history list
-            case "historyListView" when control is ListView { View: GridView { ColumnHeaderContainerStyle: { } style } grid }:
+            case "historyListView"
+            when control is ListView { View: GridView { ColumnHeaderContainerStyle: { } style } grid }:
                 grid.ColumnHeaderContainerStyle = SubclassStyle(style);
 
                 foreach (var c in grid.Columns.Select(i => i.Header).OfType<Control>())
@@ -532,7 +532,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 return;
 
             // Git changes...
-            case "statusControl" or // Actions/tool bar
+            case "statusControl" or // Actions/toolbar
                 "inactiveRepoContent" or // Create repo
                 "sectionContainer" or // Branches and tags
                 "amendCheckBox": // Checkbox... for amending...
@@ -667,7 +667,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 border.Background = Brushes.Transparent;
                 break;
 
-            // Commit diff view, tool bar
+            // Commit diff view, toolbar
             case "Microsoft.VisualStudio.Differencing.Package.DiffControlToolbar":
                 border.Background = Brushes.Transparent;
                 break;

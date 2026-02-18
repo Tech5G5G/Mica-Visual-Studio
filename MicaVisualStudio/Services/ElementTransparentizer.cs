@@ -42,6 +42,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     #endregion
 
+    private readonly ILogger _logger;
+    private readonly IGeneral _general;
     private readonly IWindowManager _window;
     private readonly IResourceManager _resource;
 
@@ -52,8 +54,16 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     private readonly ILHook _visualDetour;
 
-    public ElementTransparentizer(IWindowManager window, IResourceManager resource)
+    private readonly bool _layeredWindows;
+
+    public ElementTransparentizer(
+        ILogger logger,
+        IGeneral general,
+        IWindowManager window,
+        IResourceManager resource)
     {
+        _logger = logger;
+        _general = general;
         _window = window;
         _resource = resource;
 
@@ -61,6 +71,13 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         resource.CustomResources.Add(LayeredBrushKey, new(SolidBackgroundFillTertiaryKey, (t, c) =>
             new SolidColorBrush(c with { A = 0xFF / 2 /* 50% opacity */ })));
         resource.AddCustomResources();
+
+        // Check if enabled
+        if (!_general.ForceTransparency)
+        {
+            return;
+        }
+        _layeredWindows = general.LayeredWindows;
 
         // Generate Visual.AddVisualChild detour
         _visualDetour = typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic)
@@ -111,10 +128,17 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     private void AddVisualChild(Visual instance, Visual child)
     {
+        try
+        {
         if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Skip other types
             instance is FrameworkElement element && GetIsTracked(element))
         {
             StyleElementTree(element);
+        }
+    }
+        catch (Exception ex)
+        {
+            _logger.Output(ex);
         }
     }
 
@@ -166,6 +190,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     public void StyleWindowFrame(IVsWindowFrame frame)
     {
+        try
+        {
         if (get_WindowFrame_FrameView(frame) is not DependencyObject view)
         {
             return;
@@ -188,9 +214,23 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             StyleElementTree(dock);
         }
     }
+        catch (Exception ex)
+        {
+            _logger.Output(ex);
+        }
+    }
 
-    public void StyleElementTree(FrameworkElement element) =>
+    public void StyleElementTree(FrameworkElement element)
+    {
+        try
+        {
         StyleTree(element.FindDescendants<FrameworkElement>().Append(element));
+        }
+        catch (Exception ex)
+        {
+            _logger.Output(ex);
+        }
+    }
 
     public void StyleTree(IEnumerable<FrameworkElement> tree)
     {
@@ -303,6 +343,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     public void StyleHwndHost(HwndHost host)
     {
+        if (!_layeredWindows)
+        {
+            return;
+        }
+
         var handle = host.Handle;
 
         if (handle == IntPtr.Zero)
@@ -706,7 +751,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         if (!_disposed)
         {
-            _visualDetour.Dispose();
+            _visualDetour?.Dispose();
 
             _window.FrameIsOnScreenChanged -= OnFrameIsOnScreenChanged;
             _window.ActiveFrameChanged -= OnActiveFrameChanged;

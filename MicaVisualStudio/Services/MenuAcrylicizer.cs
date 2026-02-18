@@ -23,12 +23,16 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     private static readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundBrush);
 
+    private readonly ILogger _logger;
+    private readonly IGeneral _general;
     private readonly IResourceManager _resource;
 
     private readonly ILHook _sourceDetour;
 
-    public MenuAcrylicizer(IResourceManager resource)
+    public MenuAcrylicizer(ILogger logger, IGeneral general, IResourceManager resource)
     {
+        _logger = logger;
+        _general = general;
         _resource = resource;
 
         // Add brushes
@@ -42,6 +46,12 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 
         resource.AddCustomResources();
 
+        // Check if enabled
+        if (!general.AcrylicMenus)
+        {
+            return;
+        }
+
         // Generate HwndSouce.RootVisual.set detour
         _sourceDetour = typeof(HwndSource).GetProperty("RootVisual").SetMethod
                                           .CreateDetour<HwndSource, Visual>(RootVisualChanged);
@@ -49,20 +59,27 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 
     public void RootVisualChanged(HwndSource instance, Visual value)
     {
-        if (value is null || instance.CompositionTarget is null)
+        try
         {
-            return;
-        }
+            if (value is null || instance.CompositionTarget is null)
+            {
+                return;
+            }
 
-        if (value is FrameworkElement root &&
-            root.Parent is Popup popup) // Check if owned by popup
-                                        // Popups use separate element as root of HwndSource
-        {
-            AcrylicizePopup(popup, instance, root);
+            if (value is FrameworkElement root &&
+                root.Parent is Popup popup) // Check if owned by popup
+                                            // Popups use separate element as root of HwndSource
+            {
+                AcrylicizePopup(popup, instance, root);
+            }
+            else if (value is not Window) // Avoid already handled values
+            {
+                instance.CompositionTarget.BackgroundColor = Colors.Transparent;
+            }
         }
-        else if (value is not Window) // Avoid already handled values
+        catch (Exception ex)
         {
-            instance.CompositionTarget.BackgroundColor = Colors.Transparent;
+            _logger.Output(ex);
         }
     }
 
@@ -161,7 +178,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     {
         if (!_disposed)
         {
-            _sourceDetour.Dispose();
+            _sourceDetour?.Dispose();
             _disposed = true;
         }
     }

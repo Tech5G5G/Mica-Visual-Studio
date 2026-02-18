@@ -618,6 +618,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             case "Microsoft.VisualStudio.Differencing.Package.DiffControlToolbar":
                 border.Background = Brushes.Transparent;
                 break;
+
+            // List window, root
+            case "Microsoft.VisualStudio.ErrorListPkg.TableControlToolWindowPaneBase+ContentWrapper":
+                border.Resources.MergedDictionaries.Clear();
+                break;
         }
     }
 

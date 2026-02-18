@@ -74,6 +74,7 @@
     <Compile Include="Contracts\IGeneral.cs" />
     <Compile Include="Contracts\IInfoBarService.cs" />
     <Compile Include="Contracts\ILogger.cs" />
+    <Compile Include="Contracts\IMenuAcrylicizer.cs" />
     <Compile Include="Contracts\IThemeService.cs" />
     <Compile Include="Contracts\IResourceManager.cs" />
     <Compile Include="Contracts\IWindowManager.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Services\ElementTransparentizer.cs" />
     <Compile Include="Services\InfoBarService.cs" />
     <Compile Include="Services\Logger.cs" />
+    <Compile Include="Services\MenuAcrylicizer.cs" />
     <Compile Include="Services\ThemeService.cs" />
     <Compile Include="Services\ResourceManager.cs" />
     <Compile Include="Services\WindowManager.cs" />
@@ -99,10 +101,6 @@
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
     <Compile Include="Extensions\EnumFramesExtensions.cs" />
-    <Compile Include="VisualStudio\VsWindowStyler.Brushes.cs" />
-    <Compile Include="VisualStudio\VsWindowStyler.IL.cs" />
-    <Compile Include="VisualStudio\VsWindowStyler.FrameEvents.cs" />
-    <Compile Include="VisualStudio\VsWindowStyler.Style.cs" />
     <Compile Include="Interop\WinEventHook.cs" />
     <Compile Include="Options\Controls\DialogPage.xaml.cs">
       <DependentUpon>DialogPage.xaml</DependentUpon>
@@ -119,7 +117,6 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MicaVisualStudioPackage.cs" />
-    <Compile Include="VisualStudio\VsWindowStyler.cs" />
   </ItemGroup>
   <!-- XAML files -->
   <ItemGroup>

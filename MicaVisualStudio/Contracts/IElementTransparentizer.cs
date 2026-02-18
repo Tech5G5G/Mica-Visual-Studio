@@ -18,7 +18,6 @@ public interface IElementTransparentizer
     void StyleTree(IEnumerable<FrameworkElement> tree);
 
     void StyleDockTarget(Border dock);
-    void StyleDockPanel(DockPanel dock);
     void StyleToolBar(ToolBar bar);
     void StyleTabItem(TabItem tab);
     void StyleHwndHost(HwndHost host);

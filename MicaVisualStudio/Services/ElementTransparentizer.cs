@@ -193,8 +193,6 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     public void StyleTree(IEnumerable<FrameworkElement> tree)
     {
-        var isRootDock = tree.FirstOrDefault() is { } first && IsDockTarget(first);
-
         foreach (var element in tree)
         {
             switch (element)
@@ -216,11 +214,6 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                     break;
 
                 case Panel panel:
-                    if (isRootDock && panel is DockPanel dock)
-                    {
-                        StyleDockPanel(dock);
-                    }
-
                     StylePanel(panel);
                     break;
 
@@ -259,9 +252,6 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             dock.Background = Brushes.Transparent;
         }
     }
-
-    public void StyleDockPanel(DockPanel panel) =>
-        panel.Background = Brushes.Transparent;
 
     public void StyleToolBar(ToolBar bar)
     {

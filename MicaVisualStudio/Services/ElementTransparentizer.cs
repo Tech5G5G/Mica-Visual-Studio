@@ -381,6 +381,20 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             case "ChatPrompt":
                 control.Background = Brushes.Transparent;
                 return;
+
+            // AppxManifest editor
+            case "MainTabControl" when control.GetVisualOrLogicalParent()?
+                                              .GetVisualOrLogicalParent() is Grid { Name: "LayoutRoot" } root:
+                control.Background = Brushes.Transparent;
+                root.Background = Brushes.Transparent;
+                return;
+
+            // Resource editor
+            case "_resourceView"
+            when control is ContentControl { Content: DockPanel panel }:
+                panel.Background = Brushes.Transparent;
+                return;
+
             #region Git Windows
 
             case "gitWindowView" or // Git changes window

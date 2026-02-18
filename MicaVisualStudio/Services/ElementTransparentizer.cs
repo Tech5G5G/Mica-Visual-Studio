@@ -455,8 +455,17 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 "teamExplorerFrame" or // Team explorer window
                 "createPullRequestView": // New PR window
             GitWindow:
+                {
                 control.Background = Brushes.Transparent;
+
+                    // Git command buttons
+                    if (control.TryFindResource("TESectionCommandButtonStyle") is Style style)
+                    {
+                        TransparentizeStyle(style);
+                    }
+
                 StyleTree(control.LogicalDescendants<FrameworkElement>());
+                }
                 return;
 
             // Commit history
@@ -465,12 +474,6 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                                            .GetVisualOrLogicalParent() is Border history:
                 history.Background = Brushes.Transparent;
                 goto GitWindow;
-
-            // Git changes, command buttons
-            case "gitAction" or "detailsView"
-            when control.TryFindResource("TESectionCommandButtonStyle") is Style style:
-                TransparentizeStyle(style);
-                return;
 
             // Smth in a git window
             case "thisPageControl":

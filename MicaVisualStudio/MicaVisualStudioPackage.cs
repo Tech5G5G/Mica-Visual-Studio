@@ -40,6 +40,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
     private ILogger _logger;
     private IBackdropManager _backdrop;
     private IResourceManager _resource;
+    private IMenuAcrylicizer _acrylicizer;
     private IElementTransparentizer _transparentizer;
 
     private ServiceProvider _provider;
@@ -143,6 +144,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
                 .AddSingleton<IInfoBarService, InfoBarService>()
                 .AddSingleton<IBackdropManager, BackdropManager>()
                 .AddSingleton<IResourceManager, ResourceManager>()
+                .AddSingleton<IMenuAcrylicizer, MenuAcrylicizer>()
                 .AddSingleton<IElementTransparentizer, ElementTransparentizer>();
 
         services.AddSingleton<NoneCommand>()
@@ -177,6 +179,7 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
             // So backdrop applies when it's actually visible
             TryGetService(out _transparentizer);
+            TryGetService(out _acrylicizer);
             TryGetService(out _backdrop);
         }
     }

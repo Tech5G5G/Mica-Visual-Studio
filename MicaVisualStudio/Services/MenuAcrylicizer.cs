@@ -1,17 +1,17 @@
-﻿using MicaVisualStudio.Contracts;
-using MicaVisualStudio.Extensions;
-using MicaVisualStudio.Interop;
-using MicaVisualStudio.Options;
-using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell;
-using MonoMod.RuntimeDetour;
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Interop;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Interop;
-using System.Windows.Media;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.PlatformUI;
+using MonoMod.RuntimeDetour;
+using MicaVisualStudio.Enums;
+using MicaVisualStudio.Interop;
+using MicaVisualStudio.Contracts;
+using MicaVisualStudio.Extensions;
 
 namespace MicaVisualStudio.Services;
 

@@ -2,7 +2,7 @@
 using System.Windows;
 using Microsoft.VisualStudio.Shell;
 using Community.VisualStudio.Toolkit;
-using MicaVisualStudio.Interop;
+using MicaVisualStudio.Enums;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Options;
 using MicaVisualStudio.Options.Controls;

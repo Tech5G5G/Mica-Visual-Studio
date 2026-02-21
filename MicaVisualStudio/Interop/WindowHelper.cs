@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
+using MicaVisualStudio.Enums;
 
 namespace MicaVisualStudio.Interop;
 
@@ -523,53 +524,6 @@ public static class WindowHelper
     #endregion
 }
 
-#region Enums
-
-/// <summary>
-/// Specifies the type of backdrop to use in <see cref="WindowHelper.SetBackdropType(IntPtr, BackdropType)"/>.
-/// </summary>
-public enum BackdropType
-{
-    Auto,
-    None,
-    Mica,
-    Acrylic,
-    Tabbed,
-    Glass
-}
-
-/// <summary>
-/// Specifies the corner preference to use in <see cref="WindowHelper.SetCornerPreference(IntPtr, CornerPreference)"/>.
-/// </summary>
-public enum CornerPreference
-{
-    Default,
-    Square,
-    Round,
-    RoundSmall
-}
-
-/// <summary>
-/// Specifies the type of a <see cref="Window"/>.
-/// </summary>
-public enum WindowType
-{
-    /// <summary>
-    /// Specifies that the <see cref="Window"/> is the main window of the process.
-    /// </summary>
-    Main,
-
-    /// <summary>
-    /// Specifies that the <see cref="Window"/> is an additional top-level window, meant for tooling and options.
-    /// </summary>
-    Tool,
-
-    /// <summary>
-    /// Specifies that the <see cref="Window"/> is a child window, meant for responding to requests and displaying information.
-    /// </summary>
-    Dialog
-}
-
 /// <summary>
 /// Specifies the style(s) of a window.
 /// </summary>
@@ -656,5 +610,3 @@ public enum WindowStylesEx : uint
     Transparent = 0x00000020,
     WindowEdge = 0x00000100
 }
-
-#endregion

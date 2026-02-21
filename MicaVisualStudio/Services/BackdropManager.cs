@@ -3,8 +3,8 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Interop;
 using Microsoft.VisualStudio.PlatformUI;
+using MicaVisualStudio.Enums;
 using MicaVisualStudio.Interop;
-using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;

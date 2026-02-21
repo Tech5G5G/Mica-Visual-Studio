@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Shell;
 using Community.VisualStudio.Toolkit;
 using Community.VisualStudio.Toolkit.DependencyInjection;
 using Community.VisualStudio.Toolkit.DependencyInjection.Core;
-using MicaVisualStudio.Interop;
+using MicaVisualStudio.Enums;
 using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio;

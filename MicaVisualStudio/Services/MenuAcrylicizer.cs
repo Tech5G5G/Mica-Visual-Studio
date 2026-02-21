@@ -8,10 +8,11 @@ using System.Windows.Controls.Primitives;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.PlatformUI;
 using MonoMod.RuntimeDetour;
-using MicaVisualStudio.Enums;
+using MicaVisualStudio.Options;
 using MicaVisualStudio.Interop;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Extensions;
+using MicaVisualStudio.Resourcing;
 
 namespace MicaVisualStudio.Services;
 

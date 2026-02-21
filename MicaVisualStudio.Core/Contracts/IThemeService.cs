@@ -1,5 +1,5 @@
 ﻿using System;
-using MicaVisualStudio.Enums;
+using MicaVisualStudio.Options;
 
 namespace MicaVisualStudio.Contracts;
 

@@ -1,4 +1,4 @@
-﻿namespace MicaVisualStudio.Enums;
+﻿namespace MicaVisualStudio.Options;
 
 /// <summary>
 /// Specifies the theme to use.

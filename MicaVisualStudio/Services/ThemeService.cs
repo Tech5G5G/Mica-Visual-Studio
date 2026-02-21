@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Win32;
-using MicaVisualStudio.Enums;
+using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;

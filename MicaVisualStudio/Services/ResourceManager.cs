@@ -9,9 +9,9 @@ using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using MicaVisualStudio.Enums;
-using MicaVisualStudio.Contracts;
+using MicaVisualStudio.Options;
 using MicaVisualStudio.Extensions;
+using MicaVisualStudio.Resourcing;
 
 namespace MicaVisualStudio.Services;
 

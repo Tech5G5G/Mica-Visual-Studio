@@ -13,10 +13,12 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using MonoMod.RuntimeDetour;
 using MicaVisualStudio.Interop;
+using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
+using MicaVisualStudio.Windowing;
 using MicaVisualStudio.Extensions;
 using Expression = System.Linq.Expressions.Expression;
-using IResourceManager = MicaVisualStudio.Contracts.IResourceManager;
+using IResourceManager = MicaVisualStudio.Resourcing.IResourceManager;
 
 namespace MicaVisualStudio.Services;
 

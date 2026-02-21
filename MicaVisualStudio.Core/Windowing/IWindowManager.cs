@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace MicaVisualStudio.Contracts;
+namespace MicaVisualStudio.Windowing;
 
 public interface IWindowManager
 {
@@ -19,13 +19,4 @@ public interface IWindowManager
     event WindowFrameEventHandler<bool> FrameIsVisibleChanged;
     event WindowFrameEventHandler<bool> FrameIsOnScreenChanged;
     event WindowFrameEventHandler<IVsWindowFrame> ActiveFrameChanged;
-}
-
-public delegate void WindowFrameEventHandler<TEventArgs>(IVsWindowFrame sender, TEventArgs args);
-
-public class WindowActionEventArgs(nint handle, Window window) : EventArgs
-{
-    public Window Window { get; } = window;
-
-    public nint WindowHandle { get; } = handle;
 }

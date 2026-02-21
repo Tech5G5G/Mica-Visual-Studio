@@ -11,8 +11,11 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Community.VisualStudio.Toolkit;
 using Community.VisualStudio.Toolkit.DependencyInjection.Microsoft;
 using MonoMod.Utils;
+using MicaVisualStudio.Options;
 using MicaVisualStudio.Services;
 using MicaVisualStudio.Contracts;
+using MicaVisualStudio.Windowing;
+using MicaVisualStudio.Resourcing;
 using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
 
 namespace MicaVisualStudio;

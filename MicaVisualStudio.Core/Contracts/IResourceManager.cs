@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Shell;
-using MicaVisualStudio.Options;
+using MicaVisualStudio.Enums;
 
 namespace MicaVisualStudio.Contracts;
 

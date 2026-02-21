@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
-using MicaVisualStudio.Interop;
-using MicaVisualStudio.Options;
+using MicaVisualStudio.Enums;
 
 namespace MicaVisualStudio.Contracts;
 

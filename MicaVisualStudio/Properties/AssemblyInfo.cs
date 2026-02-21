@@ -8,7 +8,7 @@ using MicaVisualStudio;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct(Vsix.Name)]
-[assembly: AssemblyCopyright("© Ignacy Tomczyk")]
+[assembly: AssemblyCopyright("Copyright © Ignacy Tomczyk")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

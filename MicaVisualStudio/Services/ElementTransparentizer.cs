@@ -112,7 +112,17 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         EventManager.RegisterClassHandler(
             dockType,
             FrameworkElement.LoadedEvent,
-            new RoutedEventHandler((s, e) => StyleElementTree(s as Border)));
+            new RoutedEventHandler((s, e) =>
+            {
+                try
+                {
+                    StyleElementTree(s as Border);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Output(ex);
+                }
+            }));
 
         if (AppDomain.CurrentDomain.GetAssemblies()
                                    .FirstOrDefault(i => i.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
@@ -121,7 +131,17 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             EventManager.RegisterClassHandler(
                 hostType,
                 FrameworkElement.LoadedEvent,
-                new RoutedEventHandler((s, e) => StyleElementTree(s as DockPanel)));
+                new RoutedEventHandler((s, e) =>
+                {
+                    try
+                    {
+                        StyleElementTree(s as DockPanel);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Output(ex);
+                    }
+                }));
         }
 
         // Apply to all visible elements
@@ -147,25 +167,46 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     private void OnFrameIsOnScreenChanged(IVsWindowFrame frame, bool isOnScreen)
     {
+        try
+        {
         if (isOnScreen)
         {
             StyleWindowFrame(frame);
         }
     }
+        catch (Exception ex)
+        {
+            _logger.Output(ex);
+        }
+    }
 
     private void OnActiveFrameChanged(IVsWindowFrame frame, IVsWindowFrame newFrame)
     {
+        try
+        {
         if (newFrame is not null)
         {
             StyleWindowFrame(newFrame);
         }
     }
+        catch (Exception ex)
+        {
+            _logger.Output(ex);
+        }
+    }
 
     private void OnWindowOpened(object sender, WindowActionEventArgs args)
     {
+        try
+        {
         if (args.Window is not null)
         {
             StyleWindow(args.Window);
+        }
+    }
+        catch (Exception ex)
+        {
+            _logger.Output(ex);
         }
     }
 
@@ -175,8 +216,15 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         {
             if (window is not null)
             {
+                try
+                {
                 StyleWindow(window);
             }
+                catch (Exception ex)
+                {
+                    _logger.Output(ex);
+        }
+    }
         }
     }
 
@@ -187,14 +235,19 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         foreach (var frame in _window.WindowFrames)
         {
+            try
+            {
             StyleWindowFrame(frame);
+        }
+            catch (Exception ex)
+            {
+                _logger.Output(ex);
+    }
         }
     }
 
     public void StyleWindowFrame(IVsWindowFrame frame)
     {
-        try
-        {
             if (get_WindowFrame_FrameView(frame) is not DependencyObject view)
             {
                 return;
@@ -217,23 +270,9 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 StyleElementTree(dock);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.Output(ex);
-        }
-    }
 
-    public void StyleElementTree(FrameworkElement element)
-    {
-        try
-        {
+    public void StyleElementTree(FrameworkElement element) =>
             StyleTree(element.FindDescendants<FrameworkElement>().Append(element));
-        }
-        catch (Exception ex)
-        {
-            _logger.Output(ex);
-        }
-    }
 
     public void StyleTree(IEnumerable<FrameworkElement> tree)
     {

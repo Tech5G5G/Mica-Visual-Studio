@@ -23,7 +23,9 @@ public static class TreeExtensions
             yield return child;
 
             foreach (var obj in LogicalDescendants(child))
+            {
                 yield return obj;
+            }
         }
     }
 

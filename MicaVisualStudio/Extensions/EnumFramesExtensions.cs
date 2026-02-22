@@ -20,6 +20,8 @@ public static class EnumFramesExtensions
         var frames = new IVsWindowFrame[Amount];
 
         while (ErrorHandler.Succeeded(@enum.Next(Amount, frames, out uint fetched)) && fetched == Amount)
+        {
             yield return frames[0];
+        }
     }
 }

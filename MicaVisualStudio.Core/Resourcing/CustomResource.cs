@@ -5,9 +5,9 @@ using MicaVisualStudio.Options;
 
 namespace MicaVisualStudio.Resourcing;
 
-public readonly struct CustomResource(ThemeResourceKey baseResourceKey, Func<Theme, Color, object> factory)
+public class CustomResource(ThemeResourceKey baseResourceKey, Func<Theme, Color, object> factory)
 {
-    public readonly ThemeResourceKey BaseResourceKey { get; } = baseResourceKey;
+    public ThemeResourceKey BaseResourceKey { get; } = baseResourceKey;
 
-    public readonly Func<Theme, Color, object> Factory { get; } = factory;
+    public Func<Theme, Color, object> Factory { get; } = factory;
 }

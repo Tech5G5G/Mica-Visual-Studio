@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Linq.Expressions;
 using System.Windows;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;

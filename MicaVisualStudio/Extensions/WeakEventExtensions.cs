@@ -1,8 +1,6 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Data;
+﻿using System.Windows.Data;
 
-namespace MicaVisualStudio.Extensions;
+namespace System.Windows;
 
 // https://agsmith.wordpress.com/2008/04/07/propertydescriptor-addvaluechanged-alternative/
 

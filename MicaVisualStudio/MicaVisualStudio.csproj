@@ -98,8 +98,8 @@
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\MenuAcrylicizer.cs" />
     <Compile Include="Services\ThemeService.cs" />
-    <Compile Include="Services\ResourceManager.cs" />
-    <Compile Include="Services\WindowManager.cs" />
+    <Compile Include="Resourcing\ResourceManager.cs" />
+    <Compile Include="Windowing\WindowManager.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

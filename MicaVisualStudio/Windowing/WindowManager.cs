@@ -9,10 +9,8 @@ using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using MicaVisualStudio.Interop;
-using MicaVisualStudio.Windowing;
-using MicaVisualStudio.Extensions;
 
-namespace MicaVisualStudio.Services;
+namespace MicaVisualStudio.Windowing;
 
 public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
 {

@@ -69,6 +69,12 @@
       <DependentUpon>CommandTable.vsct</DependentUpon>
     </Compile>
     <Compile Include="Commands\BackdropCommands.cs" />
+    <Compile Include="Contracts\IBackdropManager.cs" />
+    <Compile Include="Contracts\IElementTransparentizer.cs" />
+    <Compile Include="Contracts\IInfoBarService.cs" />
+    <Compile Include="Contracts\ILogger.cs" />
+    <Compile Include="Contracts\IMenuAcrylicizer.cs" />
+    <Compile Include="Contracts\IThemeService.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\EnumFramesExtensions.cs" />
     <Compile Include="Extensions\ExpressionExtensions.cs" />
@@ -76,8 +82,16 @@
     <Compile Include="Extensions\TreeExtensions.cs" />
     <Compile Include="Extensions\WeakEventExtensions.cs" />
     <Compile Include="Interop\PInvoke.UxTheme.cs" />
+    <Compile Include="Options\BackdropType.cs" />
+    <Compile Include="Options\CornerPreference.cs" />
+    <Compile Include="Options\IGeneral.cs" />
     <Compile Include="Options\ObservableOptionModel.cs" />
     <Compile Include="Interop\WindowHelper.cs" />
+    <Compile Include="Options\Theme.cs" />
+    <Compile Include="Options\WindowType.cs" />
+    <Compile Include="Resourcing\CustomResource.cs" />
+    <Compile Include="Resourcing\IResourceManager.cs" />
+    <Compile Include="Resourcing\ResourceConfiguration.cs" />
     <Compile Include="Services\BackdropManager.cs" />
     <Compile Include="Services\ElementTransparentizer.cs" />
     <Compile Include="Services\InfoBarService.cs" />
@@ -107,6 +121,9 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MicaVisualStudioPackage.cs" />
+    <Compile Include="Windowing\IWindowManager.cs" />
+    <Compile Include="Windowing\WindowActionEventArgs.cs" />
+    <Compile Include="Windowing\WindowFrameEventHandler.cs" />
   </ItemGroup>
   <!-- XAML files -->
   <ItemGroup>
@@ -182,10 +199,6 @@
   </ItemGroup>
   <!-- Projects -->
   <ItemGroup>
-    <ProjectReference Include="..\MicaVisualStudio.Core\MicaVisualStudio.Core.csproj">
-      <Project>{31243b42-02cc-4409-89e6-f85b7f240624}</Project>
-      <Name>MicaVisualStudio.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MonoMod\MonoMod\src\MonoMod.Utils\MonoMod.Utils.csproj" />
     <ProjectReference Include="..\MonoMod\MonoMod\src\MonoMod.RuntimeDetour\MonoMod.RuntimeDetour.csproj" />
   </ItemGroup>

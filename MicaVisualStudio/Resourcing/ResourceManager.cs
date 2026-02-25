@@ -126,7 +126,7 @@ public class ResourceManager : IResourceManager
         {
             string str => _configs.TryGetValue(str.Replace("VsBrush.", null).Replace("VsColor.", null), out ResourceConfiguration config) ? config : null,
 
-            ThemeResourceKey theme when theme.KeyType == ThemeResourceKeyType.BackgroundColor || theme.KeyType == ThemeResourceKeyType.BackgroundBrush =>
+            ThemeResourceKey theme when theme.KeyType is ThemeResourceKeyType.BackgroundColor or ThemeResourceKeyType.BackgroundBrush =>
                 _configs.TryGetValue(theme.Name, out ResourceConfiguration config) ? config : null,
 
             _ => null

@@ -190,9 +190,7 @@ public sealed class MicaVisualStudioPackage : AsyncPackage
         }
         catch (Exception ex)
         {
-#if DEBUG
             Debug.WriteLine($"Error initializing Mica Visual Studio: {ex.Message}");
-#endif
 
             progress.Report(new("Mica Visual Studio", $"Error while initializing Mica Visual Studio:\n{ex.Message}"));
             queuedInfo = ($"Error while initializing Mica Visual Studio: {ex.Message} ({ex.GetType().Name})\n{ex.StackTrace}", KnownMonikers.StatusError);

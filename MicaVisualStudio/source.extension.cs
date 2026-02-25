@@ -12,7 +12,7 @@ namespace MicaVisualStudio
         public const string Name = "Mica Visual Studio";
         public const string Description = @"Enhance your Visual Studio experience with Windows materials";
         public const string Language = "en-US";
-        public const string Version = "2.1.4";
+        public const string Version = "2.2.0";
         public const string Author = "Tech5G5G";
         public const string Tags = "Design, Modern, Theme, UI, Windows, Mica, Tabbed, Acrylic, Glass";
         public const bool IsPreview = false;

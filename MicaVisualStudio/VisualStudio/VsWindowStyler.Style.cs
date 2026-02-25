@@ -285,9 +285,9 @@ public partial class VsWindowStyler
                 if (sources.Any(i => i == handle))
                     continue;
 
-                var children = Interop.WindowHelper.GetChildren(handle);
+                var children = WindowHelper.GetChildren(handle);
                 if (!sources.Any(children.Contains))
-                    Interop.WindowHelper.MakeLayered(handle);
+                    WindowHelper.MakeLayered(handle);
             }
 
             else if (element is Control control)
@@ -324,7 +324,7 @@ public partial class VsWindowStyler
                                     ss.Setters.Add(bb);
 
                                     if (ss.Triggers.OfType<Trigger>()
-                                                   .FirstOrDefault(i => i.Property == System.Windows.UIElement.IsEnabledProperty) is Trigger t)
+                                                   .FirstOrDefault(i => i.Property == UIElement.IsEnabledProperty) is Trigger t)
                                     {
                                         t.Setters.Add(bg);
                                         t.Setters.Add(bb);
@@ -409,14 +409,14 @@ public partial class VsWindowStyler
                                     "pushButton" or
                                     "syncButton" or
                                     "additionalOperationsButton" when
-                                    e is Button b:
-                                    b.Style = new(b.Style.TargetType, b.Style)
+                                    e is Button { Style: Style s } b:
+                                    b.Style = new(s.TargetType, s)
                                     {
                                         Triggers =
                                         {
                                             new Trigger
                                             {
-                                                Property = System.Windows.UIElement.IsEnabledProperty,
+                                                Property = UIElement.IsEnabledProperty,
                                                 Value = false,
                                                 Setters =
                                                 {

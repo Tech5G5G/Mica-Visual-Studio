@@ -184,8 +184,8 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     {
         if (!_disposed)
         {
-            _sourceDetour?.Dispose();
             _disposed = true;
+            _sourceDetour?.Dispose();
         }
     }
 

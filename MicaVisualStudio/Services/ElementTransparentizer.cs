@@ -834,14 +834,14 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         if (!_disposed)
         {
+            _disposed = true;
+
             _visualDetour?.Dispose();
 
             _window.FrameIsOnScreenChanged -= OnFrameIsOnScreenChanged;
             _window.ActiveFrameChanged -= OnActiveFrameChanged;
 
             _window.WindowOpened -= OnWindowOpened;
-
-            _disposed = true;
         }
     }
 

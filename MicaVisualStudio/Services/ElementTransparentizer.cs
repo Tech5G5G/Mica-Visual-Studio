@@ -432,7 +432,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Warning dialog, footer
             case "OKButton"
             when control is Button &&
-                PresentationSource.FromVisual(control)?.RootVisual is DialogWindowBase &&
+                Window.GetWindow(control) is DialogWindowBase &&
                 control.FindAncestor<FrameworkElement>()?.FindAncestor<Border>() is Border footer:
                 Layer(footer);
                 return;

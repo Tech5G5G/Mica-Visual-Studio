@@ -16,7 +16,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ScrollViewer>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <GroupBox Header="Main window" Style="{StaticResource OptionGroupBoxStyle}">
                 <Grid Margin="0,2,0,0">

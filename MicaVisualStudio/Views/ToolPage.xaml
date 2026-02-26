@@ -15,7 +15,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ScrollViewer>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <GroupBox Header="Tool windows" Style="{StaticResource OptionGroupBoxStyle}">
             <StackPanel>
                 <CheckBox x:Name="EnabledCheck"

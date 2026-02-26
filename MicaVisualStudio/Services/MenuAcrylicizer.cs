@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -60,8 +59,8 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             {
                 _sourceDetour = typeof(HwndSource).GetProperty("RootVisual")
                                                   .SetMethod
-                                          .CreateDetour<HwndSource, Visual>(RootVisualChanged);
-    }
+                                                  .CreateDetour<HwndSource, Visual>(RootVisualChanged);
+            }
         }).FireAndForget(logOnFailure: true);
     }
 
@@ -145,37 +144,36 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     {
         if (popup.Placement == PlacementMode.Custom)
         {
-            const int LeftAlignedPlacementIndex = 1;
-
-            var callback = popup.CustomPopupPlacementCallback;
-            var originalXOffset = popup.HorizontalOffset;
-
-            popup.CustomPopupPlacementCallback = (popupSize, targetSize, offset) =>
-            {
-                var placement = callback(popupSize, targetSize, offset).ToList();
-
-                if (placement.Count >= LeftAlignedPlacementIndex + 1)
-                {
-                    var leftAlignedPlacement = placement[LeftAlignedPlacementIndex];
-
-                    placement.Insert(
-                        LeftAlignedPlacementIndex,
-                        leftAlignedPlacement with
-                        {
-                            Point = new(
-                                leftAlignedPlacement.Point.X + (originalXOffset * 2), // idk why 2x
-                                leftAlignedPlacement.Point.Y)
-                        });
-
-                    placement.RemoveAt(LeftAlignedPlacementIndex + 1);
-                }
-
-                return [.. placement];
-            };
+            popup.CustomPopupPlacementCallback = SubclassPopupPlacementCallback(
+                popup.CustomPopupPlacementCallback,
+                popup.HorizontalOffset);
         }
 
         popup.HorizontalOffset = 0;
         popup.UpdateLayout();
+    }
+
+    private CustomPopupPlacementCallback SubclassPopupPlacementCallback(CustomPopupPlacementCallback callback, double horizontalOffset)
+    {
+        const int LeftPlacementIndex = 1;
+
+        return (popupSize, targetSize, offset) =>
+        {
+            var placements = callback(popupSize, targetSize, offset);
+
+            if (placements.Length >= LeftPlacementIndex + 1)
+            {
+                var leftPlacement = placements[LeftPlacementIndex];
+                placements[LeftPlacementIndex] = leftPlacement with
+                {
+                    Point = new(
+                        leftPlacement.Point.X + (horizontalOffset * 2), // idk why 2x
+                        leftPlacement.Point.Y - horizontalOffset)
+                };
+            }
+
+            return placements;
+        };
     }
 
     #region Dispose

@@ -442,11 +442,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 control.Resources["outlining.chevron.expanded.background"] =
                 control.Resources["outlining.chevron.collapsed.background"] = Brushes.Transparent;
 
-                if (control.FindDescendant<FrameworkElement>()?
-                           .FindDescendant<Grid>() is { } hostGrid)
-                {
-                    hostGrid.Background = Brushes.Transparent;
-                }
+                control.LogicalDescendant<Grid>()?.Background = Brushes.Transparent;
                 return;
 
             // Editor, output, etc. text

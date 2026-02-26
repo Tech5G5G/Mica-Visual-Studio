@@ -99,6 +99,8 @@
     <Compile Include="Services\MenuAcrylicizer.cs" />
     <Compile Include="Services\ThemeService.cs" />
     <Compile Include="Resourcing\ResourceManager.cs" />
+    <Compile Include="UI\Converters\EnumToInt32Converter.cs" />
+    <Compile Include="ViewModels\OptionPageViewModel.cs" />
     <Compile Include="Windowing\WindowManager.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
@@ -106,18 +108,15 @@
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
     <Compile Include="Interop\WinEventHook.cs" />
-    <Compile Include="Options\Controls\DialogPage.xaml.cs">
+    <Compile Include="Views\DialogPage.xaml.cs">
       <DependentUpon>DialogPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\General.cs" />
-    <Compile Include="Options\Controls\GeneralPage.xaml.cs">
+    <Compile Include="Views\GeneralPage.xaml.cs">
       <DependentUpon>GeneralPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Options\Controls\ToolPage.xaml.cs">
+    <Compile Include="Views\ToolPage.xaml.cs">
       <DependentUpon>ToolPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Options\Controls\WindowOptions.xaml.cs">
-      <DependentUpon>WindowOptions.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MicaVisualStudioPackage.cs" />
@@ -127,19 +126,19 @@
   </ItemGroup>
   <!-- XAML files -->
   <ItemGroup>
-    <Page Include="Options\Controls\DialogPage.xaml">
+    <Page Include="Views\DialogPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\Controls\GeneralPage.xaml">
+    <Page Include="Views\GeneralPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\Controls\ToolPage.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="UI\OptionResources.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="Options\Controls\WindowOptions.xaml">
+    <Page Include="Views\ToolPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -16,6 +16,7 @@ using MicaVisualStudio.Services;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Windowing;
 using MicaVisualStudio.Resourcing;
+using MicaVisualStudio.ViewModels;
 using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
 
 namespace MicaVisualStudio;
@@ -156,6 +157,8 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
                 .AddSingleton<AcrylicCommand>()
                 .AddSingleton<GlassCommand>()
                 .AddSingleton<MoreCommand>();
+
+        services.AddTransient<OptionPageViewModel>();
     }
 
     protected override IServiceProvider BuildServiceProvider(IServiceCollection serviceCollection) =>

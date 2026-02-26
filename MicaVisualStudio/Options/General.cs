@@ -2,8 +2,9 @@
 using System.Windows;
 using Microsoft.VisualStudio.Shell;
 using Community.VisualStudio.Toolkit;
+using MicaVisualStudio.Views;
 using MicaVisualStudio.Options;
-using MicaVisualStudio.Options.Controls;
+using DialogPage = MicaVisualStudio.Views.DialogPage;
 
 namespace MicaVisualStudio;
 
@@ -24,7 +25,7 @@ internal partial class OptionsProvider
     [ComVisible(true)]
     public class DialogOptions : UIElementDialogPage
     {
-        protected override UIElement Child => new Options.Controls.DialogPage();
+        protected override UIElement Child => new DialogPage();
     }
 }
 

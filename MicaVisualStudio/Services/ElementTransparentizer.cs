@@ -476,7 +476,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 return;
 
             // AppxManifest editor
-            case "MainTabControl" when control.GetVisualOrLogicalParent()?
+            case "MainTabControl"
+            when control.GetVisualOrLogicalParent()?
                                               .GetVisualOrLogicalParent() is Grid { Name: "LayoutRoot" } root:
                 control.Background = root.Background = Brushes.Transparent;
                 return;
@@ -510,7 +511,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 return;
 
             // Commit history
-            case "historyView" when control.GetVisualOrLogicalParent()?
+            case "historyView"
+            when control.GetVisualOrLogicalParent()?
                                            .GetVisualOrLogicalParent()?
                                            .GetVisualOrLogicalParent() is Border history:
                 history.Background = Brushes.Transparent;
@@ -527,7 +529,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 return;
 
             // Git branch selector
-            case "branchesList" when control.GetVisualOrLogicalParent()?
+            case "branchesList"
+            when control.GetVisualOrLogicalParent()?
                                             .GetVisualOrLogicalParent()?
                                             .GetVisualOrLogicalParent()?
                                             .GetVisualOrLogicalParent() is Control branches:
@@ -547,7 +550,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 return;
 
             // Commit diff info
-            case "pageContentViewer" when control.GetVisualOrLogicalParent()?
+            case "pageContentViewer"
+            when control.GetVisualOrLogicalParent()?
                                                  .GetVisualOrLogicalParent() is Border viewer:
                 viewer.Background = Brushes.Transparent;
                 return;
@@ -604,7 +608,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         switch (panel.Name)
         {
             // Commit diff
-            case "detailsViewMainGrid" when panel.GetVisualOrLogicalParent()?
+            case "detailsViewMainGrid"
+            when panel.GetVisualOrLogicalParent()?
                                                  .GetVisualOrLogicalParent() is Border details:
                 details.Background = Brushes.Transparent;
                 return;

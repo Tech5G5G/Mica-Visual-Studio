@@ -29,6 +29,8 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     private readonly IGeneral _general;
     private readonly IResourceManager _resource;
 
+    private readonly bool _acrylicMenus;
+
     private ILHook _sourceDetour;
 
     public MenuAcrylicizer(ILogger logger, IGeneral general, IResourceManager resource)
@@ -48,11 +50,8 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 
         resource.AddCustomResources();
 
-        // Check if enabled
-        if (!general.AcrylicMenus)
-        {
-            return;
-        }
+        // Set flag
+        _acrylicMenus = general.AcrylicMenus;
 
         // Generate HwndSouce.RootVisual.set detour on background thread
         Task.Run(() =>
@@ -99,7 +98,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             return;
         }
 
-        if (root.FindDescendant<Border>(i => i.Name == "DropShadowBorder") is { } drop)
+        if (_acrylicMenus && root.FindDescendant<Border>(i => i.Name == "DropShadowBorder") is { } drop)
         {
             AcrylicizePopupInternal(popup, drop, source, root);
         }

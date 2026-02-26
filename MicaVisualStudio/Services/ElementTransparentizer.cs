@@ -228,8 +228,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         }
     }
 
-    public void StyleWindow(Window window) =>
+    public void StyleWindow(Window window)
+    {
         StyleElementTree(window);
+    }
 
     public void StyleAllWindowFrames()
     {
@@ -271,8 +273,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             }
         }
 
-    public void StyleElementTree(FrameworkElement element) =>
+    public void StyleElementTree(FrameworkElement element)
+    {
             StyleTree(element.FindDescendants<FrameworkElement>().Append(element));
+    }
 
     public void StyleTree(IEnumerable<FrameworkElement> tree)
     {
@@ -737,14 +741,20 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         }
     }
 
-    public void Layer(Control control) =>
+    public void Layer(Control control)
+    {
         control.SetResourceReference(Control.BackgroundProperty, LayeredBrushKey);
+    }
 
-    public void Layer(Panel panel) =>
+    public void Layer(Panel panel)
+    {
         panel.SetResourceReference(Panel.BackgroundProperty, LayeredBrushKey);
+    }
 
-    public void Layer(Border border) =>
+    public void Layer(Border border)
+    {
         border.SetResourceReference(Border.BackgroundProperty, LayeredBrushKey);
+    }
 
     public void TransparentizeStyle(Style style)
     {
@@ -790,16 +800,20 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     /// </summary>
     /// <param name="target">The <see cref="FrameworkElement"/> from which to read the property value.</param>
     /// <returns>The value of the <see cref="IsTrackedProperty"/> attached property.</returns>
-    public static bool GetIsTracked(FrameworkElement target) =>
-        (bool)target.GetValue(IsTrackedProperty);
+    public static bool GetIsTracked(FrameworkElement target)
+    {
+        return (bool)target.GetValue(IsTrackedProperty);
+    }
 
     /// <summary>
     /// Sets the value of the <see cref="IsTrackedProperty"/> attached property from a given <see cref="FrameworkElement"/>.
     /// </summary>
     /// <param name="target">The <see cref="FrameworkElement"/> on which to set the attached property.</param>
     /// <param name="value">The property value to set.</param>
-    public static void SetIsTracked(FrameworkElement target, bool value) =>
+    public static void SetIsTracked(FrameworkElement target, bool value)
+    {
         target.SetValue(IsTrackedProperty, value);
+    }
 
     /// <summary>
     /// Identifies the MicaVisualStudio.Services.ElementTransparentizer.IsTracked dependency property.

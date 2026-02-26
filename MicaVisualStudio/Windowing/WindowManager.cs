@@ -72,10 +72,12 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
         GetAllWindowFrames();
     }
 
-    private void GetAllWindows() =>
+    private void GetAllWindows()
+    {
         _handles.AddRange(
             Application.Current.Windows.OfType<Window>()
                                        .Select(w => w.GetHandle()));
+    }
 
     private void GetAllWindowFrames()
     {
@@ -126,10 +128,12 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
         }
     }
 
-    private void CleanHandles() =>
+    private void CleanHandles()
+    {
         _handles.RemoveAll(h =>
             !WindowHelper.IsAlive(h) || // Check if alive...
             WindowHelper.GetProcessId(h) != _pid); // and belongs to current process
+    }
 
     #region IVsWindowFrameEvents
 
@@ -145,14 +149,20 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
         FrameDestroyed?.Invoke(frame, args: null);
     }
 
-    void IVsWindowFrameEvents.OnFrameIsVisibleChanged(IVsWindowFrame frame, bool newIsVisible) =>
+    void IVsWindowFrameEvents.OnFrameIsVisibleChanged(IVsWindowFrame frame, bool newIsVisible)
+    {
         FrameIsVisibleChanged?.Invoke(frame, newIsVisible);
+    }
 
-    void IVsWindowFrameEvents.OnFrameIsOnScreenChanged(IVsWindowFrame frame, bool newIsOnScreen) =>
+    void IVsWindowFrameEvents.OnFrameIsOnScreenChanged(IVsWindowFrame frame, bool newIsOnScreen)
+    {
         FrameIsOnScreenChanged?.Invoke(frame, newIsOnScreen);
+    }
 
-    void IVsWindowFrameEvents.OnActiveFrameChanged(IVsWindowFrame oldFrame, IVsWindowFrame newFrame) =>
+    void IVsWindowFrameEvents.OnActiveFrameChanged(IVsWindowFrame oldFrame, IVsWindowFrame newFrame)
+    {
         ActiveFrameChanged?.Invoke(oldFrame, newFrame);
+    }
 
     #endregion
 

@@ -11,8 +11,9 @@ namespace MicaVisualStudio.Extensions;
 
 public static class ReflectionExtensions
 {
-    public static ILHook CreateDetour<T1, T2>(this MethodInfo info, Action<T1, T2> action) =>
-        new(info, context =>
+    public static ILHook CreateDetour<T1, T2>(this MethodInfo info, Action<T1, T2> action)
+    {
+        return new(info, context =>
         {
             ILCursor cursor = new(context);
             cursor.Index = cursor.Instrs.Count - 1; // Move cursor to end, but before return
@@ -22,6 +23,7 @@ public static class ReflectionExtensions
 
             cursor.EmitDelegate(action);
         });
+    }
 
     public static Func<TOwner, TReturn> CreateGetter<TOwner, TReturn>(this PropertyInfo property)
     {
@@ -32,7 +34,9 @@ public static class ReflectionExtensions
                         .Compile<TOwner, TReturn>(parameter);
     }
 
-    public static DependencyProperty GetDependencyProperty(this Type type, string propertyName) =>
-        (DependencyProperty)type.GetField($"{propertyName}Property", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
-                                .GetValue(null);
+    public static DependencyProperty GetDependencyProperty(this Type type, string propertyName)
+    {
+        return (DependencyProperty)type.GetField($"{propertyName}Property", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+                                       .GetValue(null);
+    }
 }

@@ -121,8 +121,9 @@ public class ResourceManager : IResourceManager
         return _theme != theme;
     }
 
-    private ResourceConfiguration? GetConfiguration(object key) =>
-        key switch
+    private ResourceConfiguration? GetConfiguration(object key)
+    {
+        return key switch
         {
             string str => _configs.TryGetValue(str.Replace("VsBrush.", null).Replace("VsColor.", null), out ResourceConfiguration config) ? config : null,
 
@@ -131,6 +132,7 @@ public class ResourceManager : IResourceManager
 
             _ => null
         };
+    }
 
     private Color DetermineColor(Color color, ResourceConfiguration config)
     {

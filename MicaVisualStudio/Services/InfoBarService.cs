@@ -13,8 +13,10 @@ public class InfoBarService : IInfoBarService
 
     private bool _isAvailable;
 
-    public InfoBarService() =>
+    public InfoBarService()
+    {
         VS.Events.ShellEvents.MainWindowVisibilityChanged += OnMainWindowVisibilityChanged;
+    }
 
     private void OnMainWindowVisibilityChanged(bool args)
     {
@@ -26,10 +28,12 @@ public class InfoBarService : IInfoBarService
         }
     }
 
-    private void ShowModel(InfoBarModel model) =>
+    private void ShowModel(InfoBarModel model)
+    {
         VS.InfoBar.CreateAsync(model)
                   .ContinueWith(t => t.Result?.TryShowInfoBarUIAsync().Forget(), TaskScheduler.Default)
                   .Forget();
+    }
 
     public void EnqueueInfoBarModel(InfoBarModel model)
     {

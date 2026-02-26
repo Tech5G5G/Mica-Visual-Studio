@@ -13,6 +13,8 @@ public static class ColorExtensions
     /// Whether or not the specified <paramref name="color"/>'s
     /// <see cref="Color.R"/>, <see cref="Color.G"/>, and <see cref="Color.B"/> channels are equal.
     /// </returns>
-    public static bool IsGray(this Color color) =>
+    public static bool IsGray(this Color color)
+    {
         color.R == color.G && color.G == color.B;
+    }
 }

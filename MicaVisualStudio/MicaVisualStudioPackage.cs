@@ -161,8 +161,10 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         services.AddTransient<OptionPageViewModel>();
     }
 
-    protected override IServiceProvider BuildServiceProvider(IServiceCollection serviceCollection) =>
-        _provider = base.BuildServiceProvider(serviceCollection) as ServiceProvider;
+    protected override IServiceProvider BuildServiceProvider(IServiceCollection serviceCollection)
+    {
+        return _provider = base.BuildServiceProvider(serviceCollection) as ServiceProvider;
+    }
 
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {

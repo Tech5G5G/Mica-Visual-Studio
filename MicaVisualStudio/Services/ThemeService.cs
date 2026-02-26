@@ -21,12 +21,14 @@ public class ThemeService : IThemeService, IDisposable
     public ThemeService() =>
         SystemEvents.InvokeOnEventsThread(new Action(() => SystemEvents.UserPreferenceChanging += OnPreferenceChanging));
 
-    private static Theme GetSystemTheme() =>
-        (int)Registry.GetValue(
+    private static Theme GetSystemTheme()
+    {
+        return (int)Registry.GetValue(
             keyName: @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
             valueName: "AppsUseLightTheme",
             defaultValue: 0)
-        == 1 /* TRUE */ ? Theme.Light : Theme.Dark;
+            == 1 /* TRUE */ ? Theme.Light : Theme.Dark;
+    }
 
     private void OnPreferenceChanging(object sender, UserPreferenceChangingEventArgs args)
     {

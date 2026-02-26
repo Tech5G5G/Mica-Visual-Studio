@@ -37,14 +37,20 @@ public class BackdropManager : IBackdropManager
         RefreshPreferences(firstTime: true);
     }
 
-    private void OnOptionChanged(object sender, PropertyChangedEventArgs args) =>
+    private void OnOptionChanged(object sender, PropertyChangedEventArgs args)
+    {
         RefreshPreferences(firstTime: false);
+    }
 
-    private void OnThemeChanged(object sender, Theme args) =>
+    private void OnThemeChanged(object sender, Theme args)
+    {
         RefreshPreferences(firstTime: false);
+    }
 
-    private void OnWindowOpened(object sender, WindowActionEventArgs args) =>
+    private void OnWindowOpened(object sender, WindowActionEventArgs args)
+    {
         ApplyWindowPreferences(args.WindowHandle, args.Window, firstTime: true);
+    }
 
     private void ApplyWindowPreferences(nint handle, Window window, bool firstTime)
     {
@@ -101,12 +107,15 @@ public class BackdropManager : IBackdropManager
         }
     }
 
-    private Theme EvaluateTheme(Theme theme) => theme switch
+    private Theme EvaluateTheme(Theme theme)
     {
-        Theme.VisualStudio => _resource.VisualStudioTheme,
-        Theme.System => _theme.SystemTheme,
-        _ => theme
-    };
+        return theme switch
+        {
+            Theme.VisualStudio => _resource.VisualStudioTheme,
+            Theme.System => _theme.SystemTheme,
+            _ => theme
+        };
+    }
 
     public void RefreshPreferences(bool firstTime)
     {

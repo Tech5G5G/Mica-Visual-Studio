@@ -418,26 +418,40 @@ public static class WindowHelper
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <returns>The <see cref="WindowStyles"/> of the specified <paramref name="hWnd"/>.</returns>
-    public static WindowStyles GetWindowStyles(IntPtr hWnd) => (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);
+    public static WindowStyles GetWindowStyles(IntPtr hWnd)
+    {
+        return (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);
+    }
+
     /// <summary>
     /// Sets the <see cref="WindowStyles"/> of the specified <paramref name="hWnd"/>.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <param name="styles">The <see cref="WindowStyles"/> to set.</param>
-    public static void SetWindowStyles(IntPtr hWnd, WindowStyles styles) => SetWindowLong(hWnd, GWL_STYLE, (uint)styles);
+    public static void SetWindowStyles(IntPtr hWnd, WindowStyles styles)
+    {
+        SetWindowLong(hWnd, GWL_STYLE, (uint)styles);
+    }
 
     /// <summary>
     /// Gets the <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <returns>The <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.</returns>
-    public static WindowStylesEx GetExtendedWindowStyles(IntPtr hWnd) => (WindowStylesEx)GetWindowLong(hWnd, GWL_EXSTYLE);
+    public static WindowStylesEx GetExtendedWindowStyles(IntPtr hWnd)
+    {
+        return (WindowStylesEx)GetWindowLong(hWnd, GWL_EXSTYLE);
+    }
+
     /// <summary>
     /// Sets the <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <param name="styles">The <see cref="WindowStylesEx"/> to set.</param>
-    public static void SetExtendedWindowStyles(IntPtr hWnd, WindowStylesEx styles) => SetWindowLong(hWnd, GWL_EXSTYLE, (uint)styles);
+    public static void SetExtendedWindowStyles(IntPtr hWnd, WindowStylesEx styles)
+    {
+        SetWindowLong(hWnd, GWL_EXSTYLE, (uint)styles);
+    }
 
     #endregion
 
@@ -464,7 +478,10 @@ public static class WindowHelper
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     /// <returns><see langword="true"/> if the specified <paramref name="hWnd"/> is still alive. Otherwise, <see langword="false"/>.</returns>
-    public static bool IsAlive(IntPtr hWnd) => IsWindow(hWnd);
+    public static bool IsAlive(IntPtr hWnd)
+    {
+        return IsWindow(hWnd);
+    }
 
     /// <summary>
     /// Gets the process ID associated with the specified <paramref name="hWnd"/>.

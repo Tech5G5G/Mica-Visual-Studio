@@ -6,25 +6,25 @@ namespace MicaVisualStudio.Interop;
 /// <summary>
 /// Represents an event hook for Windows events.
 /// </summary>
-public class WinEventHook : IDisposable
+public sealed class WinEventHook : IDisposable
 {
     #region PInvoke
 
     [DllImport("user32.dll")]
-    private static extern IntPtr SetWinEventHook(
+    private static extern nint SetWinEventHook(
         uint eventMin,
         uint eventMax,
-        IntPtr hmodWinEventProc,
+        nint hmodWinEventProc,
         WinEventDelegate pfnWinEventProc,
         uint idProcess,
         uint idThread,
         uint dwFlags);
 
     [DllImport("user32.dll")]
-    private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
+    private static extern bool UnhookWinEvent(nint hWinEventHook);
 
     [DllImport("user32.dll")]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+    private static extern uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId);
 
     public const uint WINEVENT_OUTOFCONTEXT = 0;
 
@@ -33,9 +33,9 @@ public class WinEventHook : IDisposable
         EVENT_OBJECT_DESTROY = 0x8001;
 
     private delegate void WinEventDelegate(
-        IntPtr hWinEventHook,
+        nint hWinEventHook,
         int eventConst,
-        IntPtr hWnd,
+        nint hWnd,
         int idObject,
         int idChild,
         int idEventThread,
@@ -48,8 +48,8 @@ public class WinEventHook : IDisposable
     /// </summary>
     public event EventOccuredEventHandler EventOccurred;
 
-    private readonly IntPtr hookId;
-    private readonly WinEventDelegate hook;
+    private readonly nint _hookId;
+    private readonly WinEventDelegate _hook;
 
     /// <summary>
     /// Initializes a new instance of <see cref="WinEventHook"/>.
@@ -57,37 +57,40 @@ public class WinEventHook : IDisposable
     /// <param name="winEvent">The <see cref="Event"/> to look out for.</param>
     /// <param name="flags">The location of this <see cref="WinEventHook"/> and the sources to be skipped.</param>
     /// <param name="pid">The ID of the process to watch. Set to <c>0</c> to watch all processes.</param>
-    public WinEventHook(Event winEvent, EventFlags flags, int pid) =>
-        hookId = SetWinEventHook((uint)winEvent, (uint)winEvent, IntPtr.Zero, hook = Procedure, (uint)pid, idThread: 0, (uint)flags);
+    public WinEventHook(Event winEvent, EventFlags flags, int pid)
+    {
+        _hookId = SetWinEventHook((uint)winEvent, (uint)winEvent, IntPtr.Zero, _hook = Procedure, (uint)pid, idThread: 0, (uint)flags);
+    }
 
-    private void Procedure(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime) =>
+    private void Procedure(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
+    {
         EventOccurred?.Invoke(this, new(eventConst, hWnd, idObject, idChild, dwmsEventTime));
+    }
 
     #region Dispose
 
-    private bool disposed;
+    private bool _disposed;
 
-    ~WinEventHook() => Dispose(disposing: false);
+    ~WinEventHook()
+    {
+        DisposeInternal(/* disposing: false */);
+    }
 
     /// <summary>
     /// Disposes this instance of <see cref="WinEventHook"/>, unregistering the associated hook.
     /// </summary>
     public void Dispose()
     {
-        Dispose(disposing: true);
+        DisposeInternal(/* disposing: true */);
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>
-    /// Disposes this instance of <see cref="WinEventHook"/>.
-    /// </summary>
-    /// <param name="disposing">Whether to release managed resources.</param>
-    protected virtual void Dispose(bool disposing)
+    private void DisposeInternal(/* bool disposing */)
     {
-        if (!disposed)
+        if (!_disposed)
         {
-            UnhookWinEvent(hookId);
-            disposed = true;
+            UnhookWinEvent(_hookId);
+            _disposed = true;
         }
     }
 

@@ -9,7 +9,7 @@ namespace System.Windows;
 /// </summary>
 public class PropertyChangeNotifier : DependencyObject, IDisposable
 {
-    private readonly WeakReference<DependencyObject> propertySource;
+    private readonly WeakReference<DependencyObject> _propertySource;
 
     /// <summary>
     /// Initializes a new instance of <see cref="PropertyChangeNotifier"/>.
@@ -34,7 +34,7 @@ public class PropertyChangeNotifier : DependencyObject, IDisposable
     /// <param name="path">A path to the property to observe.</param>
     public PropertyChangeNotifier(DependencyObject source, PropertyPath path)
     {
-        propertySource = new(source);
+        _propertySource = new(source);
 
         BindingOperations.SetBinding(this, ValueProperty, new Binding
         {
@@ -51,7 +51,7 @@ public class PropertyChangeNotifier : DependencyObject, IDisposable
     /// If the source is unavailable, this returns <see langword="null"/>.
     /// </remarks>
     public DependencyObject PropertySource =>
-        propertySource.TryGetTarget(out DependencyObject source) ? source : null;
+        _propertySource.TryGetTarget(out DependencyObject source) ? source : null;
 
     /// <summary>
     /// Gets or sets the value of the property.
@@ -73,14 +73,18 @@ public class PropertyChangeNotifier : DependencyObject, IDisposable
     /// </summary>
     public event EventHandler ValueChanged;
 
-    private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+    private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
         (d as PropertyChangeNotifier)?.ValueChanged?.Invoke(d, EventArgs.Empty);
+    }
 
     /// <summary>
     /// Clears the internal binding used by this <see cref="PropertyChangeNotifier"/>.
     /// </summary>
-    public void Dispose() =>
+    public void Dispose()
+    {
         BindingOperations.ClearBinding(this, ValueProperty);
+    }
 }
 
 /// <summary>
@@ -97,9 +101,10 @@ public static class WeakEventExtensions
     /// <param name="source">The source to attach the <paramref name="handler"/> to.</param>
     /// <param name="routedEvent">The <see cref="RoutedEvent"/> to attach the <paramref name="handler"/> to.</param>
     /// <param name="handler">The <see cref="RoutedEventHandler"/> that recieves events.</param>
-    public static void AddWeakHandler<T>(this T source, RoutedEvent routedEvent, RoutedEventHandler handler) where T : FrameworkElement =>
+    public static void AddWeakHandler<T>(this T source, RoutedEvent routedEvent, RoutedEventHandler handler) where T : FrameworkElement
+    {
         WeakEventManager<T, RoutedEventArgs>.AddHandler(source, routedEvent.Name, (s, e) => handler(s, e));
-
+    }
 
     /// <summary>
     /// Adds the specified <paramref name="handler"/> to the specified <paramref name="routedEvent"/> using <see cref="WeakEventManager"/>.

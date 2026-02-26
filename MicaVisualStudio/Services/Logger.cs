@@ -18,8 +18,10 @@ public class Logger(IVsActivityLog log, IInfoBarService service) : ILogger
         _log.LogEntry((uint)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR, Assembly.GetCallingAssembly().GetName().Name, message);
     }
 
-    public void Log(Exception exception) =>
+    public void Log(Exception exception)
+    {
         Log(FormatException(exception));
+    }
 
     public void Output(string message)
     {
@@ -27,8 +29,10 @@ public class Logger(IVsActivityLog log, IInfoBarService service) : ILogger
         Log(message);
     }
 
-    public void Output(Exception exception) =>
+    public void Output(Exception exception)
+    {
         Output(FormatException(exception));
+    }
 
     public void InfoBar(string message, ImageMoniker image)
     {
@@ -36,9 +40,13 @@ public class Logger(IVsActivityLog log, IInfoBarService service) : ILogger
         Output(message);
     }
 
-    public void InfoBar(Exception exception, ImageMoniker image) =>
+    public void InfoBar(Exception exception, ImageMoniker image)
+    {
         InfoBar(FormatException(exception), image);
+    }
 
-    private string FormatException(Exception exception) =>
-        exception + Environment.NewLine + exception.StackTrace;
+    private string FormatException(Exception exception)
+    {
+        return exception + Environment.NewLine + exception.StackTrace;
+    }
 }

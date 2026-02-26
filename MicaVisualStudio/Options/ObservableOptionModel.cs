@@ -38,6 +38,8 @@ public abstract class ObservableOptionModel<TSelf> : BaseOptionModel<TSelf>, INo
         }
     }
 
-    protected virtual void OnPropertyChanged(string propertyName) =>
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
         PropertyChanged?.Invoke(this, new(propertyName));
+    }
 }

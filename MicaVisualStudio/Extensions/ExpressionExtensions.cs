@@ -16,8 +16,10 @@ public static class ExpressionExtensions
     /// <returns>
     /// A <see cref="UnaryExpression"/> that has the <see cref="Expression.NodeType"/> property equal to <see cref="ExpressionType.Convert"/>.
     /// </returns>
-    public static UnaryExpression Convert(this Expression expression, Type type) =>
-        Expression.Convert(expression, type);
+    public static UnaryExpression Convert(this Expression expression, Type type)
+    {
+        return Expression.Convert(expression, type);
+    }
 
     /// <summary>
     /// Creates a <see cref="UnaryExpression"/> that represents a type conversion operation to <typeparamref name="T"/>.
@@ -28,8 +30,10 @@ public static class ExpressionExtensions
     /// <returns>
     /// A <see cref="UnaryExpression"/> that has the <see cref="Expression.NodeType"/> property equal to <see cref="ExpressionType.Convert"/>.
     /// </returns>
-    public static UnaryExpression Convert<T>(this Expression expression) =>
-        expression.Convert(typeof(T));
+    public static UnaryExpression Convert<T>(this Expression expression)
+    {
+        return expression.Convert(typeof(T));
+    }
 
     /// <summary>
     /// Creates a <see cref="TypeBinaryExpression"/> that represents a type check of <paramref name="type"/>.
@@ -40,8 +44,10 @@ public static class ExpressionExtensions
     /// <returns>
     /// A <see cref="TypeBinaryExpression"/> for which the <see cref="Expression.NodeType"/> property is equal to <see cref="ExpressionType.TypeIs"/>.
     /// </returns>
-    public static TypeBinaryExpression TypeIs(this Expression expression, Type type) =>
-        Expression.TypeIs(expression, type);
+    public static TypeBinaryExpression TypeIs(this Expression expression, Type type)
+    {
+        return Expression.TypeIs(expression, type);
+    }
 
     /// <summary>
     /// Creates a <see cref="TypeBinaryExpression"/> that represents a type check of <typeparamref name="T"/>.
@@ -52,8 +58,10 @@ public static class ExpressionExtensions
     /// <returns>
     /// A <see cref="TypeBinaryExpression"/> for which the <see cref="Expression.NodeType"/> property is equal to <see cref="ExpressionType.TypeIs"/>.
     /// </returns>
-    public static TypeBinaryExpression TypeIs<T>(this Expression expression) =>
-        expression.TypeIs(typeof(T));
+    public static TypeBinaryExpression TypeIs<T>(this Expression expression)
+    {
+        return expression.TypeIs(typeof(T));
+    }
 
     /// <summary>
     /// Creates a <see cref="MemberExpression"/> that represents accessing a property.
@@ -64,8 +72,10 @@ public static class ExpressionExtensions
     /// <returns>
     /// A <see cref="MemberExpression"/> that has the <see cref="Expression.NodeType"/> property equal to <see cref="ExpressionType.MemberAccess"/>.
     /// </returns>
-    public static MemberExpression Property(this Expression expression, PropertyInfo property) =>
-        Expression.Property(expression, property);
+    public static MemberExpression Property(this Expression expression, PropertyInfo property)
+    {
+        return Expression.Property(expression, property);
+    }
 
     /// <summary>
     /// Compiles <paramref name="body"/> into executable code and produces a <see cref="Func{T, TResult}"/> that represents it.
@@ -79,6 +89,8 @@ public static class ExpressionExtensions
     /// <param name="body">The <see cref="Expression"/> to compile into executable code.</param>
     /// <param name="parameter">The <see cref="ParameterExpression"/> used by <paramref name="body"/> as a parameter.</param>
     /// <returns>A <see cref="Func{T, TResult}"/> that represents the compiled <see cref="Expression"/>.</returns>
-    public static Func<T, TResult> Compile<T, TResult>(this Expression body, ParameterExpression parameter) =>
-        Expression.Lambda<Func<T, TResult>>(body, parameter).Compile();
+    public static Func<T, TResult> Compile<T, TResult>(this Expression body, ParameterExpression parameter)
+    {
+        return Expression.Lambda<Func<T, TResult>>(body, parameter).Compile();
+    }
 }

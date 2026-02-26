@@ -35,8 +35,10 @@ public static class TreeExtensions
     /// <typeparam name="T">The type of <see cref="DependencyObject"/>s to filter.</typeparam>
     /// <param name="parent">The parent of the children to get.</param>
     /// <returns>An <see cref="IEnumerable{T}"/> of <typeparamref name="T"/> containing the logical descendants of <paramref name="parent"/>.</returns>
-    public static IEnumerable<T> LogicalDescendants<T>(this DependencyObject parent) where T : DependencyObject =>
-        LogicalDescendants(parent).OfType<T>();
+    public static IEnumerable<T> LogicalDescendants<T>(this DependencyObject parent) where T : DependencyObject
+    {
+        return LogicalDescendants(parent).OfType<T>(); 
+    }
 
     #endregion
 
@@ -52,8 +54,10 @@ public static class TreeExtensions
     /// The first <typeparamref name="T"/> whose <see cref="FrameworkElement.Name"/> is <paramref name="name"/>.
     /// If none is found, <see langword="null"/>.
     /// </returns>
-    public static T FindElement<T>(this IEnumerable<FrameworkElement> source, string name) where T : FrameworkElement =>
-        source.FirstOrDefault(i => i is T element && element.Name == name) as T;
+    public static T FindElement<T>(this IEnumerable<FrameworkElement> source, string name) where T : FrameworkElement
+    {
+        return source.FirstOrDefault(i => i is T element && element.Name == name) as T;
+    }
 
     #endregion
 }

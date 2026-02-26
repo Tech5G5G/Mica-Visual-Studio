@@ -5,7 +5,6 @@ using Community.VisualStudio.Toolkit;
 using Community.VisualStudio.Toolkit.DependencyInjection;
 using Community.VisualStudio.Toolkit.DependencyInjection.Core;
 using MicaVisualStudio.Options;
-using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio;
 
@@ -15,11 +14,8 @@ public abstract class BackdropCommand(DIToolkitPackage package, IGeneral general
 
     private readonly IGeneral _general = general;
 
-    protected async override Task ExecuteAsync(OleMenuCmdEventArgs args)
-    {
+    protected async override Task ExecuteAsync(OleMenuCmdEventArgs args) =>
         _general.Backdrop = Backdrop;
-        _general.Save();
-    }
 
     protected override void BeforeQueryStatus(EventArgs args) =>
         Command.Checked = _general.Backdrop == Backdrop;

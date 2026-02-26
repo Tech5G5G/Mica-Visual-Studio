@@ -29,47 +29,107 @@ internal partial class OptionsProvider
 }
 
 /// <summary>
-/// Represents the general options used by Mica Visual Studio.
+/// Represents the options used by Mica Visual Studio.
 /// </summary>
 public class General : ObservableOptionModel<General>, IGeneral
 {
     [OverrideDataType(SettingDataType.Int32)]
-    public Theme Theme { get; set; } = Theme.VisualStudio;
+    public Theme Theme
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = Theme.VisualStudio;
 
     [OverrideDataType(SettingDataType.Int32)]
-    public BackdropType Backdrop { get; set; } = BackdropType.Mica;
+    public BackdropType Backdrop
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = BackdropType.Mica;
 
     [OverrideDataType(SettingDataType.Int32)]
-    public CornerPreference CornerPreference { get; set; } = CornerPreference.Default;
+    public CornerPreference CornerPreference
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = CornerPreference.Default;
 
-    public bool ToolWindows { get; set; } = false;
-
-    [OverrideDataType(SettingDataType.Int32)]
-    public Theme ToolTheme { get; set; } = Theme.VisualStudio;
-
-    [OverrideDataType(SettingDataType.Int32)]
-    public BackdropType ToolBackdrop { get; set; } = BackdropType.Mica;
-
-    [OverrideDataType(SettingDataType.Int32)]
-    public CornerPreference ToolCornerPreference { get; set; } = CornerPreference.Default;
-
-    public bool DialogWindows { get; set; } = false;
+    public bool ToolWindows
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = false;
 
     [OverrideDataType(SettingDataType.Int32)]
-    public Theme DialogTheme { get; set; } = Theme.VisualStudio;
+    public Theme ToolTheme
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = Theme.VisualStudio;
 
     [OverrideDataType(SettingDataType.Int32)]
-    public BackdropType DialogBackdrop { get; set; } = BackdropType.Mica;
+    public BackdropType ToolBackdrop
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = BackdropType.Mica;
 
     [OverrideDataType(SettingDataType.Int32)]
-    public CornerPreference DialogCornerPreference { get; set; } = CornerPreference.Default;
+    public CornerPreference ToolCornerPreference
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = CornerPreference.Default;
+
+    public bool DialogWindows
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = false;
 
     [OverrideDataType(SettingDataType.Int32)]
-    public Theme AppTheme { get; set; } = Theme.VisualStudio;
+    public Theme DialogTheme
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = Theme.VisualStudio;
 
-    public bool ForceTransparency { get; set; } = true;
+    [OverrideDataType(SettingDataType.Int32)]
+    public BackdropType DialogBackdrop
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = BackdropType.Mica;
 
-    public bool LayeredWindows { get; set; } = true;
+    [OverrideDataType(SettingDataType.Int32)]
+    public CornerPreference DialogCornerPreference
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = CornerPreference.Default;
 
-    public bool AcrylicMenus { get; set; } = true;
+    [OverrideDataType(SettingDataType.Int32)]
+    public Theme AppTheme
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = Theme.VisualStudio;
+
+    public bool ForceTransparency
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = true;
+
+    public bool LayeredWindows
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = true;
+
+    public bool AcrylicMenus
+    {
+        get => field;
+        set => SetValue(ref field, value);
+    } = true;
 }

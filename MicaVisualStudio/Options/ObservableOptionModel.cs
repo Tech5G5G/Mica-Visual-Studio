@@ -1,8 +1,6 @@
-﻿using System.Linq;
-using System.Reflection;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Community.VisualStudio.Toolkit;
 
 namespace MicaVisualStudio.Options;
@@ -12,35 +10,32 @@ public abstract class ObservableOptionModel<TSelf> : BaseOptionModel<TSelf>, INo
 {
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private readonly List<PropertyInfo> _properties = [];
+    private bool IsLoading => _loadDepth > 0;
+    private int _loadDepth;
 
-    private object[] _originalValues;
+    protected void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "")
+    {
+        field = value;
 
-    public ObservableOptionModel() =>
-        _properties.AddRange([.. GetPropertyWrappers().OfType<OptionModelPropertyWrapper>().Select(i => i.PropertyInfo)]);
+        if (!IsLoading)
+        {
+            Save();
+        }
+
+        OnPropertyChanged(name);
+    }
 
     public override async Task LoadAsync()
     {
-        await base.LoadAsync();
-        _originalValues = [.. _properties.Select(p => p.GetValue(this))];
-    }
-
-    public override Task SaveAsync()
-    {
-        if (_originalValues is not null)
+        ++_loadDepth;
+        try
         {
-            for (int i = 0; i < _properties.Count; ++i)
-            {
-                var property = _properties[i];
-
-                if (_originalValues[i] != (_originalValues[i] = property.GetValue(this)))
-                {
-                    OnPropertyChanged(property.Name);
-                }
-            }
+            await base.LoadAsync();
         }
-
-        return base.SaveAsync();
+        finally
+        {
+            --_loadDepth;
+        }
     }
 
     protected virtual void OnPropertyChanged(string propertyName) =>

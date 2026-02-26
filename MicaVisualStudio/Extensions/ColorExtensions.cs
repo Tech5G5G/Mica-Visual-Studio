@@ -15,6 +15,6 @@ public static class ColorExtensions
     /// </returns>
     public static bool IsGray(this Color color)
     {
-        color.R == color.G && color.G == color.B;
+        return color.R == color.G && color.G == color.B;
     }
 }

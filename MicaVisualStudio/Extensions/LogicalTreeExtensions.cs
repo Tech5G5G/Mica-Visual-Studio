@@ -5,11 +5,32 @@ using System.Windows;
 namespace MicaVisualStudio.Extensions;
 
 /// <summary>
-/// Contains extensions for traversing the WPF element tree.
+/// Contains extensions for traversing the logical element tree.
 /// </summary>
-public static class TreeExtensions
+public static class LogicalTreeExtensions
 {
-    #region Logical
+    public static T LogicalDescendant<T>(this DependencyObject parent) where T : DependencyObject
+    {
+        var children = LogicalTreeHelper.GetChildren(parent).OfType<DependencyObject>().ToArray();
+
+        foreach (var child in children)
+        {
+            if (child is T value)
+            {
+                return value;
+            }
+        }
+
+        foreach (var child in children)
+        {
+            if (child.LogicalDescendant<T>() is T value)
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Gets the logical descendants of <paramref name="parent"/> using <see cref="LogicalTreeHelper"/>.
@@ -39,25 +60,4 @@ public static class TreeExtensions
     {
         return LogicalDescendants(parent).OfType<T>(); 
     }
-
-    #endregion
-
-    #region Utilities
-
-    /// <summary>
-    /// Finds the first <typeparamref name="T"/> in <paramref name="source"/> whose <see cref="FrameworkElement.Name"/> is <paramref name="name"/>.
-    /// </summary>
-    /// <typeparam name="T">The <see cref="FrameworkElement"/>-derived type of the element to find.</typeparam>
-    /// <param name="source">An <see cref="IEnumerable{T}"/> of <see cref="FrameworkElement"/>s to filter through.</param>
-    /// <param name="name">The <see cref="FrameworkElement.Name"/> to check for.</param>
-    /// <returns>
-    /// The first <typeparamref name="T"/> whose <see cref="FrameworkElement.Name"/> is <paramref name="name"/>.
-    /// If none is found, <see langword="null"/>.
-    /// </returns>
-    public static T FindElement<T>(this IEnumerable<FrameworkElement> source, string name) where T : FrameworkElement
-    {
-        return source.FirstOrDefault(i => i is T element && element.Name == name) as T;
-    }
-
-    #endregion
 }

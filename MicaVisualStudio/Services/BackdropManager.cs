@@ -68,7 +68,7 @@ public class BackdropManager : IBackdropManager
             source.CompositionTarget?.BackgroundColor = Colors.Transparent;
 
             // Don't remove caption buttons from windows that need them
-            if (window.WindowStyle == WindowStyle.None || window is not DialogWindowBase)
+            if (window.WindowStyle == System.Windows.WindowStyle.None || window is not DialogWindowBase)
             {
                 WindowHelper.RemoveCaptionButtons(source);
             }

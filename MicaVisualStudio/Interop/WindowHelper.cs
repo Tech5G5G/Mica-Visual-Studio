@@ -98,7 +98,7 @@ public static class WindowHelper
     /// <param name="enable">Whether or not to enable dark mode.</param>
     public static void EnableDarkMode(IntPtr hWnd, bool enable)
     {
-        uint mode = enable ? 1u : 0;
+        var mode = enable ? 1u : 0;
         SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(uint));
     }
 
@@ -109,7 +109,7 @@ public static class WindowHelper
     /// <param name="preference">The <see cref="CornerPreference"/> to set.</param>
     public static void SetCornerPreference(IntPtr hWnd, CornerPreference preference)
     {
-        uint corner = (uint)preference;
+        var corner = (uint)preference;
         SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref corner, sizeof(uint));
     }
 
@@ -120,7 +120,7 @@ public static class WindowHelper
     /// <param name="backdrop">The <see cref="BackdropType"/> to set.</param>
     public static void SetBackdropType(IntPtr hWnd, BackdropType backdrop)
     {
-        uint type = (uint)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
+        var type = (uint)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
         SetWindowAttribute(hWnd, DWMWA_SYSTEMBACKDROP_TYPE, ref type, sizeof(uint));
 
         EnableWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
@@ -133,7 +133,7 @@ public static class WindowHelper
     /// <param name="enable">Whether or not to show the border.</param>
     public static void EnableWindowBorder(IntPtr hWnd, bool enable)
     {
-        uint color = enable ? DWMWA_COLOR_DEFAULT : DWMWA_COLOR_NONE;
+        var color = enable ? DWMWA_COLOR_DEFAULT : DWMWA_COLOR_NONE;
         SetWindowAttribute(hWnd, DWMWA_BORDER_COLOR, ref color, sizeof(uint));
     }
 
@@ -229,11 +229,9 @@ public static class WindowHelper
         TPM_RETURNCMD = 0x100,
         TPM_NOANIMATION = 0x4000;
 
-    private const uint SW_NORMAL = 1,
-        SW_MAXIMIZE = 3;
+    private const uint SW_NORMAL = 1, SW_MAXIMIZE = 3;
 
-    private const uint MF_ENABLED = 0x0,
-        MF_GRAYED = 0x1;
+    private const uint MF_ENABLED = 0x0, MF_GRAYED = 0x1;
 
     private const int HTCAPTION = 2;
 
@@ -280,7 +278,8 @@ public static class WindowHelper
         const int MenuSpacing = 2;
         WindowType type = GetWindowType(source.RootVisual as Window);
 
-        GetSystemMenu(source.Handle, bRevert: false); // Make sure window menu is created
+        // Make sure window menu is created
+        GetSystemMenu(source.Handle, bRevert: false);
 
         source.AddHook(Hook);
         SetWindowStyles(source.Handle, GetWindowStyles(source.Handle)); // Refresh styles
@@ -290,17 +289,21 @@ public static class WindowHelper
             switch (msg)
             {
                 case WM_DESTROY:
-                    HwndSource.FromHwnd(hWnd)?.RemoveHook(Hook); // Avoid memory leaks
+                    // Clean up hook
+                    HwndSource.FromHwnd(hWnd)?.RemoveHook(Hook);
                     break;
 
                 case WM_STYLECHANGING when (int)wParam == GWL_STYLE:
-                    STYLESTRUCT structure = Marshal.PtrToStructure<STYLESTRUCT>(lParam);
+                    var structure = Marshal.PtrToStructure<STYLESTRUCT>(lParam);
 
                     if (type == WindowType.Main || // Apply WS_OVERLAPPEDWINDOW style to main window
-                        ((WindowStyles)structure.styleNew).HasFlag(WindowStyles.ThickFrame)) // or any sizable window
-                        structure.styleNew |= (uint)WindowStyles.OverlappedWindow;
+                        ((WindowStyle)structure.styleNew).HasFlag(WindowStyle.ThickFrame)) // or any sizable window
+                    {
+                        structure.styleNew |= (uint)WindowStyle.OverlappedWindow;
+                    }
 
-                    structure.styleNew &= (uint)~WindowStyles.SystemMenu; // Remove the WS_SYSMENU style
+                    // Remove the WS_SYSMENU style
+                    structure.styleNew &= (uint)~WindowStyle.SystemMenu;
 
                     Marshal.StructureToPtr(structure, lParam, fDeleteOld: true);
                     handled = true;
@@ -316,7 +319,7 @@ public static class WindowHelper
                     break;
 
                 case WM_SYSKEYDOWN when (int)wParam == VK_SPACE && IsAltPressed(lParam):
-                    int height = GetTitleBarHeight(hWnd);
+                    var height = GetTitleBarHeight(hWnd);
 
                     POINT point = new() { x = MenuSpacing, y = (height > 0 ? height : System.Windows.Forms.SystemInformation.CaptionHeight) + MenuSpacing };
                     ClientToScreen(hWnd, ref point);
@@ -333,10 +336,11 @@ public static class WindowHelper
             IntPtr menu = GetSystemMenu(hWnd, bRevert: false);
 
             uint minimize = type == WindowType.Dialog ? MF_GRAYED : MF_ENABLED;
-            uint maximize = GetWindowStyles(source.Handle).HasFlag(WindowStyles.MaximizeBox) ? MF_ENABLED : MF_GRAYED;
-            uint size = GetWindowStyles(source.Handle).HasFlag(WindowStyles.ThickFrame) ? MF_ENABLED : MF_GRAYED;
+            uint maximize = GetWindowStyles(source.Handle).HasFlag(WindowStyle.MaximizeBox) ? MF_ENABLED : MF_GRAYED;
+            uint size = GetWindowStyles(source.Handle).HasFlag(WindowStyle.ThickFrame) ? MF_ENABLED : MF_GRAYED;
 
             if (GetWindowPlacement(hWnd, out WINDOWPLACEMENT placement))
+            {
                 if (placement.showCmd == SW_NORMAL)
                 {
                     EnableMenuItem(menu, SC_RESTORE, MF_GRAYED);
@@ -355,6 +359,7 @@ public static class WindowHelper
                     EnableMenuItem(menu, SC_MAXIMIZE, MF_GRAYED);
                     EnableMenuItem(menu, SC_CLOSE, MF_ENABLED);
                 }
+            }
 
             int cmd = TrackPopupMenuEx(
                 menu,
@@ -368,7 +373,9 @@ public static class WindowHelper
                 IntPtr.Zero);
 
             if (cmd != WM_NULL)
+            {
                 SendMessage(hWnd, WM_SYSCOMMAND, (IntPtr)cmd, IntPtr.Zero);
+            }
         }
 
         bool IsAltPressed(IntPtr lParam) =>
@@ -381,14 +388,29 @@ public static class WindowHelper
 
     #region Window Styles
 
-    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
-    private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+    [DllImport("user32.dll")]
+    private static extern nint GetWindowLongW(nint hWnd, int nIndex);
 
-    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
-    private static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
+    [DllImport("user32.dll")]
+    private static extern nint GetWindowLongPtrW(nint hWnd, int nIndex);
 
-    private const int GWL_STYLE = -16,
-        GWL_EXSTYLE = -20;
+    private static nint GetWindowLong(nint hWnd, int nIndex)
+    {
+        return Environment.Is64BitProcess ? GetWindowLongPtrW(hWnd, nIndex) : GetWindowLongW(hWnd, nIndex);
+    }
+
+    [DllImport("user32.dll")]
+    private static extern nint SetWindowLongW(nint hWnd, int nIndex, uint dwNewLong);
+
+    [DllImport("user32.dll")]
+    private static extern nint SetWindowLongPtrW(nint hWnd, int nIndex, uint dwNewLong);
+
+    private static nint SetWindowLong(nint hWnd, int nIndex, uint dwNewLong)
+    {
+        return Environment.Is64BitProcess ? SetWindowLongPtrW(hWnd, nIndex, dwNewLong) : SetWindowLongW(hWnd, nIndex, dwNewLong);
+    }
+
+    private const int GWL_STYLE = -16, GWL_EXSTYLE = -20;
 
     /// <summary>
     /// Determines the <see cref="WindowType"/> of the specified <paramref name="window"/>.
@@ -402,7 +424,7 @@ public static class WindowHelper
             return WindowType.Main;
         }
         else if (window is not null && // Check if window is WPF
-            (window.WindowStyle == WindowStyle.None || // and has no style
+            (window.WindowStyle == System.Windows.WindowStyle.None || // and has no style
             window.Owner is null)) // or no owner
         {
             return WindowType.Tool;
@@ -414,41 +436,41 @@ public static class WindowHelper
     }
 
     /// <summary>
-    /// Gets the <see cref="WindowStyles"/> of the specified <paramref name="hWnd"/>.
+    /// Gets the <see cref="WindowStyle"/> of the specified <paramref name="hWnd"/>.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
-    /// <returns>The <see cref="WindowStyles"/> of the specified <paramref name="hWnd"/>.</returns>
-    public static WindowStyles GetWindowStyles(IntPtr hWnd)
+    /// <returns>The <see cref="WindowStyle"/> of the specified <paramref name="hWnd"/>.</returns>
+    public static WindowStyle GetWindowStyles(IntPtr hWnd)
     {
-        return (WindowStyles)GetWindowLong(hWnd, GWL_STYLE);
+        return (WindowStyle)GetWindowLong(hWnd, GWL_STYLE);
     }
 
     /// <summary>
-    /// Sets the <see cref="WindowStyles"/> of the specified <paramref name="hWnd"/>.
+    /// Sets the <see cref="WindowStyle"/> of the specified <paramref name="hWnd"/>.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
-    /// <param name="styles">The <see cref="WindowStyles"/> to set.</param>
-    public static void SetWindowStyles(IntPtr hWnd, WindowStyles styles)
+    /// <param name="styles">The <see cref="WindowStyle"/> to set.</param>
+    public static void SetWindowStyles(IntPtr hWnd, WindowStyle styles)
     {
         SetWindowLong(hWnd, GWL_STYLE, (uint)styles);
     }
 
     /// <summary>
-    /// Gets the <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.
+    /// Gets the <see cref="ExtendedWindowStyle"/> of the specified <paramref name="hWnd"/>.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
-    /// <returns>The <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.</returns>
-    public static WindowStylesEx GetExtendedWindowStyles(IntPtr hWnd)
+    /// <returns>The <see cref="ExtendedWindowStyle"/> of the specified <paramref name="hWnd"/>.</returns>
+    public static ExtendedWindowStyle GetExtendedWindowStyles(IntPtr hWnd)
     {
-        return (WindowStylesEx)GetWindowLong(hWnd, GWL_EXSTYLE);
+        return (ExtendedWindowStyle)GetWindowLong(hWnd, GWL_EXSTYLE);
     }
 
     /// <summary>
-    /// Sets the <see cref="WindowStylesEx"/> of the specified <paramref name="hWnd"/>.
+    /// Sets the <see cref="ExtendedWindowStyle"/> of the specified <paramref name="hWnd"/>.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
-    /// <param name="styles">The <see cref="WindowStylesEx"/> to set.</param>
-    public static void SetExtendedWindowStyles(IntPtr hWnd, WindowStylesEx styles)
+    /// <param name="styles">The <see cref="ExtendedWindowStyle"/> to set.</param>
+    public static void SetExtendedWindowStyles(IntPtr hWnd, ExtendedWindowStyle styles)
     {
         SetWindowLong(hWnd, GWL_EXSTYLE, (uint)styles);
     }
@@ -495,12 +517,12 @@ public static class WindowHelper
     }
 
     /// <summary>
-    /// Makes the specified <paramref name="hWnd"/> layered by adding the <see cref="WindowStylesEx.Layered"/> style.
+    /// Makes the specified <paramref name="hWnd"/> layered by adding the <see cref="ExtendedWindowStyle.Layered"/> style.
     /// </summary>
     /// <param name="hWnd">A handle to a window.</param>
     public static void MakeLayered(IntPtr hWnd)
     {
-        SetExtendedWindowStyles(hWnd, GetExtendedWindowStyles(hWnd) | WindowStylesEx.Layered);
+        SetExtendedWindowStyles(hWnd, GetExtendedWindowStyles(hWnd) | ExtendedWindowStyle.Layered);
         SetLayeredWindowAttributes(
             hWnd,
             (uint)ColorTranslator.ToWin32(Color.Black),
@@ -551,12 +573,12 @@ public static class WindowHelper
 /// <see cref="WindowHelper.GetWindowStyles(IntPtr)"/>
 /// </item>
 /// <item>
-/// <see cref="WindowHelper.SetWindowStyles(IntPtr, WindowStyles)"/>
+/// <see cref="WindowHelper.SetWindowStyles(IntPtr, WindowStyle)"/>
 /// </item>
 /// </list>
 /// </remarks>
 [Flags]
-public enum WindowStyles : uint
+public enum WindowStyle : uint
 {
     Border = 0x00800000,
     Caption = 0x00C00000,
@@ -593,11 +615,11 @@ public enum WindowStyles : uint
 /// <see cref="WindowHelper.GetExtendedWindowStyles(IntPtr)"/>
 /// </item>
 /// <item>
-/// <see cref="WindowHelper.SetExtendedWindowStyles(IntPtr, WindowStylesEx)"/>
+/// <see cref="WindowHelper.SetExtendedWindowStyles(IntPtr, ExtendedWindowStyle)"/>
 /// </item>
 /// </list>
 /// </remarks>
-public enum WindowStylesEx : uint
+public enum ExtendedWindowStyle : uint
 {
     AcceptFiles = 0x00000010,
     AppWindow = 0x00040000,

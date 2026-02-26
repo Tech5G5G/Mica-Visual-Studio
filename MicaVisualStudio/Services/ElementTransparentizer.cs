@@ -488,6 +488,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 panel.Background = Brushes.Transparent;
                 return;
 
+            // Code coverage, column headers
+            case "GridHeader" when control is DataGrid:
+                control.Background = Brushes.Transparent;
+                return;
+
             #region Git Windows
 
             case "gitWindowView" or // Git changes window
@@ -599,6 +604,12 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Resource editor
             case "Microsoft.VisualStudio.ResourceExplorer.UI.ResourceGroupEditorControl":
                 control.Background = Brushes.Transparent;
+                break;
+
+            // JSON editor, schema selector
+            case "Microsoft.WebTools.Languages.Json.VS.Schema.DropdownMargin.JsonSchemaDropdown"
+            when control.FindDescendant<Grid>() is { } grid:
+                grid.Background = Brushes.Transparent;
                 break;
         }
     }

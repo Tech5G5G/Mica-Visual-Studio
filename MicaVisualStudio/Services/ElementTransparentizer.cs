@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Windows;
@@ -55,9 +56,9 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     private readonly DependencyProperty View_ContentProperty, View_IsActiveProperty;
 
-    private readonly ILHook _visualDetour;
-
     private readonly bool _layeredWindows;
+
+    private ILHook _visualDetour;
 
     public ElementTransparentizer(
         ILogger logger,
@@ -76,15 +77,21 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         resource.AddCustomResources();
 
         // Check if enabled
-        if (!_general.ForceTransparency)
+        _layeredWindows = general.LayeredWindows;
+        if (!general.ForceTransparency)
         {
             return;
         }
-        _layeredWindows = general.LayeredWindows;
 
-        // Generate Visual.AddVisualChild detour
+        // Generate Visual.AddVisualChild detour on background thread
+        Task.Run(() =>
+        {
+            if (!_disposed)
+            {
         _visualDetour = typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic)
                                       .CreateDetour<Visual, Visual>(AddVisualChild);
+            }
+        }).FireAndForget(logOnFailure: true);
 
         // Generate function for WindowFrame.FrameView.get
         get_WindowFrame_FrameView = Type

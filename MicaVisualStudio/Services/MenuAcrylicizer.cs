@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Interop;
@@ -28,7 +29,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     private readonly IGeneral _general;
     private readonly IResourceManager _resource;
 
-    private readonly ILHook _sourceDetour;
+    private ILHook _sourceDetour;
 
     public MenuAcrylicizer(ILogger logger, IGeneral general, IResourceManager resource)
     {
@@ -53,9 +54,16 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             return;
         }
 
-        // Generate HwndSouce.RootVisual.set detour
-        _sourceDetour = typeof(HwndSource).GetProperty("RootVisual").SetMethod
+        // Generate HwndSouce.RootVisual.set detour on background thread
+        Task.Run(() =>
+        {
+            if (!_disposed)
+            {
+                _sourceDetour = typeof(HwndSource).GetProperty("RootVisual")
+                                                  .SetMethod
                                           .CreateDetour<HwndSource, Visual>(RootVisualChanged);
+    }
+        }).FireAndForget(logOnFailure: true);
     }
 
     public void RootVisualChanged(HwndSource instance, Visual value)

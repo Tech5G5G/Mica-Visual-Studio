@@ -37,19 +37,19 @@ public class BackdropManager : IBackdropManager
         RefreshPreferences(firstTime: true);
     }
 
-    private void OnOptionChanged(object sender, PropertyChangedEventArgs args)
+    private void OnOptionChanged(object sender, PropertyChangedEventArgs e)
     {
         RefreshPreferences(firstTime: false);
     }
 
-    private void OnThemeChanged(object sender, Theme args)
+    private void OnThemeChanged(object sender, Theme e)
     {
         RefreshPreferences(firstTime: false);
     }
 
-    private void OnWindowOpened(object sender, WindowActionEventArgs args)
+    private void OnWindowOpened(object sender, WindowActionEventArgs e)
     {
-        ApplyWindowPreferences(args.WindowHandle, args.Window, firstTime: true);
+        ApplyWindowPreferences(e.WindowHandle, e.Window, firstTime: true);
     }
 
     private void ApplyWindowPreferences(nint handle, Window window, bool firstTime)

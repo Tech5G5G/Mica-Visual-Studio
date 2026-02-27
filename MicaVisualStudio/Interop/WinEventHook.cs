@@ -200,5 +200,5 @@ public class EventOccuredEventArgs(int eventConst, IntPtr hWnd, int idObject, in
 /// Represents the handler for the <see cref="WinEventHook.EventOccurred"/> event.
 /// </summary>
 /// <param name="sender">The <see cref="WinEventHook"/> that generated the event.</param>
-/// <param name="args">The <see cref="EventOccuredEventArgs"/> to go along with the event.</param>
-public delegate void EventOccuredEventHandler(WinEventHook sender, EventOccuredEventArgs args);
+/// <param name="e">The <see cref="EventOccuredEventArgs"/> to go along with the event.</param>
+public delegate void EventOccuredEventHandler(WinEventHook sender, EventOccuredEventArgs e);

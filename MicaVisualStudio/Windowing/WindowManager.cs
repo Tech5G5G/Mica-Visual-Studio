@@ -92,7 +92,7 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
         }
     }
 
-    private void OnWindowLoaded(object sender, RoutedEventArgs args)
+    private void OnWindowLoaded(object sender, RoutedEventArgs e)
     {
         if (sender is Window window)
         {
@@ -107,7 +107,7 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
         }
     }
 
-    private void OnWindowUnloaded(object sender, RoutedEventArgs args)
+    private void OnWindowUnloaded(object sender, RoutedEventArgs e)
     {
         if (sender is Window window)
         {
@@ -116,15 +116,15 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
         }
     }
 
-    private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs args)
+    private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
     {
-        if (!_handles.Contains(args.WindowHandle) && // Prefer WPF over WinEventHook and avoid duplicates
-            WindowHelper.GetWindowStyles(args.WindowHandle).HasFlag(Interop.WindowStyle.Caption)) // Check window for title bar
+        if (!_handles.Contains(e.WindowHandle) && // Prefer WPF over WinEventHook and avoid duplicates
+            WindowHelper.GetWindowStyles(e.WindowHandle).HasFlag(Interop.WindowStyle.Caption)) // Check window for title bar
         {
-            _handles.Add(args.WindowHandle);
+            _handles.Add(e.WindowHandle);
 
-            var window = HwndSource.FromHwnd(args.WindowHandle) is HwndSource source ? source.RootVisual as Window : null;
-            WindowOpened?.Invoke(this, new(args.WindowHandle, window));
+            var window = HwndSource.FromHwnd(e.WindowHandle) is HwndSource source ? source.RootVisual as Window : null;
+            WindowOpened?.Invoke(this, new(e.WindowHandle, window));
         }
     }
 
@@ -140,13 +140,13 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
     void IVsWindowFrameEvents.OnFrameCreated(IVsWindowFrame frame)
     {
         _frames.Add(frame);
-        FrameCreated?.Invoke(frame, args: null);
+        FrameCreated?.Invoke(frame, e: null);
     }
 
     void IVsWindowFrameEvents.OnFrameDestroyed(IVsWindowFrame frame)
     {
         _frames.Remove(frame);
-        FrameDestroyed?.Invoke(frame, args: null);
+        FrameDestroyed?.Invoke(frame, e: null);
     }
 
     void IVsWindowFrameEvents.OnFrameIsVisibleChanged(IVsWindowFrame frame, bool newIsVisible)

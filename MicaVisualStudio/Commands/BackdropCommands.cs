@@ -14,12 +14,12 @@ public abstract class BackdropCommand(DIToolkitPackage package, IGeneral general
 
     private readonly IGeneral _general = general;
 
-    protected async override Task ExecuteAsync(OleMenuCmdEventArgs args)
+    protected async override Task ExecuteAsync(OleMenuCmdEventArgs e)
     {
         _general.Backdrop = Backdrop;
     }
 
-    protected override void BeforeQueryStatus(EventArgs args)
+    protected override void BeforeQueryStatus(EventArgs e)
     {
         Command.Checked = _general.Backdrop == Backdrop;
     }

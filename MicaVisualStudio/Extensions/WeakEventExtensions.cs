@@ -118,9 +118,9 @@ public static class WeakEventExtensions
     {
         WeakEventManager<T, RoutedEventArgs>.AddHandler(source, routedEvent.Name, Handler);
 
-        void Handler(object sender, RoutedEventArgs args)
+        void Handler(object sender, RoutedEventArgs e)
         {
-            handler(sender, args);
+            handler(sender, e);
             WeakEventManager<T, RoutedEventArgs>.RemoveHandler(source, routedEvent.Name, Handler);
         }
     }
@@ -153,7 +153,7 @@ public static class WeakEventExtensions
         PropertyChangeNotifier notifier = new(source, property);
         notifier.ValueChanged += ValueChanged;
 
-        void ValueChanged(object sender, EventArgs args)
+        void ValueChanged(object sender, EventArgs e)
         {
             if (sender is PropertyChangeNotifier notifier)
             {

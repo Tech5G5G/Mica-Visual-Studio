@@ -9,7 +9,7 @@ namespace MicaVisualStudio;
 [Command(PackageIds.MoreCommandId)]
 public sealed class MoreCommand(DIToolkitPackage package) : BaseDICommand(package)
 {
-    protected override async Task ExecuteAsync(OleMenuCmdEventArgs args)
+    protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
     {
         await VS.Settings.OpenAsync<OptionsProvider.GeneralOptions>();
     }

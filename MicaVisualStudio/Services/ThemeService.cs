@@ -32,7 +32,7 @@ public class ThemeService : IThemeService, IDisposable
             == 1 /* TRUE */ ? Theme.Light : Theme.Dark;
     }
 
-    private void OnPreferenceChanging(object sender, UserPreferenceChangingEventArgs args)
+    private void OnPreferenceChanging(object sender, UserPreferenceChangingEventArgs e)
     {
         SystemThemeChanged?.Invoke(this, _theme = GetSystemTheme());
     }

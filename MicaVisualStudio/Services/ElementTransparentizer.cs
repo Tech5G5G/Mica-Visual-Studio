@@ -202,13 +202,13 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         }
     }
 
-    private void OnWindowOpened(object sender, WindowActionEventArgs args)
+    private void OnWindowOpened(object sender, WindowActionEventArgs e)
     {
         try
         {
-        if (args.Window is not null)
+            if (e.Window is not null)
         {
-            StyleWindow(args.Window);
+                StyleWindow(e.Window);
         }
     }
         catch (Exception ex)

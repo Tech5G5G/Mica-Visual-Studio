@@ -18,9 +18,9 @@ public class InfoBarService : IInfoBarService
         VS.Events.ShellEvents.MainWindowVisibilityChanged += OnMainWindowVisibilityChanged;
     }
 
-    private void OnMainWindowVisibilityChanged(bool args)
+    private void OnMainWindowVisibilityChanged(bool e)
     {
-        _isAvailable = args;
+        _isAvailable = e;
 
         while (_models.Count > 0)
         {

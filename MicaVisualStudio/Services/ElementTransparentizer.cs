@@ -645,6 +645,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             case "targetAndSourceBranchPickers":
                 panel.Background = Brushes.Transparent;
                 return;
+
+            // Full-screen title bar
+            case "MenuBarDockPanel":
+                panel.Background = Brushes.Transparent;
+                return;
         }
 
         switch (panel.GetType().FullName)

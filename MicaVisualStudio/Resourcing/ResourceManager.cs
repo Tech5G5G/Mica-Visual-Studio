@@ -136,7 +136,7 @@ public class ResourceManager : IResourceManager
 
     private Color DetermineColor(Color color, ResourceConfiguration config)
     {
-        if (!config.IsTranslucent || (config.TransparentIfGray && color.IsGray()))
+        if (!config.IsTranslucent || (config.TransparentIfGray && color.IsGray))
         {
             return _theme == Theme.Light ? TransparentWhite : TranslucentBlack;
         }

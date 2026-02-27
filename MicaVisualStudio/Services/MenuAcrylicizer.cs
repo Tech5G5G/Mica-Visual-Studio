@@ -40,7 +40,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 
         // Add brushes
         resource.CustomResources.Add(PopupBackgroundKey, new(SolidBackgroundFillTertiaryKey, (t, c) =>
-            new SolidColorBrush(t == Theme.Light || !c.IsGray() ?
+            new SolidColorBrush(t == Theme.Light || !c.IsGray ?
                 c with { A = 0xFF / 4 /* 25% opacity */ } :
                 Color.FromArgb(0x01, 0x00, 0x00, 0x00)))); // Full acrylic experience for those who can handle it
 
@@ -134,7 +134,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 
         WindowHelper.EnableWindowBlur(
             source.Handle,
-            fallback: _resource.VisualStudioTheme == Theme.Dark && color.IsGray() ?
+            fallback: _resource.VisualStudioTheme == Theme.Dark && color.IsGray ?
                 System.Drawing.Color.FromArgb(0x2C, 0x2C, 0x2C) : // Dark mode acrylic fallback
                 System.Drawing.Color.FromArgb(color.R, color.G, color.B),
             enable: true);

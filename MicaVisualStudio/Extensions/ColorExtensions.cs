@@ -5,16 +5,11 @@
 /// </summary>
 public static class ColorExtensions
 {
-    /// <summary>
-    /// Determines whether the specified <paramref name="color"/> is a shade of gray.
-    /// </summary>
-    /// <param name="color">A <see cref="Color"/> to check the grayness of.</param>
-    /// <returns>
-    /// Whether or not the specified <paramref name="color"/>'s
-    /// <see cref="Color.R"/>, <see cref="Color.G"/>, and <see cref="Color.B"/> channels are equal.
-    /// </returns>
-    public static bool IsGray(this Color color)
+    extension(Color color)
     {
-        return color.R == color.G && color.G == color.B;
+        /// <summary>
+        /// Gets whether the <see cref="Color"/> is a shade of gray.
+        /// </summary>
+        public bool IsGray => color.R == color.G && color.G == color.B;
     }
 }

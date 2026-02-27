@@ -169,6 +169,8 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
         await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+        await General.GetLiveInstanceAsync();
+
         await base.InitializeAsync(cancellationToken, progress);
 
         // If this fails, welp

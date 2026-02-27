@@ -18,8 +18,10 @@ public class ThemeService : IThemeService, IDisposable
     public Theme SystemTheme => _theme;
     private Theme _theme = GetSystemTheme();
 
-    public ThemeService() =>
+    public ThemeService()
+    {
         SystemEvents.InvokeOnEventsThread(new Action(() => SystemEvents.UserPreferenceChanging += OnPreferenceChanging));
+    }
 
     private static Theme GetSystemTheme()
     {
@@ -32,8 +34,7 @@ public class ThemeService : IThemeService, IDisposable
 
     private void OnPreferenceChanging(object sender, UserPreferenceChangingEventArgs args)
     {
-        var theme = _theme = GetSystemTheme();
-        SystemThemeChanged?.Invoke(this, theme);
+        SystemThemeChanged?.Invoke(this, _theme = GetSystemTheme());
     }
 
     #region Dispose

@@ -278,7 +278,17 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             {
                 StyleElementTree(dock);
             }
+        else if (!host.IsLoaded)
+        {
+            host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, e) =>
+            {
+                if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
+                {
+                    StyleElementTree(dock);
         }
+            });
+        }
+    }
 
     public void StyleElementTree(FrameworkElement element)
     {

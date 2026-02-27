@@ -457,7 +457,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 TransparentizeStyle(grid.CellStyle);
                 return;
 
-            // VSIX manfiest editor
+            // VSIX manifest editor
             case "VsixEditorControl":
                 control.Background = Brushes.Transparent;
                 foreach (var tab in control.FindDescendants<TabItem>())

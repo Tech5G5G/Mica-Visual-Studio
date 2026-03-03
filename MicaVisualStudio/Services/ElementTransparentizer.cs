@@ -194,7 +194,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         try
         {
             if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Skip other types
-            instance is FrameworkElement element && GetIsTracked(element))
+                instance is FrameworkElement element && GetIsTracked(element))
             {
                 s_transparentizer.StyleElementTree(element);
             }
@@ -209,11 +209,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         try
         {
-        if (isOnScreen)
-        {
-            StyleWindowFrame(frame);
+            if (isOnScreen)
+            {
+                StyleWindowFrame(frame);
+            }
         }
-    }
         catch (Exception ex)
         {
             _logger.Output(ex);
@@ -224,11 +224,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         try
         {
-        if (newFrame is not null)
-        {
-            StyleWindowFrame(newFrame);
+            if (newFrame is not null)
+            {
+                StyleWindowFrame(newFrame);
+            }
         }
-    }
         catch (Exception ex)
         {
             _logger.Output(ex);
@@ -240,10 +240,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         try
         {
             if (e.Window is not null)
-        {
+            {
                 StyleWindow(e.Window);
+            }
         }
-    }
         catch (Exception ex)
         {
             _logger.Output(ex);
@@ -258,13 +258,13 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             {
                 try
                 {
-                StyleWindow(window);
-            }
+                    StyleWindow(window);
+                }
                 catch (Exception ex)
                 {
                     _logger.Output(ex);
-        }
-    }
+                }
+            }
         }
     }
 
@@ -279,38 +279,38 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         {
             try
             {
-            StyleWindowFrame(frame);
-        }
+                StyleWindowFrame(frame);
+            }
             catch (Exception ex)
             {
                 _logger.Output(ex);
-    }
+            }
         }
     }
 
     public void StyleWindowFrame(IVsWindowFrame frame)
     {
-            if (get_WindowFrame_FrameView(frame) is not DependencyObject view)
-            {
-                return;
-            }
+        if (get_WindowFrame_FrameView(frame) is not DependencyObject view)
+        {
+            return;
+        }
 
-            if (view.GetValue(View_ContentProperty) is not Grid host)
-            {
-                WeakReference<IVsWindowFrame> weakFrame = new(frame);
+        if (view.GetValue(View_ContentProperty) is not Grid host)
+        {
+            WeakReference<IVsWindowFrame> weakFrame = new(frame);
 
-                view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, e) =>
+            view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, e) =>
+            {
+                if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
                 {
-                    if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
-                    {
-                        StyleWindowFrame(frame);
-                    }
-                });
-            }
-            else if (host.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
-            {
-                StyleElementTree(dock);
-            }
+                    StyleWindowFrame(frame);
+                }
+            });
+        }
+        else if (host.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
+        {
+            StyleElementTree(dock);
+        }
         else if (!host.IsLoaded)
         {
             host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, e) =>
@@ -318,14 +318,14 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
                 {
                     StyleElementTree(dock);
-        }
+                }
             });
         }
     }
 
     public void StyleElementTree(FrameworkElement element)
     {
-            StyleTree(element.FindDescendants<FrameworkElement>().Append(element));
+        StyleTree(element.FindDescendants<FrameworkElement>().Append(element));
     }
 
     public void StyleTree(IEnumerable<FrameworkElement> tree)
@@ -528,7 +528,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // AppxManifest editor
             case "MainTabControl"
             when control.GetVisualOrLogicalParent()?
-                                              .GetVisualOrLogicalParent() is Grid { Name: "LayoutRoot" } root:
+                        .GetVisualOrLogicalParent() is Grid { Name: "LayoutRoot" } root:
                 control.Background = root.Background = Brushes.Transparent;
                 return;
 
@@ -568,8 +568,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Commit history
             case "historyView"
             when control.GetVisualOrLogicalParent()?
-                                           .GetVisualOrLogicalParent()?
-                                           .GetVisualOrLogicalParent() is Border history:
+                        .GetVisualOrLogicalParent()?
+                        .GetVisualOrLogicalParent() is Border history:
                 history.Background = Brushes.Transparent;
                 goto GitWindow;
 
@@ -586,9 +586,9 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Git branch selector
             case "branchesList"
             when control.GetVisualOrLogicalParent()?
-                                            .GetVisualOrLogicalParent()?
-                                            .GetVisualOrLogicalParent()?
-                                            .GetVisualOrLogicalParent() is Control branches:
+                        .GetVisualOrLogicalParent()?
+                        .GetVisualOrLogicalParent()?
+                        .GetVisualOrLogicalParent() is Control branches:
                 branches.Background = Brushes.Transparent;
                 return;
 
@@ -607,7 +607,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Commit diff info
             case "pageContentViewer"
             when control.GetVisualOrLogicalParent()?
-                                                 .GetVisualOrLogicalParent() is Border viewer:
+                        .GetVisualOrLogicalParent() is Border viewer:
                 viewer.Background = Brushes.Transparent;
                 return;
 
@@ -671,7 +671,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Commit diff
             case "detailsViewMainGrid"
             when panel.GetVisualOrLogicalParent()?
-                                                 .GetVisualOrLogicalParent() is Border details:
+                      .GetVisualOrLogicalParent() is Border details:
                 details.Background = Brushes.Transparent;
                 return;
 
@@ -886,7 +886,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             _source.Dispose();
 
             s_transparentizer = null;
-            Interlocked.Exchange(ref _visualDetour, null)?.Dispose();
+            Interlocked.Exchange(ref _visualHook, null)?.Dispose();
 
             _window.FrameIsOnScreenChanged -= OnFrameIsOnScreenChanged;
             _window.ActiveFrameChanged -= OnActiveFrameChanged;

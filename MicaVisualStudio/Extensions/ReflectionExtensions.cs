@@ -11,12 +11,13 @@ namespace MicaVisualStudio.Extensions;
 
 public static class ReflectionExtensions
 {
-    public static ILHook CreateDetour<T1, T2>(this MethodInfo info, Action<T1, T2> action)
+    public static ILHook CreateHook<T1, T2>(this MethodInfo info, Action<T1, T2> action)
     {
         return new(info, context =>
         {
             ILCursor cursor = new(context);
-            cursor.Index = cursor.Instrs.Count - 1; // Move cursor to end, but before return
+            cursor.Index = cursor.Instrs.Count - 1; // Move cursor to end,
+                                                    // but before final return
 
             cursor.Emit(OpCodes.Ldarg_0); // this
             cursor.Emit(OpCodes.Ldarg_1); // First parameter

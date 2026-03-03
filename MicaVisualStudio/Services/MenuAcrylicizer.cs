@@ -49,7 +49,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
                 c with { A = 0xFF / 4 /* 25% opacity */ } :
                 Color.FromArgb(0x01, 0x00, 0x00, 0x00)))); // Full acrylic experience for those who can handle it
 
-        resource.CustomResources.Add(PopupBorderKey, new(baseResourceKey: null, (t, c) =>
+        resource.CustomResources.Add(PopupBorderKey, new(baseResourceKey: null, (t, _) =>
             new SolidColorBrush(t == Theme.Light ? Color.FromArgb(0x20, 0x000, 0x00, 0x00) : Color.FromArgb(0x55, 0x000, 0x00, 0x00))));
 
         resource.AddCustomResources();

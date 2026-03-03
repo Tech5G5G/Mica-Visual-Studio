@@ -138,7 +138,7 @@ public static class WeakEventExtensions
     public static void AddWeakPropertyChangeHandler(this DependencyObject source, DependencyProperty property, EventHandler handler)
     {
         PropertyChangeNotifier notifier = new(source, property);
-        notifier.ValueChanged += (s, e) => handler((s as PropertyChangeNotifier).PropertySource, EventArgs.Empty);
+        notifier.ValueChanged += (s, _) => handler((s as PropertyChangeNotifier).PropertySource, EventArgs.Empty);
     }
 
     /// <summary>

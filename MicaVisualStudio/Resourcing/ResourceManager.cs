@@ -39,7 +39,7 @@ public class ResourceManager : IResourceManager
         _shell5 = shell5;
 
         GetTheme(out _theme);
-        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (s, e) =>
+        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (_, e) =>
         {
             // Listen for new dictionaries
             if (e.Action is not (NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace))

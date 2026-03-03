@@ -77,7 +77,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         _resource = resource;
 
         // Add layered brush
-        resource.CustomResources.Add(LayeredBrushKey, new(SolidBackgroundFillTertiaryKey, (t, c) =>
+        resource.CustomResources.Add(LayeredBrushKey, new(SolidBackgroundFillTertiaryKey, (_, c) =>
             new SolidColorBrush(c with { A = 0xFF / 2 /* 50% opacity */ })));
         resource.AddCustomResources();
 
@@ -118,7 +118,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         EventManager.RegisterClassHandler(
             dockType,
             FrameworkElement.LoadedEvent,
-            new RoutedEventHandler((s, e) =>
+            new RoutedEventHandler((s, _) =>
             {
                 try
                 {
@@ -137,7 +137,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             EventManager.RegisterClassHandler(
                 hostType,
                 FrameworkElement.LoadedEvent,
-                new RoutedEventHandler((s, e) =>
+                new RoutedEventHandler((s, _) =>
                 {
                     try
                     {
@@ -299,7 +299,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         {
             WeakReference<IVsWindowFrame> weakFrame = new(frame);
 
-            view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, e) =>
+            view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, _) =>
             {
                 if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
                 {
@@ -313,7 +313,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         }
         else if (!host.IsLoaded)
         {
-            host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, e) =>
+            host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, _) =>
             {
                 if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
                 {
@@ -421,14 +421,14 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         SetIsTracked(tab, value: true);
         WeakReference<TabItem> weakTab = new(tab);
 
-        tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, (s, e) =>
+        tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, (s, _) =>
         {
             if (s is TabItem tab)
             {
                 StyleTabItem(tab);
             }
         });
-        view.AddPropertyChangeHandler(View_IsActiveProperty, (s, e) =>
+        view.AddPropertyChangeHandler(View_IsActiveProperty, (_, _) =>
         {
             if (weakTab.TryGetTarget(out TabItem tab))
             {

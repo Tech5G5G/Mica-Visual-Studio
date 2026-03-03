@@ -36,7 +36,7 @@ public class Logger(IVsActivityLog log, IInfoBarService service) : ILogger
 
     public void InfoBar(string message, ImageMoniker image)
     {
-        _service.EnqueueInfoBarModel(new($"[{Assembly.GetCallingAssembly().GetName().Name}] {message}", image));
+        _service.EnqueueModel(new($"[{Assembly.GetCallingAssembly().GetName().Name}] {message}", image));
         Output(message);
     }
 

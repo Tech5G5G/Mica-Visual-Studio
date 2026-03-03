@@ -35,7 +35,7 @@ public class InfoBarService : IInfoBarService
                   .Forget();
     }
 
-    public void EnqueueInfoBarModel(InfoBarModel model)
+    public void EnqueueModel(InfoBarModel model)
     {
         if (_isAvailable)
         {

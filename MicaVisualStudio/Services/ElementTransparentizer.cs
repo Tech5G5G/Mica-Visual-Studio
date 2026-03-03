@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Collections.Generic;
@@ -46,10 +47,14 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     #endregion
 
+    private static ElementTransparentizer s_transparentizer;
+
     private readonly ILogger _logger;
     private readonly IGeneral _general;
     private readonly IWindowManager _window;
     private readonly IResourceManager _resource;
+
+    private readonly CancellationTokenSource _source = new();
 
     private readonly Func<object, bool> IsDockTarget;
     private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
@@ -58,7 +63,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     private readonly bool _layeredWindows;
 
-    private ILHook _visualDetour;
+    private ILHook _visualHook;
 
     public ElementTransparentizer(
         ILogger logger,
@@ -84,14 +89,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         }
 
         // Generate Visual.AddVisualChild detour on background thread
-        Task.Run(() =>
-        {
-            if (!_disposed)
-            {
-        _visualDetour = typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic)
-                                      .CreateDetour<Visual, Visual>(AddVisualChild);
-            }
-        }).FireAndForget(logOnFailure: true);
+        s_transparentizer = this;
+        Task.Run(CreateHook, _source.Token).FireAndForget(logOnFailure: true);
 
         // Generate function for WindowFrame.FrameView.get
         get_WindowFrame_FrameView = Type
@@ -156,19 +155,53 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         StyleAllWindowFrames();
     }
 
-    private void AddVisualChild(Visual instance, Visual child)
+    private void CreateHook()
     {
+        var token = _source.Token;
+        if (token.IsCancellationRequested)
+        {
+            // Already disposed
+            return;
+        }
+
+        var hook = typeof(Visual).GetMethod("AddVisualChild", BindingFlags.Instance | BindingFlags.NonPublic)
+                                 .CreateHook<Visual, Visual>(AddVisualChild);
+
+        if (token.IsCancellationRequested)
+        {
+            hook.Dispose();
+            return;
+        }
+
+        // Publish hook
+        Interlocked.Exchange(ref _visualHook, hook)?.Dispose();
+
+        // Check if we disposed while setting hook field
+        if (token.IsCancellationRequested)
+        {
+            Interlocked.Exchange(ref _visualHook, null)?.Dispose();
+            return;
+        }
+    }
+
+    private static void AddVisualChild(Visual instance, Visual child)
+    {
+        if (s_transparentizer is null)
+        {
+            return;
+        }
+
         try
         {
             if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Skip other types
             instance is FrameworkElement element && GetIsTracked(element))
             {
-                StyleElementTree(element);
+                s_transparentizer.StyleElementTree(element);
             }
         }
         catch (Exception ex)
         {
-            _logger.Output(ex);
+            s_transparentizer._logger.Output(ex);
         }
     }
 
@@ -849,14 +882,18 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         if (!_disposed)
         {
-            _disposed = true;
+            _source.Cancel();
+            _source.Dispose();
 
-            _visualDetour?.Dispose();
+            s_transparentizer = null;
+            Interlocked.Exchange(ref _visualDetour, null)?.Dispose();
 
             _window.FrameIsOnScreenChanged -= OnFrameIsOnScreenChanged;
             _window.ActiveFrameChanged -= OnActiveFrameChanged;
 
             _window.WindowOpened -= OnWindowOpened;
+
+            _disposed = true;
         }
     }
 

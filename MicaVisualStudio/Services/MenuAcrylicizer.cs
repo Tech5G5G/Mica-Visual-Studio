@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -24,13 +25,17 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     private static readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundBrush);
 
+    private static MenuAcrylicizer s_acrylicizer;
+
     private readonly ILogger _logger;
     private readonly IGeneral _general;
     private readonly IResourceManager _resource;
 
+    private readonly CancellationTokenSource _source = new();
+
     private readonly bool _acrylicMenus;
 
-    private ILHook _sourceDetour;
+    private ILHook _sourceHook;
 
     public MenuAcrylicizer(ILogger logger, IGeneral general, IResourceManager resource)
     {
@@ -52,20 +57,48 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
         // Set flag
         _acrylicMenus = general.AcrylicMenus;
 
-        // Generate HwndSouce.RootVisual.set detour on background thread
-        Task.Run(() =>
-        {
-            if (!_disposed)
-            {
-                _sourceDetour = typeof(HwndSource).GetProperty("RootVisual")
-                                                  .SetMethod
-                                                  .CreateDetour<HwndSource, Visual>(RootVisualChanged);
-            }
-        }).FireAndForget(logOnFailure: true);
+        // Generate HwndSouce.RootVisual.set hook on background thread
+        s_acrylicizer = this;
+        Task.Run(CreateHook, _source.Token).FireAndForget(logOnFailure: true);
     }
 
-    public void RootVisualChanged(HwndSource instance, Visual value)
+    private void CreateHook()
     {
+        var token = _source.Token;
+        if (token.IsCancellationRequested)
+        {
+            // Already disposed
+            return;
+        }
+
+        var hook = typeof(HwndSource).GetProperty("RootVisual")
+                                     .SetMethod
+                                     .CreateHook<HwndSource, Visual>(RootVisualChanged);
+
+        if (token.IsCancellationRequested)
+        {
+            hook.Dispose();
+            return;
+        }
+
+        // Publish hook
+        Interlocked.Exchange(ref _sourceHook, hook)?.Dispose();
+
+        // Check if we disposed while setting hook field
+        if (token.IsCancellationRequested)
+        {
+            Interlocked.Exchange(ref _sourceHook, null)?.Dispose();
+            return;
+        }
+    }
+
+    private static void RootVisualChanged(HwndSource instance, Visual value)
+    {
+        if (s_acrylicizer is null)
+        {
+            return;
+        }
+
         try
         {
             if (value is null || instance.CompositionTarget is null)
@@ -77,7 +110,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
                 root.Parent is Popup popup) // Check if owned by popup
                                             // Popups use separate element as root of HwndSource
             {
-                AcrylicizePopup(popup, instance, root);
+                s_acrylicizer.AcrylicizePopup(popup, instance, root);
             }
             else if (value is not Window) // Avoid already handled values
             {
@@ -86,7 +119,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Output(ex);
+            s_acrylicizer._logger.Output(ex);
         }
     }
 
@@ -184,8 +217,13 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     {
         if (!_disposed)
         {
+            _source.Cancel();
+            _source.Dispose();
+
+            s_acrylicizer = null;
+            Interlocked.Exchange(ref _sourceHook, null)?.Dispose();
+
             _disposed = true;
-            _sourceDetour?.Dispose();
         }
     }
 

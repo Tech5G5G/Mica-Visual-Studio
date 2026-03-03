@@ -123,6 +123,8 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
         { "ContentMouseOver", ResourceConfiguration.Layered },
         { "ContentInactiveSelected", ResourceConfiguration.Layered },
 
+        { "Container", ResourceConfiguration.Default },
+
         { "Wonderbar", ResourceConfiguration.Default },
         { "WonderbarMouseOver", ResourceConfiguration.Layered },
         { "WonderbarTreeInactiveSelected", ResourceConfiguration.Default },

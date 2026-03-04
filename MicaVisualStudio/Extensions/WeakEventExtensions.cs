@@ -1,4 +1,5 @@
-﻿using System.Windows.Data;
+﻿using System.Collections.Generic;
+using System.Windows.Data;
 
 namespace System.Windows;
 
@@ -92,6 +93,15 @@ public class PropertyChangeNotifier : DependencyObject, IDisposable
 /// </summary>
 public static class WeakEventExtensions
 {
+    private static readonly DependencyPropertyKey NotifiersListPropertyKey =
+        DependencyProperty.RegisterAttachedReadOnly(
+            "NotifiersList",
+            typeof(List<PropertyChangeNotifier>),
+            typeof(WeakEventExtensions),
+            new(defaultValue: new List<PropertyChangeNotifier>()));
+
+    private static readonly DependencyProperty NotifiersListProperty = NotifiersListPropertyKey.DependencyProperty;
+
     /// <summary>
     /// Adds the specified <paramref name="handler"/> to the specified <paramref name="routedEvent"/> using <see cref="WeakEventManager"/>.
     /// </summary>
@@ -133,6 +143,8 @@ public static class WeakEventExtensions
     {
         PropertyChangeNotifier notifier = new(source, property);
         notifier.ValueChanged += (s, _) => handler((s as PropertyChangeNotifier).PropertySource, EventArgs.Empty);
+
+        (source.GetValue(NotifiersListProperty) as List<PropertyChangeNotifier>)?.Add(notifier);
     }
 
     /// <summary>
@@ -147,12 +159,17 @@ public static class WeakEventExtensions
         PropertyChangeNotifier notifier = new(source, property);
         notifier.ValueChanged += ValueChanged;
 
+        (source.GetValue(NotifiersListProperty) as List<PropertyChangeNotifier>)?.Add(notifier);
+
         void ValueChanged(object sender, EventArgs e)
         {
             if (sender is PropertyChangeNotifier notifier)
             {
                 handler(notifier.PropertySource, EventArgs.Empty);
+                notifier.ValueChanged -= ValueChanged;
+
                 notifier.Dispose();
+                (source.GetValue(NotifiersListProperty) as List<PropertyChangeNotifier>)?.Remove(notifier);
             }
         }
     }

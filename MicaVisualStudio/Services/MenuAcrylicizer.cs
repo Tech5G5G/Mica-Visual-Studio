@@ -159,13 +159,13 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
         drop.SetResourceReference(Border.BackgroundProperty, PopupBackgroundKey);
         drop.SetResourceReference(Border.BorderBrushProperty, PopupBorderKey);
 
-        WindowHelper.SetCornerPreference(source.Handle, CornerPreference.Round); // Add shadow and corners
-        WindowHelper.EnableWindowBorder(source.Handle, enable: false); // Remove border (we have our own)
+        PInvoke.SetCornerPreference(source.Handle, CornerPreference.Round); // Add shadow and corners
+        PInvoke.EnableWindowBorder(source.Handle, enable: false); // Remove border (we have our own)
 
         // Current popup background color
         var color = (drop.Background as SolidColorBrush)?.Color ?? default;
 
-        WindowHelper.EnableWindowBlur(
+        PInvoke.EnableWindowBlur(
             source.Handle,
             fallback: _resource.VisualStudioTheme == Theme.Dark && color.IsGray ?
                 System.Drawing.Color.FromArgb(0x2C, 0x2C, 0x2C) : // Dark mode acrylic fallback

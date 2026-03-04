@@ -62,7 +62,7 @@ public sealed class WinEventHook : IDisposable
         _hookId = SetWinEventHook((uint)winEvent, (uint)winEvent, IntPtr.Zero, _hook = Procedure, (uint)pid, idThread: 0, (uint)flags);
     }
 
-    private void Procedure(IntPtr hWinEventHook, int eventConst, IntPtr hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
+    private void Procedure(nint hWinEventHook, int eventConst, nint hWnd, int idObject, int idChild, int idEventThread, int dwmsEventTime)
     {
         EventOccurred?.Invoke(this, new(eventConst, hWnd, idObject, idChild, dwmsEventTime));
     }
@@ -166,7 +166,7 @@ public enum EventFlags
 /// <param name="idObject">The ID of the object that generated the <see cref="Interop.Event"/>.</param>
 /// <param name="idChild">The ID of the child that generated the <see cref="Interop.Event"/>.</param>
 /// <param name="dwmsEventTime">The amount of time, in milliseconds, that the <see cref="Interop.Event"/> was generated in.</param>
-public class EventOccuredEventArgs(int eventConst, IntPtr hWnd, int idObject, int idChild, int dwmsEventTime) : EventArgs
+public class EventOccuredEventArgs(int eventConst, nint hWnd, int idObject, int idChild, int dwmsEventTime) : EventArgs
 {
     private const int CHILDID_SELF = 0;
 
@@ -178,7 +178,7 @@ public class EventOccuredEventArgs(int eventConst, IntPtr hWnd, int idObject, in
     /// <summary>
     /// The handle to the window associated with the event.
     /// </summary>
-    public IntPtr WindowHandle { get; } = hWnd;
+    public nint WindowHandle { get; } = hWnd;
 
     /// <summary>
     /// The ID of the object associated with the event.

@@ -460,11 +460,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             return;
         }
 
-        var children = WindowHelper.GetChildren(handle);
+        var children = PInvoke.GetChildren(handle);
 
         if (!sources.Any(children.Contains))
         {
-            WindowHelper.MakeLayered(handle);
+            PInvoke.MakeLayered(handle);
         }
     }
 

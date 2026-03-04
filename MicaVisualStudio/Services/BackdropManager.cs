@@ -64,17 +64,17 @@ public class BackdropManager : IBackdropManager
             window is not null && // Check that window is WPF
             HwndSource.FromHwnd(handle) is HwndSource source)
         {
-            WindowHelper.ExtendFrameIntoClientArea(handle);
+            PInvoke.ExtendFrameIntoClientArea(handle);
             source.CompositionTarget?.BackgroundColor = Colors.Transparent;
 
             // Don't remove caption buttons from windows that need them
             if (window.WindowStyle == System.Windows.WindowStyle.None || window is not DialogWindowBase)
             {
-                WindowHelper.RemoveCaptionButtons(source);
+                PInvoke.RemoveCaptionButtons(source);
             }
         }
 
-        switch (WindowHelper.GetWindowType(window))
+        switch (window.WindowType)
         {
             default:
             case WindowType.Main:
@@ -101,9 +101,9 @@ public class BackdropManager : IBackdropManager
 
         void ApplyWindowAttributes(Theme theme, BackdropType backdrop, CornerPreference corner)
         {
-            WindowHelper.EnableDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
-            WindowHelper.SetBackdropType(handle, window is null && backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
-            WindowHelper.SetCornerPreference(handle, corner);
+            PInvoke.EnableDarkMode(handle, EvaluateTheme(theme) == Theme.Dark);
+            PInvoke.SetBackdropType(handle, window is null && backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
+            PInvoke.SetCornerPreference(handle, corner);
         }
     }
 

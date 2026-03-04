@@ -76,7 +76,7 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
     {
         _handles.AddRange(
             Application.Current.Windows.OfType<Window>()
-                                       .Select(w => w.GetHandle()));
+                                       .Select(w => w.Handle));
     }
 
     private void GetAllWindowFrames()
@@ -96,7 +96,7 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
     {
         if (sender is Window window)
         {
-            var handle = window.GetHandle();
+            var handle = window.Handle;
 
             if (!_handles.Contains(handle))
             {
@@ -119,7 +119,7 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
     private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
     {
         if (!_handles.Contains(e.WindowHandle) && // Prefer WPF over WinEventHook and avoid duplicates
-            WindowHelper.GetWindowStyles(e.WindowHandle).HasFlag(Interop.WindowStyle.Caption)) // Check window for title bar
+            PInvoke.GetWindowStyles(e.WindowHandle).HasFlag(Interop.WindowStyle.Caption)) // Check window for title bar
         {
             _handles.Add(e.WindowHandle);
 
@@ -131,8 +131,8 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
     private void CleanHandles()
     {
         _handles.RemoveAll(h =>
-            !WindowHelper.IsAlive(h) || // Check if alive...
-            WindowHelper.GetProcessId(h) != _pid); // and belongs to current process
+            !PInvoke.IsAlive(h) || // Check if alive...
+            PInvoke.GetProcessId(h) != _pid); // and belongs to current process
     }
 
     #region IVsWindowFrameEvents

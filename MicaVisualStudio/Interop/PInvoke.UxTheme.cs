@@ -2,7 +2,7 @@
 
 namespace MicaVisualStudio.Interop;
 
-internal static partial class PInvoke
+internal partial class PInvoke
 {
     [DllImport("uxtheme.dll", EntryPoint = "#135")]
     private static extern int SetPreferredAppMode(PreferredAppMode preferredAppMode);

@@ -84,7 +84,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
         // Publish hook
         Interlocked.Exchange(ref _sourceHook, hook)?.Dispose();
 
-        // Check if we disposed while setting hook field
+        // Check if we disposed while publishing hook
         if (token.IsCancellationRequested)
         {
             Interlocked.Exchange(ref _sourceHook, null)?.Dispose();
@@ -201,7 +201,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
                 {
                     Point = new(
                         leftPlacement.Point.X + (horizontalOffset * 2), // idk why 2x
-                        leftPlacement.Point.Y - horizontalOffset)
+                        leftPlacement.Point.Y)
                 };
             }
 

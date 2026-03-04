@@ -303,10 +303,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             {
                 try
                 {
-                if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
-                {
-                    StyleWindowFrame(frame);
-                }
+                    if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
+                    {
+                        StyleWindowFrame(frame);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -324,10 +324,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             {
                 try
                 {
-                if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
-                {
-                    StyleElementTree(dock);
-                }
+                    if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
+                    {
+                        StyleElementTree(dock);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -691,6 +691,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
             // Status bar
             case "StatusBarPanel":
+                return;
+
+            // Editor window, loading placeholder 
+            case "StackPanel_LoadingDocumentUI":
+                panel.Background = Brushes.Transparent;
                 return;
 
             // Commit history, toolbar container

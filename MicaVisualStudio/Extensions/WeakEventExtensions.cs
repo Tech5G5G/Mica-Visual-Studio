@@ -92,8 +92,6 @@ public class PropertyChangeNotifier : DependencyObject, IDisposable
 /// </summary>
 public static class WeakEventExtensions
 {
-    #region Events
-
     /// <summary>
     /// Adds the specified <paramref name="handler"/> to the specified <paramref name="routedEvent"/> using <see cref="WeakEventManager"/>.
     /// </summary>
@@ -124,10 +122,6 @@ public static class WeakEventExtensions
             WeakEventManager<T, RoutedEventArgs>.RemoveHandler(source, routedEvent.Name, Handler);
         }
     }
-
-    #endregion
-
-    #region Properties
 
     /// <summary>
     /// Adds a <see cref="PropertyChangeNotifier"/> to the specified <paramref name="property"/>.
@@ -162,6 +156,4 @@ public static class WeakEventExtensions
             }
         }
     }
-
-    #endregion
 }

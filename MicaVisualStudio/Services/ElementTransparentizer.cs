@@ -517,6 +517,12 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 control.Background = Brushes.Transparent;
                 return;
 
+            // Pull Members Up, member list
+            case "MemberSelectionGrid"
+            when control is DataGrid { RowStyle: { } style } grid:
+                grid.RowStyle = SubclassStyle(style);
+                return;
+
             #region Git Windows
 
             case "gitWindowView" or // Git changes window

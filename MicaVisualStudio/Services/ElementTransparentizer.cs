@@ -118,17 +118,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         EventManager.RegisterClassHandler(
             dockType,
             FrameworkElement.LoadedEvent,
-            new RoutedEventHandler((s, _) =>
-            {
-                try
-                {
-                    StyleElementTree(s as Border);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Output(ex);
-                }
-            }));
+            new RoutedEventHandler((s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border))));
 
         if (AppDomain.CurrentDomain.GetAssemblies()
                                    .FirstOrDefault(i => i.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
@@ -137,18 +127,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             EventManager.RegisterClassHandler(
                 hostType,
                 FrameworkElement.LoadedEvent,
-                new RoutedEventHandler((s, _) =>
-                {
-                    try
-                    {
-                        StyleElementTree(s as DockPanel);
+                new RoutedEventHandler((s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel))));
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.Output(ex);
-                    }
-                }));
-        }
 
         // Apply to all visible elements
         StyleAllWindows();
@@ -176,7 +156,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         // Publish hook
         Interlocked.Exchange(ref _visualHook, hook)?.Dispose();
 
-        // Check if we disposed while setting hook field
+        // Check if we disposed while publishing hook
         if (token.IsCancellationRequested)
         {
             Interlocked.Exchange(ref _visualHook, null)?.Dispose();
@@ -186,23 +166,14 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     private static void AddVisualChild(Visual instance, Visual child)
     {
-        if (s_transparentizer is null)
-        {
-            return;
-        }
-
-        try
+        UseTransparentizer(t =>
         {
             if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Skip other types
                 instance is FrameworkElement element && GetIsTracked(element))
             {
-                s_transparentizer.StyleElementTree(element);
-            }
+                t.StyleElementTree(element);
         }
-        catch (Exception ex)
-        {
-            s_transparentizer._logger.Output(ex);
-        }
+        });
     }
 
     private void OnFrameIsOnScreenChanged(IVsWindowFrame frame, bool isOnScreen)
@@ -301,17 +272,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
             view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, _) =>
             {
-                try
-                {
                     if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
                     {
-                        StyleWindowFrame(frame);
+                    UseTransparentizer(t => t.StyleWindowFrame(frame));
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.Output(ex);
-                }
             });
         }
         else if (host.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
@@ -322,17 +286,13 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         {
             host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, _) =>
             {
-                try
+                UseTransparentizer(t =>
                 {
-                    if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
+                    if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), t.IsDockTarget) is Border dock)
                     {
-                        StyleElementTree(dock);
+                        t.StyleElementTree(dock);
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.Output(ex);
-                }
+            });
             });
         }
     }
@@ -439,14 +399,14 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         {
             if (s is TabItem tab)
             {
-                StyleTabItem(tab);
+                UseTransparentizer(t => t.StyleTabItem(tab));
             }
         });
-        view.AddPropertyChangeHandler(View_IsActiveProperty, (_, _) =>
+        view.AddWeakPropertyChangeHandler(View_IsActiveProperty, (_, _) =>
         {
             if (weakTab.TryGetTarget(out TabItem tab))
             {
-                StyleTabItem(tab);
+                UseTransparentizer(t => t.StyleTabItem(tab));
             }
         });
     }
@@ -861,6 +821,23 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         };
         TransparentizeStyle(newStyle);
         return newStyle;
+    }
+
+    private static void UseTransparentizer(Action<ElementTransparentizer> action)
+    {
+        if (s_transparentizer is null)
+        {
+            return;
+        }
+
+        try
+        {
+            action(s_transparentizer);
+        }
+        catch (Exception ex)
+        {
+            s_transparentizer._logger.Output(ex);
+        }
     }
 
     #region IsTrackedProperty

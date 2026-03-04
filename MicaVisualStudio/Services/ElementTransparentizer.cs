@@ -301,9 +301,16 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
             view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, _) =>
             {
+                try
+                {
                 if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
                 {
                     StyleWindowFrame(frame);
+                }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Output(ex);
                 }
             });
         }
@@ -315,9 +322,16 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         {
             host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, _) =>
             {
+                try
+                {
                 if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
                 {
                     StyleElementTree(dock);
+                }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Output(ex);
                 }
             });
         }

@@ -2,9 +2,6 @@
 
 namespace MicaVisualStudio.Interop;
 
-/// <summary>
-/// Specifies the style of a window.
-/// </summary>
 [Flags]
 public enum WindowStyle : uint
 {
@@ -33,9 +30,6 @@ public enum WindowStyle : uint
     VScroll = 0x00200000
 }
 
-/// <summary>
-/// Specifies the extended style of a window.
-/// </summary>
 public enum ExtendedWindowStyle : uint
 {
     AcceptFiles = 0x00000010,

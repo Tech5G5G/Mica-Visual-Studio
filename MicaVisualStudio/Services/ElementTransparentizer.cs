@@ -128,7 +128,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 hostType,
                 FrameworkElement.LoadedEvent,
                 new RoutedEventHandler((s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel))));
-                    }
+        }
 
         // Apply to all visible elements
         StyleAllWindows();
@@ -172,7 +172,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 instance is FrameworkElement element && GetIsTracked(element))
             {
                 t.StyleElementTree(element);
-        }
+            }
         });
     }
 
@@ -272,10 +272,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
             view.AddWeakOneTimePropertyChangeHandler(View_ContentProperty, (s, _) =>
             {
-                    if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
-                    {
+                if (weakFrame.TryGetTarget(out IVsWindowFrame frame))
+                {
                     UseTransparentizer(t => t.StyleWindowFrame(frame));
-                    }
+                }
             });
         }
         else if (host.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
@@ -292,7 +292,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                     {
                         t.StyleElementTree(dock);
                     }
-            });
+                });
             });
         }
     }
@@ -659,7 +659,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             case "StatusBarPanel":
                 return;
 
-            // Editor window, loading placeholder 
+            // Editor window, loading placeholder
             case "StackPanel_LoadingDocumentUI":
                 panel.Background = Brushes.Transparent;
                 return;
@@ -848,29 +848,16 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     #region IsTrackedProperty
 
-    /// <summary>
-    /// Gets the value of the <see cref="IsTrackedProperty"/> attached property from a given <see cref="FrameworkElement"/>.
-    /// </summary>
-    /// <param name="target">The <see cref="FrameworkElement"/> from which to read the property value.</param>
-    /// <returns>The value of the <see cref="IsTrackedProperty"/> attached property.</returns>
     public static bool GetIsTracked(FrameworkElement target)
     {
         return (bool)target.GetValue(IsTrackedProperty);
     }
 
-    /// <summary>
-    /// Sets the value of the <see cref="IsTrackedProperty"/> attached property from a given <see cref="FrameworkElement"/>.
-    /// </summary>
-    /// <param name="target">The <see cref="FrameworkElement"/> on which to set the attached property.</param>
-    /// <param name="value">The property value to set.</param>
     public static void SetIsTracked(FrameworkElement target, bool value)
     {
         target.SetValue(IsTrackedProperty, value);
     }
 
-    /// <summary>
-    /// Identifies the MicaVisualStudio.Services.ElementTransparentizer.IsTracked dependency property.
-    /// </summary>
     public static readonly DependencyProperty IsTrackedProperty =
         DependencyProperty.RegisterAttached("IsTracked", typeof(bool), typeof(ElementTransparentizer), new(defaultValue: false));
 

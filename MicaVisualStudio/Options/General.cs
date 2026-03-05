@@ -29,9 +29,6 @@ internal partial class OptionsProvider
     }
 }
 
-/// <summary>
-/// Represents the options used by Mica Visual Studio.
-/// </summary>
 public class General : ObservableOptionModel<General>, IGeneral
 {
     [OverrideDataType(SettingDataType.Int32)]

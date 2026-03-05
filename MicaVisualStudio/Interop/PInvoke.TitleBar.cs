@@ -82,21 +82,12 @@ namespace MicaVisualStudio.Interop
 #pragma warning restore 0649
         }
 
-        /// <summary>
-        /// Gets the height, in pixels, of the specified <paramref name="hWnd"/>'s title bar.
-        /// </summary>
-        /// <param name="hWnd">A handle to a window.</param>
-        /// <returns>The height of the specified <paramref name="hWnd"/>'s title bar.</returns>
         public static int GetTitleBarHeight(nint hWnd)
         {
             GetWindowAttribute(hWnd, DWMWA_CAPTION_BUTTON_BOUNDS, out RECT bounds, (uint)Marshal.SizeOf<RECT>());
             return bounds.bottom - bounds.top;
         }
 
-        /// <summary>
-        /// Patches the specified <paramref name="source"/> to remove its caption buttons but retain system menu functionality.
-        /// </summary>
-        /// <param name="source">An <see cref="HwndSource"/> to patch.</param>
         public static void RemoveCaptionButtons(HwndSource source)
         {
             var type = (source.RootVisual as Window).WindowType;

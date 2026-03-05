@@ -72,43 +72,24 @@ internal partial class PInvoke
 #pragma warning restore 0649
     }
 
-    /// <summary>
-    /// Extends the frame of the specified <paramref name="hWnd"/> into its client area.
-    /// </summary>
-    /// <param name="hWnd">A handle to a window.</param>
     public static void ExtendFrameIntoClientArea(nint hWnd)
     {
         MARGINS margins = new() { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
         ExtendFrameIntoClientArea(hWnd, ref margins);
     }
 
-    /// <summary>
-    /// Enables or disables dark mode for the specified <paramref name="hWnd"/>.
-    /// </summary>
-    /// <param name="hWnd">A handle to a window.</param>
-    /// <param name="enable">Whether or not to enable dark mode.</param>
     public static void EnableDarkMode(nint hWnd, bool enable)
     {
         var mode = enable ? 1u : 0;
         SetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref mode, sizeof(uint));
     }
 
-    /// <summary>
-    /// Sets the <see cref="CornerPreference"/> of the specified <paramref name="hWnd"/>.
-    /// </summary>
-    /// <param name="hWnd">A handle to a window.</param>
-    /// <param name="preference">The <see cref="CornerPreference"/> to set.</param>
     public static void SetCornerPreference(nint hWnd, CornerPreference preference)
     {
         var corner = (uint)preference;
         SetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref corner, sizeof(uint));
     }
 
-    /// <summary>
-    /// Sets the <see cref="BackdropType"/> of the specified <paramref name="hWnd"/>.
-    /// </summary>
-    /// <param name="hWnd">A handle to a window.</param>
-    /// <param name="backdrop">The <see cref="BackdropType"/> to set.</param>
     public static void SetBackdropType(nint hWnd, BackdropType backdrop)
     {
         var type = (uint)(backdrop == BackdropType.Glass ? BackdropType.None : backdrop);
@@ -117,22 +98,12 @@ internal partial class PInvoke
         EnableWindowTransparency(hWnd, enable: backdrop == BackdropType.Glass);
     }
 
-    /// <summary>
-    /// Shows or hides the border of the specified <paramref name="hWnd"/>.
-    /// </summary>
-    /// <param name="hWnd">A handle to a window.</param>
-    /// <param name="enable">Whether or not to show the border.</param>
     public static void EnableWindowBorder(nint hWnd, bool enable)
     {
         var color = enable ? DWMWA_COLOR_DEFAULT : DWMWA_COLOR_NONE;
         SetWindowAttribute(hWnd, DWMWA_BORDER_COLOR, ref color, sizeof(uint));
     }
 
-    /// <summary>
-    /// Enables or disables transparency for the specified <paramref name="hWnd"/>.
-    /// </summary>
-    /// <param name="hWnd">A handle to a window.</param>
-    /// <param name="enable">Whether or not to enable transparency.</param>
     public static void EnableWindowTransparency(nint hWnd, bool enable)
     {
         DWM_BLURBEHIND bb = new()
@@ -145,12 +116,6 @@ internal partial class PInvoke
         _ = EnableBlurBehindWindow(hWnd, ref bb);
     }
 
-    /// <summary>
-    /// Enables or disables a blur effect used as the specified <paramref name="hWnd"/>'s background.
-    /// </summary>
-    /// <param name="hWnd">A handle to a window.</param>
-    /// <param name="fallback">A fallback <see cref="Color"/> to use if blurring is not available.</param>
-    /// <param name="enable">Whether or not to enable blurring.</param>
     public static void EnableWindowBlur(nint hWnd, Color fallback, bool enable)
     {
         AccentPolicy policy = new()

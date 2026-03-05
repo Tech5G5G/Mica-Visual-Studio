@@ -7,14 +7,8 @@ namespace MicaVisualStudio.Services;
 
 public class ThemeService : IThemeService, IDisposable
 {
-    /// <summary>
-    /// Occurs when <see cref="SystemTheme"/> has changed.
-    /// </summary>
     public event EventHandler<Theme> SystemThemeChanged;
 
-    /// <summary>
-    /// Gets the current <see cref="Theme"/> used by the system.
-    /// </summary>
     public Theme SystemTheme => _theme;
     private Theme _theme = GetSystemTheme();
 

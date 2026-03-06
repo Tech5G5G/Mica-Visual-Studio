@@ -641,6 +641,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             when control.FindDescendant<Grid>() is { } grid:
                 grid.Background = Brushes.Transparent;
                 break;
+
+            // Memory layout
+            case "Microsoft.VisualStudio.VC.MemoryViewer.MemoryViewerControl":
+                control.Resources.MergedDictionaries.Clear();
+                break;
         }
     }
 
@@ -724,6 +729,14 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Commit diff view
             case "Microsoft.VisualStudio.Differencing.Package.DiffControl":
                 panel.Background = Brushes.Transparent;
+                break;
+
+            // Memory layout, item list
+            case "Microsoft.VisualStudio.VC.MemoryViewer.MemoryLayoutCanvas"
+            when panel.FindDescendant<Line>() is null &&
+                panel.GetType().GetProperty("FontBrush", BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public) is { } property &&
+                panel.TryFindResource(SolidBackgroundFillTertiaryKey) is Brush brush:
+                property.SetValue(panel, brush);
                 break;
         }
     }

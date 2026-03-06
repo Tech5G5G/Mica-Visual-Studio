@@ -1,7 +1,7 @@
 <h1 align="center">Mica Visual Studio</h1>
 <p align="center"><strong>Enhance your Visual Studio experience with Windows materials</strong></p>
 
-![Mica Visual Studio showcase image](https://github.com/user-attachments/assets/84393113-b591-46fd-9472-dd197f869326)
+![Mica Visual Studio showcase image](https://github.com/user-attachments/assets/784a10cb-dc1c-4ccf-b463-58ee73c16c2e)
 
 ## Overview
 

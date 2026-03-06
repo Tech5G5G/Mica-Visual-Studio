@@ -119,7 +119,7 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
     private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
     {
         if (!_handles.Contains(e.WindowHandle) && // Prefer WPF over WinEventHook and avoid duplicates
-            PInvoke.GetWindowStyles(e.WindowHandle).HasFlag(Interop.WindowStyle.Caption)) // Check window for title bar
+            PInvoke.GetWindowStyles(e.WindowHandle).HasFlag(PInvoke.WindowStyle.Caption)) // Check window for title bar
         {
             _handles.Add(e.WindowHandle);
 

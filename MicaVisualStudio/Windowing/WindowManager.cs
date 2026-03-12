@@ -43,7 +43,7 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
     private readonly IVsUIShell7 _shell7;
 
     private readonly WinEventHook _hook;
-    private readonly int _pid = Process.GetCurrentProcess().Id;
+    private readonly int _pid;
 
     private readonly uint _cookie;
 
@@ -55,7 +55,8 @@ public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
         ThreadHelper.ThrowIfNotOnUIThread();
         _cookie = shell7.AdviseWindowFrameEvents(this);
 
-        _hook = new(Event.Foreground, EventFlags.OutOfContext, _pid);
+        using var process = Process.GetCurrentProcess();
+        _hook = new(Event.Foreground, EventFlags.OutOfContext, _pid = process.Id);
         _hook.EventOccurred += OnEventOccurred;
 
         EventManager.RegisterClassHandler(

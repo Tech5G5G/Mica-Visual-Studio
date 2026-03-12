@@ -63,11 +63,6 @@
   <!-- Code files -->
   <ItemGroup>
     <Compile Include="Commands\MoreCommand.cs" />
-    <Compile Include="CommandTable.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CommandTable.vsct</DependentUpon>
-    </Compile>
     <Compile Include="Commands\BackdropCommands.cs" />
     <Compile Include="Contracts\IBackdropManager.cs" />
     <Compile Include="Contracts\IElementTransparentizer.cs" />
@@ -96,48 +91,53 @@
     <Compile Include="Options\ObservableOptionModel.cs" />
     <Compile Include="Options\Theme.cs" />
     <Compile Include="Options\WindowType.cs" />
-    <Compile Include="Resourcing\CustomResource.cs" />
-    <Compile Include="Resourcing\IResourceManager.cs" />
-    <Compile Include="Resourcing\ResourceConfiguration.cs" />
+    <Compile Include="Services\Resourcing\CustomResource.cs" />
+    <Compile Include="Contracts\IResourceManager.cs" />
+    <Compile Include="Services\Resourcing\ResourceConfiguration.cs" />
     <Compile Include="Services\BackdropManager.cs" />
-    <Compile Include="Services\ElementTransparentizer.cs" />
+    <Compile Include="Services\Styling\ElementTransparentizer.cs" />
     <Compile Include="Services\InfoBarService.cs" />
     <Compile Include="Services\Logger.cs" />
-    <Compile Include="Services\MenuAcrylicizer.cs" />
+    <Compile Include="Services\Styling\MenuAcrylicizer.cs" />
     <Compile Include="Services\ThemeService.cs" />
-    <Compile Include="Resourcing\ResourceManager.cs" />
+    <Compile Include="Services\Resourcing\ResourceManager.cs" />
     <Compile Include="UI\Converters\EnumToInt32Converter.cs" />
-    <Compile Include="ViewModels\OptionPageViewModel.cs" />
-    <Compile Include="Windowing\WindowManager.cs" />
+    <Compile Include="UI\ViewModels\OptionPageViewModel.cs" />
+    <Compile Include="Services\Windowing\WindowManager.cs" />
+    <Compile Include="Interop\WinEventHook.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MicaVisualStudioPackage.cs" />
+    <Compile Include="Contracts\IWindowManager.cs" />
+    <Compile Include="Services\Windowing\WindowActionEventArgs.cs" />
+    <Compile Include="Services\Windowing\WindowFrameEventHandler.cs" />
+    <Compile Include="UI\Views\DialogPage.xaml.cs">
+      <DependentUpon>DialogPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\General.cs" />
+    <Compile Include="UI\Views\GeneralPage.xaml.cs">
+      <DependentUpon>GeneralPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\ToolPage.xaml.cs">
+      <DependentUpon>ToolPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CommandTable.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CommandTable.vsct</DependentUpon>
+    </Compile>
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
-    <Compile Include="Interop\WinEventHook.cs" />
-    <Compile Include="Views\DialogPage.xaml.cs">
-      <DependentUpon>DialogPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Options\General.cs" />
-    <Compile Include="Views\GeneralPage.xaml.cs">
-      <DependentUpon>GeneralPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ToolPage.xaml.cs">
-      <DependentUpon>ToolPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MicaVisualStudioPackage.cs" />
-    <Compile Include="Windowing\IWindowManager.cs" />
-    <Compile Include="Windowing\WindowActionEventArgs.cs" />
-    <Compile Include="Windowing\WindowFrameEventHandler.cs" />
   </ItemGroup>
   <!-- XAML files -->
   <ItemGroup>
-    <Page Include="Views\DialogPage.xaml">
+    <Page Include="UI\Views\DialogPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\GeneralPage.xaml">
+    <Page Include="UI\Views\GeneralPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -145,7 +145,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\ToolPage.xaml">
+    <Page Include="UI\Views\ToolPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -201,19 +201,7 @@
     <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.527" />
     <PackageReference Include="Community.VisualStudio.Toolkit.DependencyInjection.Microsoft.17" Version="17.0.27" />
   </ItemGroup>
-  <!-- Projects -->
-  <ItemGroup>
-    <ProjectReference Include="..\MonoMod\MonoMod\src\MonoMod.Utils\MonoMod.Utils.csproj" />
-    <ProjectReference Include="..\MonoMod\MonoMod\src\MonoMod.RuntimeDetour\MonoMod.RuntimeDetour.csproj" />
-  </ItemGroup>
-  <!-- Targets continued -->
+  <!-- Targets, continued -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -85,6 +85,7 @@
     <Compile Include="Interop\PInvoke.cs" />
     <Compile Include="Interop\PInvoke.Dwm.cs" />
     <Compile Include="Interop\PInvoke.Layered.cs" />
+    <Compile Include="Interop\PInvoke.Lineage.cs" />
     <Compile Include="Interop\PInvoke.TitleBar.cs" />
     <Compile Include="Interop\PInvoke.UxTheme.cs" />
     <Compile Include="Interop\PInvoke.WindowLong.cs" />

@@ -28,7 +28,8 @@ namespace MicaVisualStudio.Services;
 
 public class ElementTransparentizer : IElementTransparentizer, IDisposable
 {
-    private const string MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
+    private const string DocOutlineWindowClassName = "VsDocOutlineTool",
+        MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
 
     #region Keys
 
@@ -126,8 +127,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
     {
         // Generate function for WindowFrame.FrameView.get
         getFrameView = Type.GetType("Microsoft.VisualStudio.Platform.WindowManagement.WindowFrame, Microsoft.VisualStudio.Platform.WindowManagement")
-            .GetProperty("FrameView")
-            .CreateGetter<IVsWindowFrame, DependencyObject>();
+                           .GetProperty("FrameView")
+                           .CreateGetter<IVsWindowFrame, DependencyObject>();
 
         // Get View dependency properties
         var viewType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.View, Microsoft.VisualStudio.Shell.ViewManager");
@@ -246,6 +247,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
     {
+        if (PInvoke.GetClassName(PInvoke.GetOwner(e.WindowHandle)) == DocOutlineWindowClassName)
+        {
+            StyleHwnd(e.WindowHandle);
+        }
     }
 
     public void StyleAllWindows()
@@ -390,6 +395,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             if (HwndSource.FromHwnd(child) is { RootVisual: FrameworkElement childElement })
             {
                 StyleElementTree(childElement);
+                layer = false;
+            }
+            // Document Outline window
+            else if (PInvoke.GetClassName(child) == DocOutlineWindowClassName)
+            {
                 layer = false;
             }
         }
@@ -559,6 +569,37 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 grid.RowStyle = SubclassStyle(style);
                 return;
 
+            // Document Outline, root
+            case "DocumentOutline"
+            when control.GetVisualOrLogicalParent() is Panel adapter:
+                Layer(adapter);
+
+                if (!GetIsTracked(adapter))
+                {
+                    adapter.SizeChanged += OnSizeChanged;
+                    SetIsTracked(adapter, value: true);
+                }
+
+                static void OnSizeChanged(object sender, RoutedEventArgs e)
+                {
+                    if (sender is Panel adapter)
+                    {
+                        UseTransparentizer(t => t.Layer(adapter));
+                    }
+                }
+                return;
+
+            // Document Outline, list view
+            case "SymbolTree"
+            when control is TreeView && control.FindDescendant<Rectangle>() is { } rectangle:
+                rectangle.Fill = Brushes.Transparent;
+                return;
+
+            // Document Outline, designer root
+            case "DocumentOutlinePaneHolder":
+                control.Background = Brushes.Transparent;
+                break;
+
             #region Git Windows
 
             case "gitWindowView" or // Git changes window
@@ -719,6 +760,16 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             case "MenuBarDockPanel":
                 panel.Background = Brushes.Transparent;
                 return;
+
+            // Document Outline, designer item container
+            case "SplitterGrid" when panel is Grid grid:
+                Layer(grid);
+
+                foreach (var border in grid.Children.OfType<Border>())
+                {
+                    border.Background = Brushes.Transparent;
+                }
+                break;
         }
 
         switch (panel.GetType().FullName)

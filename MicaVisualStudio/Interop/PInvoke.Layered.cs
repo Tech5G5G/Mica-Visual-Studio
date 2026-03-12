@@ -10,13 +10,13 @@ internal partial class PInvoke
 
     private const uint LWA_ALPHA = 0x00000002;
 
-    public static void MakeLayered(nint hWnd)
+    public static void AddLayeredAttributes(nint hWnd)
     {
         SetExtendedWindowStyles(hWnd, GetExtendedWindowStyles(hWnd) | ExtendedWindowStyle.Layered);
         SetLayeredWindowAttributes(
             hWnd,
             (uint)ColorTranslator.ToWin32(Color.Black),
-            0xFF, // Set opactiy to 100%
+            0xFF, // Set opacity to 100%
             LWA_ALPHA);
     }
 }

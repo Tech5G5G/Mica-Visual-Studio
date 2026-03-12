@@ -375,6 +375,31 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         }
     }
 
+    public void StyleHwnd(nint handle)
+    {
+        if (HwndSource.FromHwnd(handle) is { RootVisual: FrameworkElement element })
+        {
+            StyleElementTree(element);
+            return;
+        }
+
+        var layer = true;
+
+        foreach (var child in PInvoke.GetChildren(handle))
+        {
+            if (HwndSource.FromHwnd(child) is { RootVisual: FrameworkElement childElement })
+            {
+                StyleElementTree(childElement);
+                layer = false;
+            }
+        }
+
+        if (layer)
+        {
+            PInvoke.AddLayeredAttributes(handle);
+        }
+    }
+
     public void StyleDockTarget(Border dock)
     {
         // DockTarget is used in multiple ways
@@ -446,26 +471,9 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         }
 
         var handle = host.Handle;
-
-        if (handle == IntPtr.Zero)
+        if (handle != IntPtr.Zero)
         {
-            return;
-        }
-
-        var sources = PresentationSource.CurrentSources.OfType<HwndSource>()
-                                                       .Select(i => i.Handle)
-                                                       .ToArray();
-
-        if (sources.Contains(handle))
-        {
-            return;
-        }
-
-        var children = PInvoke.GetChildren(handle);
-
-        if (!sources.Any(children.Contains))
-        {
-            PInvoke.MakeLayered(handle);
+            StyleHwnd(handle);
         }
     }
 

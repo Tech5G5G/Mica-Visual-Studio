@@ -19,17 +19,17 @@ using MonoMod.RuntimeDetour;
 using MicaVisualStudio.Interop;
 using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
-using MicaVisualStudio.Windowing;
 using MicaVisualStudio.Extensions;
+using MicaVisualStudio.Services.Windowing;
 using Expression = System.Linq.Expressions.Expression;
-using IResourceManager = MicaVisualStudio.Resourcing.IResourceManager;
+using IResourceManager = MicaVisualStudio.Contracts.IResourceManager;
 
-namespace MicaVisualStudio.Services;
+namespace MicaVisualStudio.Services.Styling;
 
 public class ElementTransparentizer : IElementTransparentizer, IDisposable
 {
     private const string DocOutlineWindowClassName = "VsDocOutlineTool",
-        MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
+                         MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
 
     #region Keys
 
@@ -39,7 +39,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundBrush);
 
     private static readonly ThemeResourceKey TextFillPrimaryKey =
-    new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextFillPrimary", ThemeResourceKeyType.BackgroundBrush);
+        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextFillPrimary", ThemeResourceKeyType.BackgroundBrush);
 
     private static readonly ThemeResourceKey TextOnAccentFillPrimaryKey =
         new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextOnAccentFillPrimary", ThemeResourceKeyType.BackgroundBrush);

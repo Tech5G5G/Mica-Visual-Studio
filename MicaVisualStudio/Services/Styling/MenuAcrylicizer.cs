@@ -13,9 +13,8 @@ using MicaVisualStudio.Options;
 using MicaVisualStudio.Interop;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Extensions;
-using MicaVisualStudio.Resourcing;
 
-namespace MicaVisualStudio.Services;
+namespace MicaVisualStudio.Services.Styling;
 
 public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 {

@@ -121,7 +121,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             new RoutedEventHandler((s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border))));
 
         if (AppDomain.CurrentDomain.GetAssemblies()
-                                   .FirstOrDefault(i => i.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
+                                   .FirstOrDefault(a => a.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
                                    .GetType(MultiViewHostTypeName) is Type hostType)
         {
             EventManager.RegisterClassHandler(
@@ -278,7 +278,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 }
             });
         }
-        else if (host.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
+        else if (host.FindAncestor<DependencyObject>(o => o.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
         {
             StyleElementTree(dock);
         }
@@ -288,7 +288,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             {
                 UseTransparentizer(t =>
                 {
-                    if ((s as Border)?.FindAncestor<DependencyObject>(i => i.GetVisualOrLogicalParent(), t.IsDockTarget) is Border dock)
+                    if ((s as Border)?.FindAncestor<DependencyObject>(o => o.GetVisualOrLogicalParent(), t.IsDockTarget) is Border dock)
                     {
                         t.StyleElementTree(dock);
                     }
@@ -577,10 +577,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             when control is ListView { View: GridView { ColumnHeaderContainerStyle: { } style } grid }:
                 grid.ColumnHeaderContainerStyle = SubclassStyle(style);
 
-                foreach (var c in grid.Columns.Select(i => i.Header).OfType<Control>())
+                foreach (var c in grid.Columns.Select(c => c.Header).OfType<Control>())
                 {
                     c.ApplyTemplate();
-                    c.FindDescendant<Border>(i => i.Name == "HeaderBorder")?.BorderBrush = Brushes.Transparent;
+                    c.FindDescendant<Border>(b => b.Name == "HeaderBorder")?.BorderBrush = Brushes.Transparent;
                 }
                 return;
 
@@ -694,7 +694,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
             // Editor window, bottom container
             case "Microsoft.VisualStudio.Text.Utilities.ContainerMargin"
-            when !panel.FindDescendants<Panel>().Any(i => i.GetType().FullName == "Microsoft.VisualStudio.Text.Utilities.ContainerMargin"):
+            when !panel.FindDescendants<Panel>().Any(p => p.GetType().FullName == "Microsoft.VisualStudio.Text.Utilities.ContainerMargin"):
                 Layer(panel);
                 break;
 
@@ -828,7 +828,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     public Style SubclassStyle(Style style)
     {
-        if (style.Setters.FirstOrDefault(i => (i as Setter)?.Property == IsTrackedProperty) is not null)
+        if (style.Setters.FirstOrDefault(s => (s as Setter)?.Property == IsTrackedProperty) is not null)
         {
             // Style already subclassed
             return style;

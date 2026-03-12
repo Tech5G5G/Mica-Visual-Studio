@@ -130,7 +130,7 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             return;
         }
 
-        if (_acrylicMenus && root.FindDescendant<Border>(i => i.Name == "DropShadowBorder") is { } drop)
+        if (_acrylicMenus && root.FindDescendant<Border>(b => b.Name == "DropShadowBorder") is { } drop)
         {
             AcrylicizePopupInternal(popup, drop, source, root);
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Text;
 using System.Runtime.InteropServices;
 
 namespace MicaVisualStudio.Interop;
@@ -13,9 +12,7 @@ internal static partial class PInvoke
     private static extern uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId);
 
     [DllImport("user32.dll")]
-    private static extern bool EnumChildWindows(nint hWndParent, EnumChildProc lpEnumFunc, nint lParam);
-
-    private delegate bool EnumChildProc(nint hwnd, nint lParam);
+    private static extern int GetClassName(nint hWnd, StringBuilder lpClassName, int nMaxCount);
 
     public static bool IsAlive(nint hWnd)
     {
@@ -28,16 +25,16 @@ internal static partial class PInvoke
         return (int)procId;
     }
 
-    public static IEnumerable<nint> GetChildren(nint hWnd)
+    public static string GetClassName(nint hWnd)
     {
-        List<nint> handles = [];
-        EnumChildWindows(hWnd, Proc, IntPtr.Zero);
-        return handles;
-
-        bool Proc(nint hwnd, nint lParam)
+        StringBuilder builder = new(256);
+        if (GetClassName(hWnd, builder, builder.Capacity) != 0)
         {
-            handles.Add(hwnd);
-            return true;
+            return builder.ToString();
+        }
+        else
+        {
+            return string.Empty;
         }
     }
 }

@@ -37,7 +37,7 @@ public static class ReflectionExtensions
 
     public static DependencyProperty GetDependencyProperty(this Type type, string propertyName)
     {
-        return (DependencyProperty)type.GetField($"{propertyName}Property", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+        return (DependencyProperty)type.GetField(propertyName + "Property", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
                                        .GetValue(null);
     }
 }

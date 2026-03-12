@@ -3,7 +3,7 @@ using System.Windows.Media;
 using Microsoft.VisualStudio.Shell;
 using MicaVisualStudio.Options;
 
-namespace MicaVisualStudio.Resourcing;
+namespace MicaVisualStudio.Services.Resourcing;
 
 public class CustomResource(ThemeResourceKey baseResourceKey, Func<Theme, Color, object> factory)
 {

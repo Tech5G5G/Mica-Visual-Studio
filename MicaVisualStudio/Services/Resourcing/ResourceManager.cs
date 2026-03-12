@@ -10,8 +10,9 @@ using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using MicaVisualStudio.Options;
+using MicaVisualStudio.Contracts;
 
-namespace MicaVisualStudio.Resourcing;
+namespace MicaVisualStudio.Services.Resourcing;
 
 public class ResourceManager : IResourceManager
 {

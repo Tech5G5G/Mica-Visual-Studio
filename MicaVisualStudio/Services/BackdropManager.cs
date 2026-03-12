@@ -7,7 +7,6 @@ using MicaVisualStudio.Options;
 using MicaVisualStudio.Interop;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Services.Windowing;
-using MicaVisualStudio.Resourcing;
 
 namespace MicaVisualStudio.Services;
 

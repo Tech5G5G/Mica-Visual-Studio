@@ -16,7 +16,7 @@ using MicaVisualStudio.Services;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Services;
 using MicaVisualStudio.Services.Windowing;
-using MicaVisualStudio.Resourcing;
+using MicaVisualStudio.Services.Resourcing;
 using MicaVisualStudio.ViewModels;
 using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
 

@@ -1,4 +1,4 @@
-﻿namespace MicaVisualStudio.Resourcing;
+﻿namespace MicaVisualStudio.Services.Resourcing;
 
 public readonly struct ResourceConfiguration(bool transparentIfGray = true, bool translucent = false, byte opacity = 0x38)
 {

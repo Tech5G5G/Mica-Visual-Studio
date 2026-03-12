@@ -692,8 +692,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Git changes...
             case "statusControl" or // Actions/toolbar
                 "inactiveRepoContent" or // Create repo
-                "sectionContainer" or // Branches and tags
-                "amendCheckBox": // Checkbox... for amending...
+                "sectionContainer": // Branches and tags
                 control.Background = Brushes.Transparent;
                 return;
 

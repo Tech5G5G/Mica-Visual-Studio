@@ -87,7 +87,8 @@ public enum Event
     Foreground = 0x0003,
     Create = 0x8000,
     Destroy = 0x8001,
-    Show = 0x8002
+    Show = 0x8002,
+    ParentChange = 0x800F
 }
 
 [Flags]

@@ -876,17 +876,17 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     #region IsTrackedProperty
 
-    public static bool GetIsTracked(FrameworkElement target)
+    private static bool GetIsTracked(FrameworkElement target)
     {
         return (bool)target.GetValue(IsTrackedProperty);
     }
 
-    public static void SetIsTracked(FrameworkElement target, bool value)
+    private static void SetIsTracked(FrameworkElement target, bool value)
     {
         target.SetValue(IsTrackedProperty, value);
     }
 
-    public static readonly DependencyProperty IsTrackedProperty =
+    private static readonly DependencyProperty IsTrackedProperty =
         DependencyProperty.RegisterAttached("IsTracked", typeof(bool), typeof(ElementTransparentizer), new(defaultValue: false));
 
     #endregion

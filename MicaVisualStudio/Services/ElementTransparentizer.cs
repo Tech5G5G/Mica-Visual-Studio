@@ -137,7 +137,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         EventManager.RegisterClassHandler(
             dockType,
             FrameworkElement.LoadedEvent,
-            new RoutedEventHandler((s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border))));
+            new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border))));
 
         if (AppDomain.CurrentDomain.GetAssemblies()
                                    .FirstOrDefault(a => a.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
@@ -146,7 +146,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             EventManager.RegisterClassHandler(
                 hostType,
                 FrameworkElement.LoadedEvent,
-                new RoutedEventHandler((s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel))));
+                new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel))));
         }
     }
 
@@ -299,7 +299,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         }
         else if (!host.IsLoaded)
         {
-            host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, (s, _) =>
+            host.AddWeakOneTimeHandler(FrameworkElement.LoadedEvent, static (s, _) =>
             {
                 UseTransparentizer(t =>
                 {
@@ -410,7 +410,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         SetIsTracked(tab, value: true);
         WeakReference<TabItem> weakTab = new(tab);
 
-        tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, (s, _) =>
+        tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, static (s, _) =>
         {
             if (s is TabItem tab)
             {

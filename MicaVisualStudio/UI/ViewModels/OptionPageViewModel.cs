@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.PlatformUI;
 using MicaVisualStudio.Options;
 
-namespace MicaVisualStudio.ViewModels;
+namespace MicaVisualStudio.UI.ViewModels;
 
 public class OptionPageViewModel(IGeneral general) : ObservableObject
 {

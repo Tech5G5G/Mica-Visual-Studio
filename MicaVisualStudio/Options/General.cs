@@ -2,9 +2,9 @@
 using System.Windows;
 using Microsoft.VisualStudio.Shell;
 using Community.VisualStudio.Toolkit;
-using MicaVisualStudio.Views;
 using MicaVisualStudio.Options;
-using DialogPage = MicaVisualStudio.Views.DialogPage;
+using MicaVisualStudio.UI.Views;
+using DialogPage = MicaVisualStudio.UI.Views.DialogPage;
 
 namespace MicaVisualStudio;
 

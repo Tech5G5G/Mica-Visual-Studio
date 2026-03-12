@@ -14,10 +14,10 @@ using MonoMod.Utils;
 using MicaVisualStudio.Options;
 using MicaVisualStudio.Services;
 using MicaVisualStudio.Contracts;
+using MicaVisualStudio.UI.ViewModels;
 using MicaVisualStudio.Services;
 using MicaVisualStudio.Services.Windowing;
 using MicaVisualStudio.Services.Resourcing;
-using MicaVisualStudio.ViewModels;
 using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
 
 namespace MicaVisualStudio;

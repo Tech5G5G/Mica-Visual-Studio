@@ -3,16 +3,16 @@ using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Community.VisualStudio.Toolkit;
 using Community.VisualStudio.Toolkit.DependencyInjection.Core;
-using MicaVisualStudio.ViewModels;
+using MicaVisualStudio.UI.ViewModels;
 
-namespace MicaVisualStudio.Views
+namespace MicaVisualStudio.UI.Views
 {
     /// <summary>
-    /// Interaction logic for ToolPage.xaml
+    /// Interaction logic for DialogPage.xaml
     /// </summary>
-    public partial class ToolPage : UserControl
+    public partial class DialogPage : UserControl
     {
-        public ToolPage()
+        public DialogPage()
         {
             InitializeComponent();
             DataContext = VS.GetRequiredService<SToolkitServiceProvider<MicaVisualStudioPackage>, IServiceProvider>()

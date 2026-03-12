@@ -1,10 +1,10 @@
-﻿<UserControl x:Class="MicaVisualStudio.Views.DialogPage"
+﻿<UserControl x:Class="MicaVisualStudio.UI.Views.ToolPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:MicaVisualStudio.Views"
-             xmlns:models="clr-namespace:MicaVisualStudio.ViewModels"
+             xmlns:local="clr-namespace:MicaVisualStudio.UI.Views"
+             xmlns:models="clr-namespace:MicaVisualStudio.UI.ViewModels"
              d:DataContext="{d:DesignInstance Type=models:OptionPageViewModel}"
              mc:Ignorable="d">
     <UserControl.Resources>
@@ -14,13 +14,13 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <GroupBox Header="Dialog windows" Style="{StaticResource OptionGroupBoxStyle}">
+        <GroupBox Header="Tool windows" Style="{StaticResource OptionGroupBoxStyle}">
             <StackPanel>
                 <CheckBox x:Name="EnabledCheck"
-                          IsChecked="{Binding General.DialogWindows}"
-                          Content="Enable separate options for dialog windows"
+                          IsChecked="{Binding General.ToolWindows}"
+                          Content="Enable separate options for tool windows"
                           Margin="5,0,0,2" Style="{StaticResource OptionCheckBoxStyle}" />
 
                 <Grid Margin="0,2,0,0" Visibility="{Binding ElementName=EnabledCheck, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -38,7 +38,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Text="Backdrop" Margin="6,0,0,0" Style="{StaticResource TitleTextBlockStyle}" />
-                    <ComboBox SelectedIndex="{Binding General.DialogBackdrop, Converter={StaticResource EnumToInt32Converter}}"
+                    <ComboBox SelectedIndex="{Binding General.ToolBackdrop, Converter={StaticResource EnumToInt32Converter}}"
                               Style="{StaticResource OptionComboBoxStyle}"
                               Grid.Column="2">
                         <ComboBoxItem Content="Auto" Visibility="Collapsed" />
@@ -50,7 +50,7 @@
                     </ComboBox>
 
                     <TextBlock Text="Corner preference" Margin="6,0,0,0" Style="{StaticResource TitleTextBlockStyle}" Grid.Row="2" />
-                    <ComboBox SelectedIndex="{Binding General.DialogCornerPreference, Converter={StaticResource EnumToInt32Converter}}"
+                    <ComboBox SelectedIndex="{Binding General.ToolCornerPreference, Converter={StaticResource EnumToInt32Converter}}"
                               Style="{StaticResource OptionComboBoxStyle}"
                               Grid.Column="2" Grid.Row="2">
                         <ComboBoxItem Content="Default" />
@@ -60,7 +60,7 @@
                     </ComboBox>
 
                     <TextBlock Text="Theme" Margin="6,0,0,0" Style="{StaticResource TitleTextBlockStyle}" Grid.Row="4" />
-                    <ComboBox SelectedIndex="{Binding General.DialogTheme, Converter={StaticResource EnumToInt32Converter}}"
+                    <ComboBox SelectedIndex="{Binding General.ToolTheme, Converter={StaticResource EnumToInt32Converter}}"
                               Style="{StaticResource OptionComboBoxStyle}"
                               Grid.Column="2" Grid.Row="4">
                         <ComboBoxItem Content="Visual Studio" />

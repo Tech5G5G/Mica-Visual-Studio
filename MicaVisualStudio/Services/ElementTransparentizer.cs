@@ -465,7 +465,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             case "OKButton"
             when control is Button &&
                 Window.GetWindow(control) is DialogWindowBase &&
-                control.FindAncestor<FrameworkElement>()?.FindAncestor<Border>() is Border footer:
+                control.GetVisualOrLogicalParent()?
+                       .GetVisualOrLogicalParent() is Border footer:
                 Layer(footer);
                 return;
 

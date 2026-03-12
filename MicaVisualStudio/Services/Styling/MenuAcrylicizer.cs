@@ -129,9 +129,17 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             return;
         }
 
-        if (_acrylicMenus && root.FindDescendant<Border>(b => b.Name == "DropShadowBorder") is { } drop)
+        if (_acrylicMenus)
         {
-            AcrylicizePopupInternal(popup, drop, source, root);
+            if (root.FindDescendant<Border>(b => b.Name == "ContentBorder") is { } content)
+            {
+                content.Background = Brushes.Transparent;
+                content.BorderBrush = Brushes.Transparent;
+            }
+            if (root.FindDescendant<Border>(b => b.Name == "DropShadowBorder") is { } drop)
+            {
+                AcrylicizePopupInternal(popup, drop, source, root);
+            }
         }
         else if (root.FindDescendant<FrameworkElement>()?
                      .FindDescendant<FrameworkElement>()?
@@ -145,8 +153,16 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 
     private void AcrylicizePopupInternal(Popup popup, Border drop, HwndSource source, FrameworkElement root)
     {
-        (root.FindDescendant<ToolTip>() is ToolTip tip ? // Tool tips use themselves for margins
-            tip : drop as FrameworkElement).Margin = default;
+        if (root.FindDescendant<ToolTip>() is ToolTip tip)
+        {
+            // Tool tips use themselves for margins
+            tip.Margin = default;
+        }
+        else
+        {
+            drop.Margin = default;
+            (drop.GetVisualOrLogicalParent() as Grid)?.Margin = default;
+        }
 
         // Check for popup margin accountment
         if (popup.HorizontalOffset == -12)

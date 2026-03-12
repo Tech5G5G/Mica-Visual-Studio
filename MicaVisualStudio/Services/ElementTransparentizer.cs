@@ -92,29 +92,48 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         s_transparentizer = this;
         Task.Run(CreateHook, _source.Token).FireAndForget(logOnFailure: true);
 
-        // Generate function for WindowFrame.FrameView.get
-        get_WindowFrame_FrameView = Type
-            .GetType("Microsoft.VisualStudio.Platform.WindowManagement.WindowFrame, Microsoft.VisualStudio.Platform.WindowManagement")
-            .GetProperty("FrameView")
-            .CreateGetter<IVsWindowFrame, DependencyObject>();
-
-        // Generate DockTarget type check
-        var parameter = Expression.Parameter(typeof(object));
+        // Generate functions and get dependency properties
         var dockType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.Controls.DockTarget, Microsoft.VisualStudio.Shell.ViewManager");
-        IsDockTarget = parameter.TypeIs(dockType)
-                                .Compile<object, bool>(parameter);
+        PerformReflection(dockType, out get_WindowFrame_FrameView, out IsDockTarget, out View_ContentProperty, out View_IsActiveProperty);
 
-        // Get View dependency properties
-        var viewType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.View, Microsoft.VisualStudio.Shell.ViewManager");
-        View_ContentProperty = viewType.GetDependencyProperty("Content");
-        View_IsActiveProperty = viewType.GetDependencyProperty("IsActive");
+        // Listen to dependency object events
+        RegisterClassHandlers(dockType);
 
         // Listen to window creation
         window.FrameIsOnScreenChanged += OnFrameIsOnScreenChanged;
         window.ActiveFrameChanged += OnActiveFrameChanged;
         window.WindowOpened += OnWindowOpened;
 
-        // Listen to dependency object events
+        // Apply to all visible elements
+        StyleAllWindows();
+        StyleAllWindowFrames();
+    }
+
+    private void PerformReflection(
+        Type dockType,
+        out Func<IVsWindowFrame, DependencyObject> getFrameView,
+        out Func<object, bool> isDockTarget,
+        out DependencyProperty contentProperty,
+        out DependencyProperty isActiveProperty)
+    {
+        // Generate function for WindowFrame.FrameView.get
+        getFrameView = Type.GetType("Microsoft.VisualStudio.Platform.WindowManagement.WindowFrame, Microsoft.VisualStudio.Platform.WindowManagement")
+            .GetProperty("FrameView")
+            .CreateGetter<IVsWindowFrame, DependencyObject>();
+
+        // Get View dependency properties
+        var viewType = Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.View, Microsoft.VisualStudio.Shell.ViewManager");
+        contentProperty = viewType.GetDependencyProperty("Content");
+        isActiveProperty = viewType.GetDependencyProperty("IsActive");
+
+        // Generate DockTarget type check
+        var parameter = Expression.Parameter(typeof(object));
+        isDockTarget = parameter.TypeIs(dockType)
+                                .Compile<object, bool>(parameter);
+    }
+
+    private void RegisterClassHandlers(Type dockType)
+    {
         EventManager.RegisterClassHandler(
             dockType,
             FrameworkElement.LoadedEvent,
@@ -129,10 +148,6 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 FrameworkElement.LoadedEvent,
                 new RoutedEventHandler((s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel))));
         }
-
-        // Apply to all visible elements
-        StyleAllWindows();
-        StyleAllWindowFrames();
     }
 
     private void CreateHook()

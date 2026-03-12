@@ -165,10 +165,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\third-party-notices.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <Generator>VsixManifestGenerator</Generator>
@@ -201,7 +197,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+    <PackageReference Include="MonoMod.RuntimeDetour" Version="25.3.4" />
     <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.527" />
     <PackageReference Include="Community.VisualStudio.Toolkit.DependencyInjection.Microsoft.17" Version="17.0.27" />
   </ItemGroup>

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
+using MicaVisualStudio.Services.Windowing;
 
-namespace MicaVisualStudio.Windowing;
+namespace MicaVisualStudio.Contracts;
 
 public interface IWindowManager
 {

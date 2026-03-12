@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.PlatformUI;
 using MicaVisualStudio.Options;
 using MicaVisualStudio.Interop;
 using MicaVisualStudio.Contracts;
-using MicaVisualStudio.Windowing;
+using MicaVisualStudio.Services.Windowing;
 using MicaVisualStudio.Resourcing;
 
 namespace MicaVisualStudio.Services;

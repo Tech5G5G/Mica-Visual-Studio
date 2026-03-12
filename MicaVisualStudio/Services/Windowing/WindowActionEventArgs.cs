@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace MicaVisualStudio.Windowing;
+namespace MicaVisualStudio.Services.Windowing;
 
 public class WindowActionEventArgs(nint handle, Window window) : EventArgs
 {

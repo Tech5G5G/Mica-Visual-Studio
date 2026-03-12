@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
@@ -56,6 +57,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
 
     private readonly CancellationTokenSource _source = new();
 
+    private readonly WinEventHook _eventHook;
+
     private readonly Func<object, bool> IsDockTarget;
     private readonly Func<IVsWindowFrame, DependencyObject> get_WindowFrame_FrameView;
 
@@ -103,6 +106,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         window.FrameIsOnScreenChanged += OnFrameIsOnScreenChanged;
         window.ActiveFrameChanged += OnActiveFrameChanged;
         window.WindowOpened += OnWindowOpened;
+
+        // Create event hook for window reparent
+        using var process = Process.GetCurrentProcess();
+        _eventHook = new(Event.ParentChange, EventFlags.OutOfContext, process.Id);
+        _eventHook.EventOccurred += OnEventOccurred;
 
         // Apply to all visible elements
         StyleAllWindows();
@@ -234,6 +242,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
         {
             _logger.Output(ex);
         }
+    }
+
+    private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
+    {
     }
 
     public void StyleAllWindows()
@@ -906,9 +918,10 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             s_transparentizer = null;
             Interlocked.Exchange(ref _visualHook, null)?.Dispose();
 
+            _eventHook?.Dispose();
+
             _window.FrameIsOnScreenChanged -= OnFrameIsOnScreenChanged;
             _window.ActiveFrameChanged -= OnActiveFrameChanged;
-
             _window.WindowOpened -= OnWindowOpened;
 
             _disposed = true;

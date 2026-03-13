@@ -870,6 +870,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 border.Background = Brushes.Transparent;
                 break;
 
+            // Editor window, PR comment toolbar
+            case "Microsoft.VisualStudio.Commenting.Presentation.Comments.Margin.CommentToolbar":
+                border.Background = Brushes.Transparent;
+                break;
+
             // Commit diff view, toolbar
             case "Microsoft.VisualStudio.Differencing.Package.DiffControlToolbar":
                 border.Background = Brushes.Transparent;

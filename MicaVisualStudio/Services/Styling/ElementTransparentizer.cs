@@ -613,7 +613,8 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 "detailsView" or // Git commit details
                 "focusedDetailsContainer" or // Git commit details container
                 "teamExplorerFrame" or // Team explorer window
-                "createPullRequestView": // New PR window
+                "createPullRequestView" or // New PR window
+                "pullRequestView": // Pull request window
             GitWindow:
                 {
                     control.Background = Brushes.Transparent;
@@ -693,6 +694,12 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 "additionalOperationsButton"
             when control is Button { Style: { } style } button:
                 button.Style = SubclassStyle(style);
+                return;
+
+            // GitHub PR, overview
+            case "OverviewListBox" when control is ListBox { ItemContainerStyle: { } style } list:
+                list.Background = Brushes.Transparent;
+                list.ItemContainerStyle = SubclassStyle(style);
                 return;
 
             // Git changes...

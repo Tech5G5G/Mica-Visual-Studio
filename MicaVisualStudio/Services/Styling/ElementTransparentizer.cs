@@ -775,6 +775,11 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                     border.Background = Brushes.Transparent;
                 }
                 return;
+
+            // Merge editor
+            case "mainLayoutPanel" when panel is Grid:
+                panel.Background = Brushes.Transparent;
+                return;
         }
 
         switch (panel.GetType().FullName)

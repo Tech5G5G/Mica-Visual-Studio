@@ -16,9 +16,8 @@ Official documentation of these materials (excluding Glass) can be found here: [
 
 To select which material you use as your backdrop, use the **Tools > Backdrop** submenu.
 
-## Compatibility
+## Prerequisites
 
-Mica Visual Studio should be used with:
 * Visual Studio 2026 or later
 * Windows 11 or later
 

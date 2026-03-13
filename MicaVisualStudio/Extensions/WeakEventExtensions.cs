@@ -37,7 +37,7 @@ public class PropertyChangeNotifier : DependencyObject, IDisposable
     }
 
     public static readonly DependencyProperty ValueProperty =
-        DependencyProperty.Register("Value", typeof(object), typeof(PropertyChangeNotifier), new(null, new(OnValueChanged)));
+        DependencyProperty.Register(nameof(Value), typeof(object), typeof(PropertyChangeNotifier), new(null, new(OnValueChanged)));
 
     public event EventHandler ValueChanged;
 

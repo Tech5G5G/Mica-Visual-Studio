@@ -129,17 +129,15 @@ public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             return;
         }
 
-        if (_acrylicMenus)
+        if (_acrylicMenus && root.FindDescendant<Border>(b => b.Name == "ContentBorder") is { } content)
         {
-            if (root.FindDescendant<Border>(b => b.Name == "ContentBorder") is { } content)
-            {
-                content.Background = Brushes.Transparent;
-                content.BorderBrush = Brushes.Transparent;
-            }
-            if (root.FindDescendant<Border>(b => b.Name == "DropShadowBorder") is { } drop)
-            {
-                AcrylicizePopupInternal(popup, drop, source, root);
-            }
+            content.Background = Brushes.Transparent;
+            content.BorderBrush = Brushes.Transparent;
+        }
+
+        if (_acrylicMenus && root.FindDescendant<Border>(b => b.Name == "DropShadowBorder") is { } drop)
+        {
+            AcrylicizePopupInternal(popup, drop, source, root);
         }
         else if (root.FindDescendant<FrameworkElement>()?
                      .FindDescendant<FrameworkElement>()?

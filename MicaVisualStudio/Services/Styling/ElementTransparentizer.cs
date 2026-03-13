@@ -598,7 +598,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             // Document Outline, designer root
             case "DocumentOutlinePaneHolder":
                 control.Background = Brushes.Transparent;
-                break;
+                return;
 
             #region Git Windows
 
@@ -768,7 +768,7 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
                 {
                     border.Background = Brushes.Transparent;
                 }
-                break;
+                return;
         }
 
         switch (panel.GetType().FullName)

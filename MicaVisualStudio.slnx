@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="arm64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MicaVisualStudio/MicaVisualStudio.csproj" Id="d4f84e24-0be1-41e1-a510-68535792520d">
+    <Platform Solution="*|arm64" Project="arm64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+</Solution>

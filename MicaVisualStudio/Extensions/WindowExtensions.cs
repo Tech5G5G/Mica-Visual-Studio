@@ -1,4 +1,5 @@
 ﻿using System.Windows.Interop;
+using Microsoft.VisualStudio.Shell;
 using MicaVisualStudio.Options;
 
 namespace System.Windows;
@@ -21,7 +22,7 @@ public static class WindowExtensions
         {
             get
             {
-                if (window == Application.Current.MainWindow)
+                if (ThreadHelper.CheckAccess() && window == Application.Current.MainWindow)
                 {
                     return WindowType.Main;
                 }

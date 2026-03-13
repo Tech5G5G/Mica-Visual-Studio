@@ -23,12 +23,6 @@ public sealed class WinEventHook : IDisposable
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId);
 
-    public const uint WINEVENT_OUTOFCONTEXT = 0;
-
-    public const uint EVENT_OBJECT_SHOW = 0x8002,
-        EVENT_OBJECT_CREATE = 0x8000,
-        EVENT_OBJECT_DESTROY = 0x8001;
-
     private delegate void WinEventDelegate(
         nint hWinEventHook,
         int eventConst,

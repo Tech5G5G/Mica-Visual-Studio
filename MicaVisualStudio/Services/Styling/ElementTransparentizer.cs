@@ -388,17 +388,23 @@ public class ElementTransparentizer : IElementTransparentizer, IDisposable
             return;
         }
 
-        var layer = true;
+        var children = PInvoke.GetChildren(handle);
+        if (PInvoke.GetClassName(handle) == "Static" && children.Count() == 0)
+        {
+            return;
+        }
 
-        foreach (var child in PInvoke.GetChildren(handle))
+        var layer = true;
+        foreach (var child in children)
         {
             if (HwndSource.FromHwnd(child) is { RootVisual: FrameworkElement childElement })
             {
                 StyleElementTree(childElement);
                 layer = false;
             }
-            // Document Outline window
-            else if (PInvoke.GetClassName(child) == DocOutlineWindowClassName)
+            else if (PInvoke.GetClassName(child) is
+                DocOutlineWindowClassName or // Document Outline window
+                "Chrome_WidgetWin_0") // Web view window
             {
                 layer = false;
             }

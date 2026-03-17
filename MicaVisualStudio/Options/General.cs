@@ -8,22 +8,22 @@ using DialogPage = MicaVisualStudio.UI.Views.DialogPage;
 
 namespace MicaVisualStudio;
 
-internal partial class OptionsProvider
+internal sealed partial class OptionsProvider
 {
     [ComVisible(true)]
-    public class GeneralOptions : UIElementDialogPage
+    public sealed class GeneralOptions : UIElementDialogPage
     {
         protected override UIElement Child => new GeneralPage();
     }
 
     [ComVisible(true)]
-    public class ToolOptions : UIElementDialogPage
+    public sealed class ToolOptions : UIElementDialogPage
     {
         protected override UIElement Child => new ToolPage();
     }
 
     [ComVisible(true)]
-    public class DialogOptions : UIElementDialogPage
+    public sealed class DialogOptions : UIElementDialogPage
     {
         protected override UIElement Child => new DialogPage();
     }

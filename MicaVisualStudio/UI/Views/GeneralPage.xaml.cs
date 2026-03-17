@@ -10,7 +10,7 @@ namespace MicaVisualStudio.UI.Views
     /// <summary>
     /// Interaction logic for GeneralPage.xaml
     /// </summary>
-    public partial class GeneralPage : UserControl
+    public sealed partial class GeneralPage : UserControl
     {
         public GeneralPage()
         {

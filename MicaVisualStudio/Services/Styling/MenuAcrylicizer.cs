@@ -16,7 +16,7 @@ using MicaVisualStudio.Extensions;
 
 namespace MicaVisualStudio.Services.Styling;
 
-public class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
+public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 {
     private const string PopupBackgroundKey = "VsBrush.PopupBackgroundLayered",
                          PopupBorderKey = "VsBrush.PopupBorderOnAcrylic";

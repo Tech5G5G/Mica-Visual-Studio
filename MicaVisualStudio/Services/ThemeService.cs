@@ -5,7 +5,7 @@ using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;
 
-public class ThemeService : IThemeService, IDisposable
+public sealed class ThemeService : IThemeService, IDisposable
 {
     public event EventHandler<Theme> SystemThemeChanged;
 

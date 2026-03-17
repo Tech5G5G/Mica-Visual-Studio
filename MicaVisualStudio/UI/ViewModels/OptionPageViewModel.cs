@@ -3,7 +3,7 @@ using MicaVisualStudio.Options;
 
 namespace MicaVisualStudio.UI.ViewModels;
 
-public class OptionPageViewModel(IGeneral general) : ObservableObject
+public sealed class OptionPageViewModel(IGeneral general) : ObservableObject
 {
     public IGeneral General { get; } = general;
 }

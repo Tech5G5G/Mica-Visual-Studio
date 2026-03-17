@@ -7,7 +7,7 @@ using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;
 
-public class Logger(IVsActivityLog log, IInfoBarService service) : ILogger
+public sealed class Logger(IVsActivityLog log, IInfoBarService service) : ILogger
 {
     private readonly IVsActivityLog _log = log;
     private readonly IInfoBarService _service = service;

@@ -10,7 +10,7 @@ namespace MicaVisualStudio.UI.Views
     /// <summary>
     /// Interaction logic for ToolPage.xaml
     /// </summary>
-    public partial class ToolPage : UserControl
+    public sealed partial class ToolPage : UserControl
     {
         public ToolPage()
         {

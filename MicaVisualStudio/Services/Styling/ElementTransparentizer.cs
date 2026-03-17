@@ -26,7 +26,7 @@ using IResourceManager = MicaVisualStudio.Contracts.IResourceManager;
 
 namespace MicaVisualStudio.Services.Styling;
 
-public class ElementTransparentizer : IElementTransparentizer, IDisposable
+public sealed partial class ElementTransparentizer : IElementTransparentizer, IDisposable
 {
     private const string DocOutlineWindowClassName = "VsDocOutlineTool",
                          MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";

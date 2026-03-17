@@ -10,7 +10,7 @@ using MicaVisualStudio.Services.Windowing;
 
 namespace MicaVisualStudio.Services;
 
-public class BackdropManager : IBackdropManager
+public sealed class BackdropManager : IBackdropManager
 {
     private readonly IGeneral _general;
     private readonly IThemeService _theme;

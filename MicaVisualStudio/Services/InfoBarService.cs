@@ -8,7 +8,7 @@ using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;
 
-public class InfoBarService : IInfoBarService
+public sealed class InfoBarService : IInfoBarService
 {
     private readonly Queue<InfoBarModel> _models = [];
 

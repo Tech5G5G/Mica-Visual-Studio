@@ -5,7 +5,7 @@ namespace System.Windows;
 
 // https://agsmith.wordpress.com/2008/04/07/propertydescriptor-addvaluechanged-alternative/
 
-public class PropertyChangeNotifier : DependencyObject, IDisposable
+public sealed class PropertyChangeNotifier : DependencyObject, IDisposable
 {
     private readonly WeakReference<DependencyObject> _propertySource;
 

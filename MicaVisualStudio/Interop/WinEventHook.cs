@@ -94,7 +94,7 @@ public enum EventFlags
     InContext = 0x0004,
 }
 
-public class EventOccuredEventArgs(int eventConst, nint hWnd, int idObject, int idChild, int dwmsEventTime) : EventArgs
+public sealed class EventOccuredEventArgs(int eventConst, nint hWnd, int idObject, int idChild, int dwmsEventTime) : EventArgs
 {
     private const int CHILDID_SELF = 0;
 

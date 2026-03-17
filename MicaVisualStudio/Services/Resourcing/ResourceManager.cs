@@ -14,7 +14,7 @@ using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services.Resourcing;
 
-public class ResourceManager : IResourceManager
+public sealed class ResourceManager : IResourceManager
 {
     private static readonly ThemeResourceKey MainWindowActiveCaptionKey =
         new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);

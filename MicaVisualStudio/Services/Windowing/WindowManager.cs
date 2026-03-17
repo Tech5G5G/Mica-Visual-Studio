@@ -13,7 +13,7 @@ using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services.Windowing;
 
-public class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
+public sealed class WindowManager : IWindowManager, IVsWindowFrameEvents, IDisposable
 {
     public IReadOnlyDictionary<nint, Window> Windows
     {

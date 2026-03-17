@@ -5,7 +5,7 @@ using MicaVisualStudio.Options;
 
 namespace MicaVisualStudio.Services.Resourcing;
 
-public class CustomResource(ThemeResourceKey baseResourceKey, Func<Theme, Color, object> factory)
+public sealed class CustomResource(ThemeResourceKey baseResourceKey, Func<Theme, Color, object> factory)
 {
     public ThemeResourceKey BaseResourceKey { get; } = baseResourceKey;
 

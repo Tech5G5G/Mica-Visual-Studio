@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace MicaVisualStudio.UI.Converters;
 
-public class EnumToInt32Converter : IValueConverter
+public sealed class EnumToInt32Converter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

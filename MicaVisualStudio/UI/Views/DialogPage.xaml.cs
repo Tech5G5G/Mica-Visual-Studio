@@ -10,7 +10,7 @@ namespace MicaVisualStudio.UI.Views
     /// <summary>
     /// Interaction logic for DialogPage.xaml
     /// </summary>
-    public partial class DialogPage : UserControl
+    public sealed partial class DialogPage : UserControl
     {
         public DialogPage()
         {

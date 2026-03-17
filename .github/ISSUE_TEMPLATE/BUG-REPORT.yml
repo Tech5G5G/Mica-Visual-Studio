@@ -31,15 +31,39 @@ body:
       description: A clear and concise description of what you expected to happen.
     validations:
       required: true
+  - type: input
+    attributes:
+      label: Mica Visual Studio version
+      description: What version of Mica Visual Studio are you using?
+      placeholder: "2.2"
+    validations:
+      required: true
   - type: dropdown
     attributes:
       label: Edition
-      description: What edition of Visual Studio are you using?
+      description: Which edition of Visual Studio are you using?
       options:
         - Community
         - Professional
         - Enterprise
         - Other
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Channel
+      description: Which Visual Studio channel are you on?
+      options:
+        - Release
+        - Insider
+        - Other
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Visual Studio version
+      description: What version of Visual Studio are you using?
+      placeholder: "18.4.0"
     validations:
       required: true
   - type: textarea

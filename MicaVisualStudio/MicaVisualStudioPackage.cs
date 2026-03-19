@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +30,7 @@ namespace MicaVisualStudio;
 // Options
 [ProvideOptionPage(typeof(OptionsProvider.GeneralOptions), Vsix.Name, "General", 0, 0, true, SupportsProfiles = true)]
 [ProvideProfile(typeof(OptionsProvider.GeneralOptions), Vsix.Name, "General", 0, 0, true)]
-[ProvideOptionPage(typeof(OptionsProvider.ToolOptions), Vsix.Name, /* Show before Dialog Windows */ "\u200BTool Windows", 0, 0, true, SupportsProfiles = true)]
+[ProvideOptionPage(typeof(OptionsProvider.ToolOptions), Vsix.Name, "\u200B" /* Show before Dialog Windows */ + "Tool Windows", 0, 0, true, SupportsProfiles = true)]
 [ProvideProfile(typeof(OptionsProvider.ToolOptions), Vsix.Name, "Tool Windows", 0, 0, true)]
 [ProvideOptionPage(typeof(OptionsProvider.DialogOptions), Vsix.Name, "Dialog Windows", 0, 0, true, SupportsProfiles = true)]
 [ProvideProfile(typeof(OptionsProvider.DialogOptions), Vsix.Name, "Dialog Windows", 0, 0, true)]
@@ -40,7 +39,7 @@ namespace MicaVisualStudio;
 [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideAutoLoad(UIContextGuids.EmptySolution, PackageAutoLoadFlags.BackgroundLoad)]
-public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisualStudioPackage>
+public sealed partial class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisualStudioPackage>
 {
     private ILogger _logger;
     private IBackdropManager _backdrop;
@@ -50,91 +49,33 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
 
     private ServiceProvider _provider;
 
-    private readonly Dictionary<string, ResourceConfiguration> _configs = new()
+    protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
-        { "Background", new(translucent: true) },
+        await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-        { "SolidBackgroundFillQuaternary", new(translucent: true) },
+        await General.GetLiveInstanceAsync();
+        await base.InitializeAsync(cancellationToken, progress);
 
-        // { "SolidBackgroundFillTertiary", ColorConfig.Default },
-        // { "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
+        // If this fails, welp
+        _logger = ServiceProvider.GetRequiredService<ILogger>();
 
-        { "EnvironmentBackground", new(translucent: true) },
-        { "EnvironmentBackgroundGradient", ResourceConfiguration.Default },
+        // Allow Windows 11 (or later)
+        if (Environment.OSVersion.Version.Build < 22000)
+        {
+            _logger.InfoBar("Mica Visual Studio is not compatible with Windows 10 and earlier.", KnownMonikers.StatusWarning);
+        }
+        else if (TryGetService(out _resource))
+        {
+            // Initialize ResourceManager first...
+            _resource.Configurations.AddRange(s_configs);
+            _resource.ConfigureResources();
 
-        { "ActiveCaption", ResourceConfiguration.Layered },
-        { "InactiveCaption", ResourceConfiguration.Layered },
-
-        { "MainWindowActiveCaption", ResourceConfiguration.Default },
-        { "MainWindowInactiveCaption", ResourceConfiguration.Default },
-
-        { "ToolWindow", ResourceConfiguration.Default },
-        { "ToolWindowGroup", ResourceConfiguration.Default },
-        { "ToolWindowBackground", ResourceConfiguration.Default },
-        { "ToolWindowFloatingFrame", ResourceConfiguration.Default },
-        { "ToolWindowFloatingFrameInactive", ResourceConfiguration.Default },
-        { "ToolWindowTabMouseOverBackgroundGradient", ResourceConfiguration.Layered },
-
-        { "ToolWindowContentGrid", ResourceConfiguration.Layered },
-
-        { "PopupBackground", ResourceConfiguration.Default },
-
-        { "Default", ResourceConfiguration.Default },
-
-        { "Window", ResourceConfiguration.Default },
-        { "WindowPanel", new(translucent: true) },
-
-        { "CommandBarGradient", ResourceConfiguration.Default },
-        { "CommandBarGradientBegin", ResourceConfiguration.Default },
-
-        { "ListBox", ResourceConfiguration.Layered },
-        { "ListItemBackgroundHover", new(transparentIfGray: false, translucent: true) },
-
-        { "SelectedItemActive", ResourceConfiguration.Layered },
-        { "SelectedItemInactive", ResourceConfiguration.Layered },
-
-        { "Unfocused", ResourceConfiguration.Layered },
-
-        { "Caption", ResourceConfiguration.Layered },
-
-        { "TextBoxBackground", ResourceConfiguration.Layered },
-        { "SearchBoxBackground", ResourceConfiguration.Layered },
-
-        { "Button", ResourceConfiguration.Layered },
-        { "ButtonFocused", ResourceConfiguration.Default },
-
-        { "ComboBoxBackground", ResourceConfiguration.Layered },
-
-        { "InfoBarBorder", ResourceConfiguration.Default },
-
-        { "Page", ResourceConfiguration.Default },
-        { "PageBackground", ResourceConfiguration.Default },
-
-        { "BrandedUIBackground", ResourceConfiguration.Default },
-
-        { "ScrollBarBackground", ResourceConfiguration.Layered },
-        { "ScrollBarArrowBackground", ResourceConfiguration.Default },
-        { "ScrollBarArrowDisabledBackground", ResourceConfiguration.Default },
-
-        { "AutoHideResizeGrip", ResourceConfiguration.Default },
-        { "AutoHideResizeGripDisabled", ResourceConfiguration.Default },
-
-        { "Content", ResourceConfiguration.Default },
-        { "ContentSelected", ResourceConfiguration.Layered },
-        { "ContentMouseOver", ResourceConfiguration.Layered },
-        { "ContentInactiveSelected", ResourceConfiguration.Layered },
-
-        { "Container", ResourceConfiguration.Default },
-
-        { "Wonderbar", ResourceConfiguration.Default },
-        { "WonderbarMouseOver", ResourceConfiguration.Layered },
-        { "WonderbarTreeInactiveSelected", ResourceConfiguration.Default },
-
-        { "Details", ResourceConfiguration.Layered },
-
-        { "BackgroundLowerRegion", ResourceConfiguration.Default },
-        { "WizardBackgroundLowerRegion", ResourceConfiguration.Default }
-    };
+            // So backdrop applies when it's actually visible
+            TryGetService(out _transparentizer);
+            TryGetService(out _acrylicizer);
+            TryGetService(out _backdrop);
+        }
+    }
 
     protected override void InitializeServices(IServiceCollection services)
     {
@@ -167,34 +108,6 @@ public sealed class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<MicaVisu
     protected override IServiceProvider BuildServiceProvider(IServiceCollection serviceCollection)
     {
         return _provider = base.BuildServiceProvider(serviceCollection) as ServiceProvider;
-    }
-
-    protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
-    {
-        await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
-        await General.GetLiveInstanceAsync();
-        await base.InitializeAsync(cancellationToken, progress);
-
-        // If this fails, welp
-        _logger = ServiceProvider.GetRequiredService<ILogger>();
-
-        // Allow Windows 11 (or later)
-        if (Environment.OSVersion.Version.Build < 22000)
-        {
-            _logger.InfoBar("Mica Visual Studio is not compatible with Windows 10 and earlier.", KnownMonikers.StatusWarning);
-        }
-        else if (TryGetService(out _resource))
-        {
-            // Initialize ResourceManager first...
-            _resource.Configurations.AddRange(_configs);
-            _resource.ConfigureResources();
-
-            // So backdrop applies when it's actually visible
-            TryGetService(out _transparentizer);
-            TryGetService(out _acrylicizer);
-            TryGetService(out _backdrop);
-        }
     }
 
     private bool TryGetService<T>(out T service)

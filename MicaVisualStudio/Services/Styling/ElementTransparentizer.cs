@@ -173,14 +173,22 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
 
     private static void AddVisualChild(Visual instance, Visual child)
     {
-        UseTransparentizer(t =>
+        // Skip untracked types
+        if (instance is not (ContentControl or ContentPresenter or Decorator or Panel))
         {
-            if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Skip other types
-                instance is FrameworkElement element && GetIsTracked(element))
+            return;
+        }
+
+        UseTransparentizer(Action);
+
+        void Action(ElementTransparentizer transparentizer)
             {
-                t.StyleElementTree(element);
+            if (instance is FrameworkElement element && GetIsTracked(element) &&
+                child is FrameworkElement childElement)
+            {
+                transparentizer.StyleElementTree(childElement, TreeType.Visual);
             }
-        });
+    }
     }
 
     private void OnFrameIsOnScreenChanged(IVsWindowFrame frame, bool isOnScreen)

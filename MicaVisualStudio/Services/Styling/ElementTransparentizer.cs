@@ -129,7 +129,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         EventManager.RegisterClassHandler(
             dockType,
             FrameworkElement.LoadedEvent,
-            new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border))));
+            new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border, TreeType.Visual))));
 
         if (AppDomain.CurrentDomain.GetAssemblies()
                                    .FirstOrDefault(a => a.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
@@ -138,7 +138,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
             EventManager.RegisterClassHandler(
                 hostType,
                 FrameworkElement.LoadedEvent,
-                new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel))));
+                new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel, TreeType.Visual))));
         }
     }
 
@@ -272,6 +272,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     public void StyleWindow(Window window)
     {
         StyleElementTree(window);
+            StyleElementTree(window, TreeType.Visual);
     }
 
     public void StyleAllWindowFrames()
@@ -310,7 +311,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         }
         else if (host.FindAncestor<DependencyObject>(o => o.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
         {
-            StyleElementTree(dock);
+            StyleElementTree(dock, TreeType.Visual);
         }
         else if (!host.IsLoaded)
         {
@@ -320,7 +321,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
                 {
                     if ((s as Border)?.FindAncestor<DependencyObject>(o => o.GetVisualOrLogicalParent(), t.IsDockTarget) is Border dock)
                     {
-                        t.StyleElementTree(dock);
+                        t.StyleElementTree(dock, TreeType.Visual);
                     }
                 });
             });
@@ -331,7 +332,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     {
         if (HwndSource.FromHwnd(handle) is { RootVisual: FrameworkElement element })
         {
-            StyleElementTree(element);
+            StyleElementTree(element, TreeType.Visual);
             return;
         }
 
@@ -346,7 +347,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         {
             if (HwndSource.FromHwnd(child) is { RootVisual: FrameworkElement childElement })
             {
-                StyleElementTree(childElement);
+                StyleElementTree(childElement, TreeType.Visual);
                 layer = false;
             }
             else if (PInvoke.GetClassName(child) is
@@ -360,6 +361,70 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         if (layer)
         {
             PInvoke.AddLayeredAttributes(handle);
+        }
+    }
+
+    public void StyleElementTree(FrameworkElement element, TreeType type)
+    {
+        if (type == TreeType.Visual)
+        {
+            StyleProcedure(element);
+
+            var count = VisualTreeHelper.GetChildrenCount(element);
+            for (int i = 0; i < count; ++i)
+            {
+                if (VisualTreeHelper.GetChild(element, i) is FrameworkElement child)
+                {
+                    StyleElementTree(child, TreeType.Visual);
+                }
+            }
+        }
+        else
+        {
+            foreach (var child in LogicalTreeHelper.GetChildren(element))
+            {
+                if (child is FrameworkElement childElement)
+                {
+                    StyleProcedure(childElement);
+                    StyleElementTree(childElement, TreeType.Logical);
+                }
+            }
+        }
+    }
+
+    private void StyleProcedure(FrameworkElement element)
+    {
+        switch (element)
+        {
+            case Control control:
+                StyleControl(control);
+                break;
+
+            case Panel panel:
+                StylePanel(panel);
+                SetIsTracked(element, value: true);
+                return;
+
+            case Border border:
+                if (IsDockTarget(border))
+                {
+                    StyleDockTarget(border);
+                }
+                else
+                {
+                    StyleBorder(border);
+                }
+                break;
+
+            case HwndHost host:
+                StyleHwndHost(host);
+                break;
+        }
+
+        if (element is ContentControl or ContentPresenter or Decorator)
+        {
+            // Track visual children
+            SetIsTracked(element, value: true);
         }
     }
 

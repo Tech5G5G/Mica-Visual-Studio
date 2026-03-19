@@ -74,7 +74,7 @@
     <Compile Include="Extensions\EnumFramesExtensions.cs" />
     <Compile Include="Extensions\ExpressionExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
-    <Compile Include="Extensions\LogicalTreeExtensions.cs" />
+    <Compile Include="Extensions\TreeExtensions.cs" />
     <Compile Include="Extensions\WeakEventExtensions.cs" />
     <Compile Include="Extensions\WindowExtensions.cs" />
     <Compile Include="Interop\PInvoke.cs" />
@@ -85,6 +85,7 @@
     <Compile Include="Interop\PInvoke.UxTheme.cs" />
     <Compile Include="Interop\PInvoke.WindowLong.cs" />
     <Compile Include="Interop\WindowStyle.cs" />
+    <Compile Include="MicaVisualStudioPackage.Configs.cs" />
     <Compile Include="Options\BackdropType.cs" />
     <Compile Include="Options\CornerPreference.cs" />
     <Compile Include="Options\IGeneral.cs" />
@@ -95,10 +96,13 @@
     <Compile Include="Contracts\IResourceManager.cs" />
     <Compile Include="Services\Resourcing\ResourceConfiguration.cs" />
     <Compile Include="Services\BackdropManager.cs" />
+    <Compile Include="Services\Styling\ElementTransparentizer.Handlers.cs" />
     <Compile Include="Services\Styling\ElementTransparentizer.cs" />
     <Compile Include="Services\InfoBarService.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Styling\MenuAcrylicizer.cs" />
+    <Compile Include="Services\Styling\ThemeResourceKeys.cs" />
+    <Compile Include="Services\Styling\TreeType.cs" />
     <Compile Include="Services\ThemeService.cs" />
     <Compile Include="Services\Resourcing\ResourceManager.cs" />
     <Compile Include="UI\Converters\EnumToInt32Converter.cs" />

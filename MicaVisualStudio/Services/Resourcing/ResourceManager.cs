@@ -104,14 +104,14 @@ public sealed class ResourceManager : IResourceManager
         foreach (var dictionary in Application.Current.Resources.MergedDictionaries.OfType<DeferredResourceDictionaryBase>())
             foreach (var pair in _resources)
             {
-                var resource = pair.Value;
-                var value = resource.Factory(
-                    _theme,
-                    resource.BaseResourceKey is null ? default : _shell5.GetThemedWPFColor(resource.BaseResourceKey));
-
                 if (!dictionary.Contains(pair.Key))
                 {
-                    dictionary.Add(pair.Key, value);
+                    var resource = pair.Value;
+                    dictionary.Add(
+                        pair.Key,
+                        resource.Factory(
+                            _theme,
+                            resource.BaseResourceKey is null ? default : _shell5.GetThemedWPFColor(resource.BaseResourceKey)));
                 }
             }
     }

@@ -231,9 +231,16 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
 
     private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
     {
+        try
+        {
         if (PInvoke.GetClassName(PInvoke.GetOwner(e.WindowHandle)) == DocOutlineWindowClassName)
         {
             StyleHwnd(e.WindowHandle);
+        }
+    }
+        catch (Exception ex)
+        {
+            _logger.Output(ex);
         }
     }
 

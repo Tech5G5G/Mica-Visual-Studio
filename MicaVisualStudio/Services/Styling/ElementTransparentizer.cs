@@ -341,7 +341,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
             return;
         }
 
-        var layer = true;
+        var layer = _layeredWindows;
         foreach (var child in children)
         {
             if (HwndSource.FromHwnd(child) is { RootVisual: FrameworkElement childElement })
@@ -423,60 +423,8 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         }
     }
 
-    public void StyleToolBar(ToolBar bar)
-    {
-        if (bar.GetVisualOrLogicalParent() is not ToolBarTray { Name: "TopDockTray" })
-        {
-            bar.Background = bar.BorderBrush = Brushes.Transparent;
-            (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
-        }
-    }
-
-    public void StyleTabItem(TabItem tab)
-    {
-        if (tab.DataContext is not DependencyObject view ||
-            // Window frame, tab strip
-            tab.GetVisualOrLogicalParent() is not FrameworkElement { Name: "PART_TabPanel" })
-        {
-            return;
-        }
-
-        tab.Background = Brushes.Transparent;
-        tab.SetResourceReference(
-            Control.ForegroundProperty,
-            tab.IsSelected && (bool)view.GetValue(View_IsActiveProperty) ? TextOnAccentFillPrimaryKey : TextFillPrimaryKey);
-
-        if (GetIsTracked(tab))
-        {
-            return;
-        }
-
-        SetIsTracked(tab, value: true);
-        WeakReference<TabItem> weakTab = new(tab);
-
-        tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, static (s, _) =>
-        {
-            if (s is TabItem tab)
-            {
-                UseTransparentizer(t => t.StyleTabItem(tab));
-            }
-        });
-        view.AddWeakPropertyChangeHandler(View_IsActiveProperty, (_, _) =>
-        {
-            if (weakTab.TryGetTarget(out TabItem tab))
-            {
-                UseTransparentizer(t => t.StyleTabItem(tab));
-            }
-        });
-    }
-
     public void StyleHwndHost(HwndHost host)
     {
-        if (!_layeredWindows)
-        {
-            return;
-        }
-
         var handle = host.Handle;
         if (handle != IntPtr.Zero)
         {

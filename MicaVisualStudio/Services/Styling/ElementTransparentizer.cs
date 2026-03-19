@@ -31,23 +31,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     private const string DocOutlineWindowClassName = "VsDocOutlineTool",
                          MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
 
-    #region Keys
-
     private const string LayeredBrushKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
-
-    private static readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
-        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundBrush);
-
-    private static readonly ThemeResourceKey TextFillPrimaryKey =
-        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextFillPrimary", ThemeResourceKeyType.BackgroundBrush);
-
-    private static readonly ThemeResourceKey TextOnAccentFillPrimaryKey =
-        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextOnAccentFillPrimary", ThemeResourceKeyType.BackgroundBrush);
-
-    private readonly ThemeResourceKey ScrollBarBackgroundKey =
-        new(category: new("{624ed9c3-bdfd-41fa-96c3-7c824ea32e3d}"), name: "ScrollBarBackground", ThemeResourceKeyType.BackgroundBrush);
-
-    #endregion
 
     private static ElementTransparentizer s_transparentizer;
 
@@ -81,7 +65,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         _resource = resource;
 
         // Add layered brush
-        resource.CustomResources.Add(LayeredBrushKey, new(SolidBackgroundFillTertiaryKey, (_, c) =>
+        resource.CustomResources.Add(LayeredBrushKey, new(ThemeResourceKeys.SolidBackgroundFillTertiary, (_, c) =>
             new SolidColorBrush(c with { A = 0xFF / 2 /* 50% opacity */ })));
         resource.AddCustomResources();
 

@@ -21,9 +21,6 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
     private const string PopupBackgroundKey = "VsBrush.PopupBackgroundLayered",
                          PopupBorderKey = "VsBrush.PopupBorderOnAcrylic";
 
-    private static readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
-        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundBrush);
-
     private static MenuAcrylicizer s_acrylicizer;
 
     private readonly ILogger _logger;
@@ -43,7 +40,7 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
         _resource = resource;
 
         // Add brushes
-        resource.CustomResources.Add(PopupBackgroundKey, new(SolidBackgroundFillTertiaryKey, (t, c) =>
+        resource.CustomResources.Add(PopupBackgroundKey, new(ThemeResourceKeys.SolidBackgroundFillTertiary, (t, c) =>
             new SolidColorBrush(t == Theme.Light || !c.IsGray ?
                 c with { A = 0xFF / 4 /* 25% opacity */ } :
                 Color.FromArgb(0x01, 0x00, 0x00, 0x00)))); // Full acrylic experience for those who can handle it

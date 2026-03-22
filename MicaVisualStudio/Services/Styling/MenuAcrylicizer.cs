@@ -23,6 +23,9 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 
     private static MenuAcrylicizer s_acrylicizer;
 
+    [ThreadStatic]
+    private static Type t_calloutBorderType;
+
     private readonly ILogger _logger;
     private readonly IGeneral _general;
     private readonly IResourceManager _resource;
@@ -181,6 +184,27 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
                 System.Drawing.Color.FromArgb(0x2C, 0x2C, 0x2C) : // Dark mode acrylic fallback
                 System.Drawing.Color.FromArgb(color.R, color.G, color.B),
             enable: true);
+    }
+
+    private void HandleCalloutBorder(Decorator callout)
+    {
+        var type = callout.GetType();
+        if (t_calloutBorderType is null)
+        {
+            // Pointing popup (e.g. CodeLens references popup)
+            if (type.FullName != "Microsoft.VisualStudio.Language.Intellisense.CodeLensCalloutBorder")
+            {
+                return;
+            }
+
+            t_calloutBorderType = type;
+        }
+        else if (t_calloutBorderType != type)
+        {
+            return;
+        }
+
+        callout.SetResourceReference(Panel.BackgroundProperty, ThemeResourceKeys.SolidBackgroundFillTertiary);
     }
 
     public void RemovePopupOffset(Popup popup)

@@ -343,8 +343,10 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         }
 
         var layer = _layeredWindows;
-        foreach (var child in children)
+        for (int i = 0; i < children.Count; ++i)
         {
+            var child = children[i];
+
             if (HwndSource.FromHwnd(child) is { RootVisual: FrameworkElement childElement })
             {
                 StyleElementTree(childElement, TreeType.Visual);

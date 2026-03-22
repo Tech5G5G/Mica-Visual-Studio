@@ -626,7 +626,6 @@ public partial class ElementTransparentizer
             {
                 element.SetValue(Panel.BackgroundProperty, Brushes.Transparent);
             }
-
         }
 
         public static void HandleLayeredElement(Transparentizer transparentizer, FrameworkElement element)
@@ -641,7 +640,6 @@ public partial class ElementTransparentizer
             {
                 transparentizer.Layer(element);
             }
-
         }
 
         public static void HandleAndClearDictionaries(Transparentizer transparentizer, FrameworkElement element)

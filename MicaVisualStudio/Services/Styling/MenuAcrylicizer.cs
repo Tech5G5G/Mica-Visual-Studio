@@ -156,19 +156,23 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             // Tool tips use themselves for margins
             tip.Margin = default;
         }
-        else
+
+    private void HandlePopupBackground(Popup popup, Border drop, HwndSource source)
         {
+        // Remove shadow padding
             drop.Margin = default;
             (drop.GetVisualOrLogicalParent() as Grid)?.Margin = default;
-        }
 
         // Check for popup margin accountment
-        if (popup.HorizontalOffset == -12)
+        const int MarginAccountment = -12;
+        if (popup.HorizontalOffset == MarginAccountment)
         {
             RemovePopupOffset(popup);
         }
 
-        drop.CornerRadius = new(uniformRadius: 7);
+        // Update corner radii to match those of DWM
+        drop.CornerRadius = new(uniformRadius: 7); // 7 instead of 8 because DWM rounds corners
+                                                   // differently than WPF (apparently)
         drop.SetResourceReference(Border.BackgroundProperty, PopupBackgroundKey);
         drop.SetResourceReference(Border.BorderBrushProperty, PopupBorderKey);
 

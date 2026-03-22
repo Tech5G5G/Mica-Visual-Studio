@@ -193,7 +193,6 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
         }
 
         popup.HorizontalOffset = 0;
-        popup.UpdateLayout();
     }
 
     private CustomPopupPlacementCallback SubclassPopupPlacementCallback(CustomPopupPlacementCallback callback, double horizontalOffset)

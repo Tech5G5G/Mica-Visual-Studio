@@ -106,12 +106,14 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             }
 
             if (value is FrameworkElement root &&
-                root.Parent is Popup popup) // Check if owned by popup
-                                            // Popups use separate element as root of HwndSource
+                // Check if owned by popup
+                // Popups use separate element as root of HwndSource
+                root.Parent is Popup popup)
             {
                 s_acrylicizer.AcrylicizePopup(popup, instance, root);
             }
-            else if (value is not Window) // Avoid already handled values
+            // Avoid already handled values
+            else if (value is not Window)
             {
                 instance.CompositionTarget.BackgroundColor = Colors.Transparent;
             }
@@ -124,44 +126,61 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
 
     public void AcrylicizePopup(Popup popup, HwndSource source, FrameworkElement root = null)
     {
-        if ((root ??= source.RootVisual as FrameworkElement) is null)
+        if ((root ??= source.RootVisual as FrameworkElement) is not null && // Get root if not passed
+            (!_acrylicMenus || !StylePopupTree(root, popup, source)) && // Acrylicize menu if available
+            root.VisualChild()?
+                .VisualChild()?
+                .VisualChild<Decorator>() is { } callout) // Check for pointing popup element
         {
-            return;
-        }
-
-        if (_acrylicMenus && root.FindDescendant<Border>(b => b.Name == "ContentBorder") is { } content)
-        {
-            content.Background = Brushes.Transparent;
-            content.BorderBrush = Brushes.Transparent;
-        }
-
-        if (_acrylicMenus && root.FindDescendant<Border>(b => b.Name == "DropShadowBorder") is { } drop)
-        {
-            AcrylicizePopupInternal(popup, drop, source, root);
-        }
-        else if (root.FindDescendant<FrameworkElement>()?
-                     .FindDescendant<FrameworkElement>()?
-                     .FindDescendant<Decorator>() is { } callout &&
-            // Pointing popup (e.g. CodeLens references popup)
-            callout.GetType().FullName == "Microsoft.VisualStudio.Language.Intellisense.CodeLensCalloutBorder")
-        {
-            callout.SetResourceReference(Panel.BackgroundProperty, SolidBackgroundFillTertiaryKey);
+            HandleCalloutBorder(callout);
         }
     }
 
-    private void AcrylicizePopupInternal(Popup popup, Border drop, HwndSource source, FrameworkElement root)
+    private bool StylePopupTree(FrameworkElement root, Popup popup, HwndSource source)
     {
-        if (root.FindDescendant<ToolTip>() is ToolTip tip)
+        var found = false;
+
+        var count = VisualTreeHelper.GetChildrenCount(root);
+        for (int i = 0; i < count; ++i)
         {
-            // Tool tips use themselves for margins
-            tip.Margin = default;
+            if (VisualTreeHelper.GetChild(root, i) is not FrameworkElement child)
+            {
+                continue;
+            }
+
+            if (child is ToolTip tip)
+            {
+                // Tool tips use themselves for shadow padding
+                tip.Margin = default;
+            }
+            else if (child is Border { Name: { } name } border)
+            {
+                if (name == "ContentBorder")
+                {
+                    border.Background = Brushes.Transparent;
+                    border.BorderBrush = Brushes.Transparent;
+                }
+                else if (name == "DropShadowBorder")
+                {
+                    HandlePopupBackground(popup, border, source);
+                    found = true;
+                }
+            }
+
+            if (StylePopupTree(child, popup, source))
+            {
+                found = true;
+            }
         }
 
+        return found;
+    }
+
     private void HandlePopupBackground(Popup popup, Border drop, HwndSource source)
-        {
+    {
         // Remove shadow padding
-            drop.Margin = default;
-            (drop.GetVisualOrLogicalParent() as Grid)?.Margin = default;
+        drop.Margin = default;
+        (drop.GetVisualOrLogicalParent() as Grid)?.Margin = default;
 
         // Check for popup margin accountment
         const int MarginAccountment = -12;

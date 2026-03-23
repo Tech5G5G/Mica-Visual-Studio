@@ -18,7 +18,56 @@ namespace MicaVisualStudio.Services.Styling;
 
 public partial class ElementTransparentizer
 {
-    private static readonly ConcurrentDictionary<Type, Action<Transparentizer, Control>> s_controlTypeHandlers = [];
+    private static readonly ConcurrentDictionary<Type, Action<Transparentizer, Control>> s_controlTypeHandlers = new()
+    {
+        [typeof(Control)] = ElementHandlers.Noop,
+        [typeof(UserControl)] = ElementHandlers.Noop,
+
+        [typeof(Label)] = ElementHandlers.Noop,
+        [typeof(TextBox)] = ElementHandlers.Noop,
+        [typeof(RichTextBox)] = ElementHandlers.Noop,
+
+        [typeof(Button)] = ElementHandlers.Noop,
+        [typeof(CheckBox)] = ElementHandlers.Noop,
+        [typeof(ComboBox)] = ElementHandlers.Noop,
+        [typeof(RadioButton)] = ElementHandlers.Noop,
+        [typeof(RepeatButton)] = ElementHandlers.Noop,
+        [typeof(ToggleButton)] = ElementHandlers.Noop,
+
+        [typeof(ContentControl)] = ElementHandlers.Noop,
+        [typeof(HeaderedContentControl)] = ElementHandlers.Noop,
+        [typeof(Expander)] = ElementHandlers.Noop,
+        [typeof(GroupBox)] = ElementHandlers.Noop,
+
+        [typeof(Slider)] = ElementHandlers.Noop,
+        [typeof(ScrollBar)] = ElementHandlers.Noop,
+        [typeof(Separator)] = ElementHandlers.Noop,
+        [typeof(ProgressBar)] = ElementHandlers.Noop,
+
+        [typeof(ScrollViewer)] = ElementHandlers.Noop,
+        [typeof(ItemsControl)] = ElementHandlers.Noop,
+        [typeof(HeaderedItemsControl)] = ElementHandlers.Noop,
+        [typeof(ListBox)] = ElementHandlers.Noop,
+        [typeof(ListView)] = ElementHandlers.Noop,
+        [typeof(TreeView)] = ElementHandlers.Noop,
+        [typeof(TabControl)] = ElementHandlers.Noop,
+
+        [typeof(TabItem)] = ElementHandlers.Noop,
+        [typeof(MenuItem)] = ElementHandlers.Noop,
+        [typeof(ListBoxItem)] = ElementHandlers.Noop,
+        [typeof(ComboBoxItem)] = ElementHandlers.Noop,
+        [typeof(ListViewItem)] = ElementHandlers.Noop,
+        [typeof(TreeViewItem)] = ElementHandlers.Noop,
+        [typeof(StatusBarItem)] = ElementHandlers.Noop,
+
+        [typeof(ToolBar)] = ElementHandlers.Noop,
+        [typeof(StatusBar)] = ElementHandlers.Noop,
+
+        [typeof(Window)] = ElementHandlers.Noop,
+        [typeof(ToolTip)] = ElementHandlers.Noop,
+        [typeof(Menu)] = ElementHandlers.Noop,
+        [typeof(ContextMenu)] = ElementHandlers.Noop
+    };
 
     private static readonly Dictionary<string, Action<Transparentizer, Control>> s_controlHandlers = new()
     {
@@ -436,7 +485,17 @@ public partial class ElementTransparentizer
 
 public partial class ElementTransparentizer
 {
-    private static readonly ConcurrentDictionary<Type, Action<Transparentizer, Panel>> s_panelTypeHandlers = [];
+    private static readonly ConcurrentDictionary<Type, Action<Transparentizer, Panel>> s_panelTypeHandlers = new()
+    {
+        [typeof(Panel)] = ElementHandlers.Noop,
+        [typeof(Canvas)] = ElementHandlers.Noop,
+        [typeof(Grid)] = ElementHandlers.Noop,
+
+        [typeof(DockPanel)] = ElementHandlers.Noop,
+        [typeof(StackPanel)] = ElementHandlers.Noop,
+        [typeof(VirtualizingPanel)] = ElementHandlers.Noop,
+        [typeof(WrapPanel)] = ElementHandlers.Noop
+    };
 
     private static readonly Dictionary<string, Action<Transparentizer, Panel>> s_panelHandlers = new()
     {

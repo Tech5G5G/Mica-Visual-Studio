@@ -502,10 +502,6 @@ public partial class ElementTransparentizer
         // Commit diff
         { "detailsViewMainGrid", PanelHandlers.HandleCommitDiff },
 
-        // TODO: Remove?
-        // Status bar
-        { "StatusBarPanel", ElementHandlers.Noop },
-
         // Editor window, loading placeholder
         { "StackPanel_LoadingDocumentUI", ElementHandlers.HandleElement },
 

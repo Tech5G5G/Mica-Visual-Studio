@@ -11,14 +11,12 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
+using MicaVisualStudio.Services.Styling;
 
 namespace MicaVisualStudio.Services.Resourcing;
 
 public sealed class ResourceManager : IResourceManager, IDisposable
 {
-    private static readonly ThemeResourceKey MainWindowActiveCaptionKey =
-        new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);
-
     private static Color TransparentWhite = Colors.Transparent,
                          TranslucentBlack = Color.FromArgb(0x01, 0x00, 0x00, 0x00); // Slight alpha to change icon foreground (basically invisible)
 
@@ -44,20 +42,20 @@ public sealed class ResourceManager : IResourceManager, IDisposable
     }
 
     private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Listen for new dictionaries
+        if (e.Action is not (NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace))
         {
-            // Listen for new dictionaries
-            if (e.Action is not (NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace))
-            {
-                return;
-            }
+            return;
+        }
 
-            ConfigureResources();
-            AddCustomResources();
+        ConfigureResources();
+        AddCustomResources();
 
-            if (GetTheme(out var theme))
-            {
-                VisualStudioThemeChanged?.Invoke(this, _theme = theme);
-            }
+        if (GetTheme(out var theme))
+        {
+            VisualStudioThemeChanged?.Invoke(this, _theme = theme);
+        }
     }
 
     public void ConfigureResources()
@@ -120,7 +118,7 @@ public sealed class ResourceManager : IResourceManager, IDisposable
 
     private bool GetTheme(out Theme theme)
     {
-        theme = _shell5.GetThemedWPFColor(MainWindowActiveCaptionKey).IsLight() ? Theme.Light : Theme.Dark;
+        theme = _shell5.GetThemedWPFColor(ThemeResourceKeys.MainWindowActiveCaption).IsLight() ? Theme.Light : Theme.Dark;
         return _theme != theme;
     }
 

@@ -15,4 +15,7 @@ public static class ThemeResourceKeys
 
     public static readonly ThemeResourceKey ScrollBarBackground =
         new(category: new("{624ed9c3-bdfd-41fa-96c3-7c824ea32e3d}"), name: "ScrollBarBackground", ThemeResourceKeyType.BackgroundBrush);
+
+    public static readonly ThemeResourceKey MainWindowActiveCaption =
+        new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);
 }

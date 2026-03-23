@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Windows;
 using Microsoft.VisualStudio.Shell;
@@ -8,7 +9,7 @@ using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services;
 
-public sealed class InfoBarService : IInfoBarService
+public sealed class InfoBarService : IInfoBarService, IDisposable
 {
     private readonly Queue<InfoBarModel> _models = [];
 
@@ -48,4 +49,19 @@ public sealed class InfoBarService : IInfoBarService
             _models.Enqueue(model);
         }
     }
+
+    #region Dispose
+
+    private bool _disposed;
+
+    void IDisposable.Dispose()
+    {
+        if (!_disposed)
+        {
+            VS.Events.ShellEvents.MainWindowVisibilityChanged -= OnMainWindowVisibilityChanged;
+            _disposed = true;
+        }
+    }
+
+    #endregion
 }

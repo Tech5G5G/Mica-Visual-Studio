@@ -55,22 +55,29 @@ public sealed class WinEventHook : IDisposable
 
     ~WinEventHook()
     {
-        DisposeInternal(/* disposing: false */);
+        Dispose(disposing: false);
     }
 
     public void Dispose()
     {
-        DisposeInternal(/* disposing: true */);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
-    private void DisposeInternal(/* bool disposing */)
+    private void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
         {
-            UnhookWinEvent(_hookId);
-            _disposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            EventOccurred = null;
+        }
+
+        UnhookWinEvent(_hookId);
+        _disposed = true;
     }
 
     #endregion

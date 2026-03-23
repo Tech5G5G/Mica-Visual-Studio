@@ -14,7 +14,7 @@ using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services.Resourcing;
 
-public sealed class ResourceManager : IResourceManager
+public sealed class ResourceManager : IResourceManager, IDisposable
 {
     private static readonly ThemeResourceKey MainWindowActiveCaptionKey =
         new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);
@@ -40,7 +40,10 @@ public sealed class ResourceManager : IResourceManager
         _shell5 = shell5;
 
         GetTheme(out _theme);
-        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (_, e) =>
+        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged)?.CollectionChanged += OnCollectionChanged;
+    }
+
+    private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             // Listen for new dictionaries
             if (e.Action is not (NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace))
@@ -55,7 +58,6 @@ public sealed class ResourceManager : IResourceManager
             {
                 VisualStudioThemeChanged?.Invoke(this, _theme = theme);
             }
-        };
     }
 
     public void ConfigureResources()
@@ -146,4 +148,21 @@ public sealed class ResourceManager : IResourceManager
             return Color.FromArgb(Math.Min(config.Opacity, color.A), color.R, color.G, color.B);
         }
     }
+
+    #region Dispose
+
+    private bool _disposed;
+
+    void IDisposable.Dispose()
+    {
+        if (!_disposed)
+        {
+            (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged)?.CollectionChanged -= OnCollectionChanged;
+            VisualStudioThemeChanged = null;
+
+            _disposed = true;
+        }
+    }
+
+    #endregion
 }

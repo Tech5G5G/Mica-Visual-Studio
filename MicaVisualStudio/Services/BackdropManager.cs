@@ -11,7 +11,7 @@ using MicaVisualStudio.Services.Windowing;
 
 namespace MicaVisualStudio.Services;
 
-public sealed class BackdropManager : IBackdropManager
+public sealed class BackdropManager : IBackdropManager, IDisposable
 {
     private readonly ILogger _logger;
     private readonly IGeneral _general;
@@ -137,4 +137,23 @@ public sealed class BackdropManager : IBackdropManager
             ApplyWindowPreferences(entry.Key, entry.Value, firstTime);
         }
     }
+
+    #region Dispose
+
+    private bool _disposed;
+
+    void IDisposable.Dispose()
+    {
+        if (!_disposed)
+        {
+            _general.PropertyChanged -= OnOptionChanged;
+            _theme.SystemThemeChanged -= OnThemeChanged;
+            _window.WindowOpened -= OnWindowOpened;
+            _resource.VisualStudioThemeChanged -= OnThemeChanged;
+
+            _disposed = true;
+        }
+    }
+
+    #endregion
 }

@@ -40,6 +40,8 @@ public sealed class ThemeService : IThemeService, IDisposable
         if (!_disposed)
         {
             SystemEvents.InvokeOnEventsThread(new Action(() => SystemEvents.UserPreferenceChanging -= OnPreferenceChanging));
+            SystemThemeChanged = null;
+
             _disposed = true;
         }
     }

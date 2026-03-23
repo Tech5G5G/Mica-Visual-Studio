@@ -184,6 +184,15 @@ public sealed class WindowManager : IWindowManager, IVsWindowFrameEvents, IDispo
             _frames.Clear();
             _handles.Clear();
 
+            WindowOpened = null;
+            WindowClosed = null;
+
+            FrameCreated = null;
+            FrameDestroyed = null;
+            FrameIsVisibleChanged = null;
+            FrameIsOnScreenChanged = null;
+            ActiveFrameChanged = null;
+
             _disposed = true;
         }
     }

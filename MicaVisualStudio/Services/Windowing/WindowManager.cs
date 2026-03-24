@@ -118,7 +118,7 @@ public sealed class WindowManager : IWindowManager, IVsWindowFrameEvents, IDispo
         }
     }
 
-    private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
+    private void OnEventOccurred(object sender, EventOccuredEventArgs e)
     {
         if (!_handles.Contains(e.WindowHandle) && // Prefer WPF over WinEventHook and avoid duplicates
             PInvoke.GetWindowStyles(e.WindowHandle).HasFlag(PInvoke.WindowStyle.Caption)) // Check window for title bar

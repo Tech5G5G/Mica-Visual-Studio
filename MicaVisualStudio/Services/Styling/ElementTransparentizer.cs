@@ -236,7 +236,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         }
     }
 
-    private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
+    private void OnEventOccurred(object sender, EventOccuredEventArgs e)
     {
         try
         {

@@ -84,7 +84,7 @@
     <Compile Include="Interop\PInvoke.TitleBar.cs" />
     <Compile Include="Interop\PInvoke.UxTheme.cs" />
     <Compile Include="Interop\PInvoke.WindowLong.cs" />
-    <Compile Include="Interop\WindowStyle.cs" />
+    <Compile Include="Interop\PInvoke.WindowStyle.cs" />
     <Compile Include="MicaVisualStudioPackage.Configs.cs" />
     <Compile Include="Options\BackdropType.cs" />
     <Compile Include="Options\CornerPreference.cs" />

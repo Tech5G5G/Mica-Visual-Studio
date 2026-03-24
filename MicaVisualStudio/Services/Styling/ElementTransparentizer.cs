@@ -174,18 +174,17 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     private static void AddVisualChild(Visual instance, Visual child)
     {
         // Skip untracked types
-        if (instance is not (ContentControl or ContentPresenter or Decorator or Panel))
+        if (instance is ContentControl or ContentPresenter or Decorator or Panel)
         {
-            return;
+            UseTransparentizer(Action);
         }
-
-        UseTransparentizer(Action);
 
         void Action(ElementTransparentizer transparentizer)
             {
             if (instance is FrameworkElement element && GetIsTracked(element) &&
                 child is FrameworkElement childElement)
             {
+                transparentizer.StyleProcedure(element);
                 transparentizer.StyleElementTree(childElement, TreeType.Visual);
             }
     }

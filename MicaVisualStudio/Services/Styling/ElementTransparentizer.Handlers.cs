@@ -595,12 +595,26 @@ public partial class ElementTransparentizer
 
         public static void HandleAdornmentLayer(Transparentizer transparentizer, Panel panel)
         {
-            foreach (var rectangle in panel.FindDescendants<Rectangle>())
+            var alreadyLayered = false;
+
+            foreach (var child in panel.Children)
             {
-                // Check for selected line highlight properties
-                if (rectangle.RadiusX > 0 || rectangle.StrokeThickness <= 0)
+                if (child is not Rectangle rectangle ||
+                    // Check for collapsed item properties
+                    (rectangle.RadiusX == 0 && rectangle.StrokeThickness > 0))
+                {
+                    continue;
+                }
+
+                if (alreadyLayered)
+                {
+                    // Avoid layering more than once
+                    rectangle.Fill = Brushes.Transparent;
+                }
+                else
                 {
                     rectangle.SetResourceReference(Shape.FillProperty, LayeredBrushKey);
+                    alreadyLayered = true;
                 }
             }
         }

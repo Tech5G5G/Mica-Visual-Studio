@@ -181,14 +181,14 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         }
 
         void Action(ElementTransparentizer transparentizer)
-            {
+        {
             if (instance is FrameworkElement element && GetIsTracked(element) &&
                 child is FrameworkElement childElement)
             {
                 transparentizer.StyleProcedure(element);
                 transparentizer.StyleElementTree(childElement, TreeType.Visual);
             }
-    }
+        }
     }
 
     private void OnFrameIsOnScreenChanged(IVsWindowFrame frame, bool isOnScreen)
@@ -240,11 +240,11 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     {
         try
         {
-        if (PInvoke.GetClassName(PInvoke.GetOwner(e.WindowHandle)) == DocOutlineWindowClassName)
-        {
-            StyleHwnd(e.WindowHandle);
+            if (PInvoke.GetClassName(PInvoke.GetOwner(e.WindowHandle)) == DocOutlineWindowClassName)
+            {
+                StyleHwnd(e.WindowHandle);
+            }
         }
-    }
         catch (Exception ex)
         {
             _logger.Output(ex);
@@ -271,8 +271,10 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
 
     public void StyleWindow(Window window)
     {
-        StyleElementTree(window);
+        if (window.WindowType != WindowType.Main)
+        {
             StyleElementTree(window, TreeType.Visual);
+        }
     }
 
     public void StyleAllWindowFrames()
@@ -502,7 +504,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     }
 
     public void Layer(FrameworkElement element)
-                {
+    {
         element.SetResourceReference(Panel.BackgroundProperty, LayeredBrushKey);
     }
 

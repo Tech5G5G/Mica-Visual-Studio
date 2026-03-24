@@ -416,11 +416,12 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
                 {
                     StyleBorder(border);
                 }
-                break;
+                SetIsTracked(element, value: true);
+                return;
 
             case HwndHost host:
                 StyleHwndHost(host);
-                break;
+                return;
         }
 
         if (element is ContentControl or ContentPresenter or Decorator)
@@ -440,6 +441,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         if (handlers.TryGetValue(element.Name, out var nameAction))
         {
             nameAction(this, element);
+            return;
         }
 
         // and fallback to type checking if none found

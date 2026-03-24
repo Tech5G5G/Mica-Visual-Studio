@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.Shell;
 
-namespace MicaVisualStudio.Services.Styling;
+namespace MicaVisualStudio.Services.Resourcing;
 
 public static class ThemeResourceKeys
 {

@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using Microsoft.VisualStudio.PlatformUI;
 using MicaVisualStudio.Extensions;
+using MicaVisualStudio.Services.Resourcing;
 using Transparentizer = MicaVisualStudio.Services.Styling.ElementTransparentizer;
 
 namespace MicaVisualStudio.Services.Styling;

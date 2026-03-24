@@ -13,6 +13,7 @@ using MicaVisualStudio.Options;
 using MicaVisualStudio.Interop;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Extensions;
+using MicaVisualStudio.Services.Resourcing;
 
 namespace MicaVisualStudio.Services.Styling;
 

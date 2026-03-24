@@ -11,7 +11,6 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
-using MicaVisualStudio.Services.Styling;
 
 namespace MicaVisualStudio.Services.Resourcing;
 

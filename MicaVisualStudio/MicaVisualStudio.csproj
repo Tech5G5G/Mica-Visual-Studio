@@ -101,7 +101,7 @@
     <Compile Include="Services\InfoBarService.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Styling\MenuAcrylicizer.cs" />
-    <Compile Include="Services\Styling\ThemeResourceKeys.cs" />
+    <Compile Include="Services\Resourcing\ThemeResourceKeys.cs" />
     <Compile Include="Services\Styling\TreeType.cs" />
     <Compile Include="Services\ThemeService.cs" />
     <Compile Include="Services\Resourcing\ResourceManager.cs" />

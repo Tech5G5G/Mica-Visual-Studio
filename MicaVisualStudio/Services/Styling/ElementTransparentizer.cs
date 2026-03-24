@@ -20,6 +20,7 @@ using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Extensions;
 using MicaVisualStudio.Services.Windowing;
+using MicaVisualStudio.Services.Resourcing;
 using Expression = System.Linq.Expressions.Expression;
 using IResourceManager = MicaVisualStudio.Contracts.IResourceManager;
 

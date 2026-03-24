@@ -512,9 +512,6 @@ public partial class ElementTransparentizer
         // Pull request window, toolbar
         { "targetAndSourceBranchPickers", ElementHandlers.HandleElement },
 
-        // Full-screen title bar
-        { "MenuBarDockPanel", ElementHandlers.HandleElement },
-
         // Document Outline, designer item container
         { "SplitterGrid", PanelHandlers.HandleDocumentOutlineItemContainer },
 

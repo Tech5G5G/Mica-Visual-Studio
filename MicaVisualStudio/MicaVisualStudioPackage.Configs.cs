@@ -42,6 +42,8 @@ public partial class MicaVisualStudioPackage
         { "CommandBarGradient", ResourceConfiguration.Default },
         { "CommandBarGradientBegin", ResourceConfiguration.Default },
 
+        { "CommandShelfHighlightGradient", ResourceConfiguration.Default },
+
         { "ListBox", ResourceConfiguration.Layered },
         { "ListItemBackgroundHover", new(transparentIfGray: false, translucent: true) },
 

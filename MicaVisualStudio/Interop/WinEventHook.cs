@@ -34,7 +34,7 @@ public sealed class WinEventHook : IDisposable
 
     #endregion
 
-    public event EventOccuredEventHandler EventOccurred;
+    public event EventHandler<EventOccuredEventArgs> EventOccurred;
 
     private readonly nint _hookId;
     private readonly WinEventDelegate _hook;
@@ -115,5 +115,3 @@ public sealed class EventOccuredEventArgs(int eventConst, nint hWnd, int idObjec
 
     public int EventTime { get; } = dwmsEventTime;
 }
-
-public delegate void EventOccuredEventHandler(WinEventHook sender, EventOccuredEventArgs e);

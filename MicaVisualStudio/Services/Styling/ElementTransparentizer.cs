@@ -182,11 +182,9 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
 
         void Action(ElementTransparentizer transparentizer)
         {
-            if (instance is FrameworkElement element && GetIsTracked(element) &&
-                child is FrameworkElement childElement)
+            if (instance is FrameworkElement element && GetIsTracked(element))
             {
-                transparentizer.StyleProcedure(element);
-                transparentizer.StyleElementTree(childElement, TreeType.Visual);
+                transparentizer.StyleElementTree(element, TreeType.Visual);
             }
         }
     }
@@ -410,7 +408,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
                 return;
 
             case Border border:
-                    StyleBorder(border);
+                StyleBorder(border);
                 SetIsTracked(element, value: true);
                 return;
 

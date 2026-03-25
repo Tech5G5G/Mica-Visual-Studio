@@ -311,7 +311,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
                 }
             });
         }
-        else if (host.FindAncestor<DependencyObject>(o => o.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
+        else if (host.FindAncestor<DependencyObject>(ExtensionMethods.GetVisualOrLogicalParent, IsDockTarget) is Border dock)
         {
             StyleElementTree(dock, TreeType.Visual);
         }
@@ -321,7 +321,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
             {
                 UseTransparentizer(t =>
                 {
-                    if ((s as Border)?.FindAncestor<DependencyObject>(o => o.GetVisualOrLogicalParent(), t.IsDockTarget) is Border dock)
+                    if ((s as Border)?.FindAncestor<DependencyObject>(ExtensionMethods.GetVisualOrLogicalParent, t.IsDockTarget) is Border dock)
                     {
                         t.StyleElementTree(dock, TreeType.Visual);
                     }

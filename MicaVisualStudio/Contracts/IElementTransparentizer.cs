@@ -21,7 +21,6 @@ public interface IElementTransparentizer
     void StylePanel(Panel panel);
     void StyleBorder(Border border);
 
-    void StyleDockTarget(Border dock);
     void StyleHwndHost(HwndHost host);
 
     void Layer(FrameworkElement element);

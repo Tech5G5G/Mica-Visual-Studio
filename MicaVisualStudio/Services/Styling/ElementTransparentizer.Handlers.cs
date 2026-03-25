@@ -635,6 +635,13 @@ public partial class ElementTransparentizer
 
     private static readonly Dictionary<string, Action<Transparentizer, Border>> s_borderHandlers = new()
     {
+        // DockTarget is used in multiple ways
+
+        // If name is ViewFrameTarget, it's the background behind a single floating tool window
+        { "ViewFrameTarget", BorderHandlers.HandleFrameDockTarget },
+        // Otherwise, make it transparent to remove the smoke layer behind tabs
+        { "Microsoft.VisualStudio.PlatformUI.Shell.Controls.DockTarget", BorderHandlers.HandleDockTarget },
+
         // Window frame, content area
         { "PART_ContentPanel", ElementHandlers.HandleLayeredElement },
 
@@ -665,6 +672,22 @@ public partial class ElementTransparentizer
 
     private static class BorderHandlers
     {
+        public static void HandleFrameDockTarget(Transparentizer transparentizer, Border border)
+        {
+            if (transparentizer.IsDockTarget(border))
+            {
+                transparentizer.Layer(border);
+            }
+        }
+
+        public static void HandleDockTarget(Transparentizer transparentizer, Border border)
+        {
+            if (transparentizer.IsDockTarget(border))
+            {
+                border.Background = Brushes.Transparent;
+            }
+        }
+
         public static void HandleSectionHeader(Transparentizer transparentizer, Border border)
         {
             if (border is { Style: { } style })

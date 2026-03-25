@@ -410,14 +410,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
                 return;
 
             case Border border:
-                if (IsDockTarget(border))
-                {
-                    StyleDockTarget(border);
-                }
-                else
-                {
                     StyleBorder(border);
-                }
                 SetIsTracked(element, value: true);
                 return;
 
@@ -476,31 +469,6 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     public void StyleBorder(Border border)
     {
         StyleBackgroundElement(border, s_borderHandlers, s_borderTypeHandlers);
-    }
-
-    public void StyleDockTarget(Border dock)
-    {
-        // DockTarget is used in multiple ways
-
-        // If name is ViewFrameTarget, it's the background behind a single floating tool window
-        if (dock.Name == "ViewFrameTarget")
-        {
-            Layer(dock);
-        }
-        // Otherwise, make it transparent to remove the smoke layer behind tabs
-        else
-        {
-            dock.Background = Brushes.Transparent;
-        }
-    }
-
-    public void StyleHwndHost(HwndHost host)
-    {
-        var handle = host.Handle;
-        if (handle != IntPtr.Zero)
-        {
-            StyleHwnd(handle);
-        }
     }
 
     public void Layer(FrameworkElement element)

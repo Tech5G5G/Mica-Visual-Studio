@@ -14,11 +14,8 @@ using MicaVisualStudio.Contracts;
 
 namespace MicaVisualStudio.Services.Resourcing;
 
-public sealed class ResourceManager : IResourceManager
+public sealed class ResourceManager : IResourceManager, IDisposable
 {
-    private static readonly ThemeResourceKey MainWindowActiveCaptionKey =
-        new(category: new("624ed9c3-bdfd-41fa-96c3-7c824ea32e3d"), name: "MainWindowActiveCaption", ThemeResourceKeyType.BackgroundColor);
-
     private static Color TransparentWhite = Colors.Transparent,
                          TranslucentBlack = Color.FromArgb(0x01, 0x00, 0x00, 0x00); // Slight alpha to change icon foreground (basically invisible)
 
@@ -40,22 +37,24 @@ public sealed class ResourceManager : IResourceManager
         _shell5 = shell5;
 
         GetTheme(out _theme);
-        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged).CollectionChanged += (_, e) =>
+        (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged)?.CollectionChanged += OnCollectionChanged;
+    }
+
+    private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Listen for new dictionaries
+        if (e.Action is not (NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace))
         {
-            // Listen for new dictionaries
-            if (e.Action is not (NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace))
-            {
-                return;
-            }
+            return;
+        }
 
-            ConfigureResources();
-            AddCustomResources();
+        ConfigureResources();
+        AddCustomResources();
 
-            if (GetTheme(out var theme))
-            {
-                VisualStudioThemeChanged?.Invoke(this, _theme = theme);
-            }
-        };
+        if (GetTheme(out var theme))
+        {
+            VisualStudioThemeChanged?.Invoke(this, _theme = theme);
+        }
     }
 
     public void ConfigureResources()
@@ -104,21 +103,21 @@ public sealed class ResourceManager : IResourceManager
         foreach (var dictionary in Application.Current.Resources.MergedDictionaries.OfType<DeferredResourceDictionaryBase>())
             foreach (var pair in _resources)
             {
-                var resource = pair.Value;
-                var value = resource.Factory(
-                    _theme,
-                    resource.BaseResourceKey is null ? default : _shell5.GetThemedWPFColor(resource.BaseResourceKey));
-
                 if (!dictionary.Contains(pair.Key))
                 {
-                    dictionary.Add(pair.Key, value);
+                    var resource = pair.Value;
+                    dictionary.Add(
+                        pair.Key,
+                        resource.Factory(
+                            _theme,
+                            resource.BaseResourceKey is null ? default : _shell5.GetThemedWPFColor(resource.BaseResourceKey)));
                 }
             }
     }
 
     private bool GetTheme(out Theme theme)
     {
-        theme = _shell5.GetThemedWPFColor(MainWindowActiveCaptionKey).IsLight() ? Theme.Light : Theme.Dark;
+        theme = _shell5.GetThemedWPFColor(ThemeResourceKeys.MainWindowActiveCaption).IsLight() ? Theme.Light : Theme.Dark;
         return _theme != theme;
     }
 
@@ -146,4 +145,21 @@ public sealed class ResourceManager : IResourceManager
             return Color.FromArgb(Math.Min(config.Opacity, color.A), color.R, color.G, color.B);
         }
     }
+
+    #region Dispose
+
+    private bool _disposed;
+
+    void IDisposable.Dispose()
+    {
+        if (!_disposed)
+        {
+            (Application.Current.Resources.MergedDictionaries as INotifyCollectionChanged)?.CollectionChanged -= OnCollectionChanged;
+            VisualStudioThemeChanged = null;
+
+            _disposed = true;
+        }
+    }
+
+    #endregion
 }

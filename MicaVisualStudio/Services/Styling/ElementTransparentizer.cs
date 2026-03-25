@@ -2,16 +2,15 @@
 using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using System.Windows.Interop;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -21,6 +20,7 @@ using MicaVisualStudio.Options;
 using MicaVisualStudio.Contracts;
 using MicaVisualStudio.Extensions;
 using MicaVisualStudio.Services.Windowing;
+using MicaVisualStudio.Services.Resourcing;
 using Expression = System.Linq.Expressions.Expression;
 using IResourceManager = MicaVisualStudio.Contracts.IResourceManager;
 
@@ -31,23 +31,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     private const string DocOutlineWindowClassName = "VsDocOutlineTool",
                          MultiViewHostTypeName = "Microsoft.VisualStudio.Editor.Implementation.WpfMultiViewHost";
 
-    #region Keys
-
     private const string LayeredBrushKey = "VsBrush.SolidBackgroundFillTertiaryLayered";
-
-    private static readonly ThemeResourceKey SolidBackgroundFillTertiaryKey =
-        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "SolidBackgroundFillTertiary", ThemeResourceKeyType.BackgroundBrush);
-
-    private static readonly ThemeResourceKey TextFillPrimaryKey =
-        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextFillPrimary", ThemeResourceKeyType.BackgroundBrush);
-
-    private static readonly ThemeResourceKey TextOnAccentFillPrimaryKey =
-        new(category: new("73708ded-2d56-4aad-b8eb-73b20d3f4bff"), name: "TextOnAccentFillPrimary", ThemeResourceKeyType.BackgroundBrush);
-
-    private readonly ThemeResourceKey ScrollBarBackgroundKey =
-        new(category: new("{624ed9c3-bdfd-41fa-96c3-7c824ea32e3d}"), name: "ScrollBarBackground", ThemeResourceKeyType.BackgroundBrush);
-
-    #endregion
 
     private static ElementTransparentizer s_transparentizer;
 
@@ -81,7 +65,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         _resource = resource;
 
         // Add layered brush
-        resource.CustomResources.Add(LayeredBrushKey, new(SolidBackgroundFillTertiaryKey, (_, c) =>
+        resource.CustomResources.Add(LayeredBrushKey, new(ThemeResourceKeys.SolidBackgroundFillTertiary, (_, c) =>
             new SolidColorBrush(c with { A = 0xFF / 2 /* 50% opacity */ })));
         resource.AddCustomResources();
 
@@ -146,7 +130,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         EventManager.RegisterClassHandler(
             dockType,
             FrameworkElement.LoadedEvent,
-            new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border))));
+            new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border, TreeType.Visual))));
 
         if (AppDomain.CurrentDomain.GetAssemblies()
                                    .FirstOrDefault(a => a.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
@@ -155,7 +139,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
             EventManager.RegisterClassHandler(
                 hostType,
                 FrameworkElement.LoadedEvent,
-                new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel))));
+                new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as DockPanel, TreeType.Visual))));
         }
     }
 
@@ -190,14 +174,19 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
 
     private static void AddVisualChild(Visual instance, Visual child)
     {
-        UseTransparentizer(t =>
+        // Skip untracked types
+        if (instance is ContentControl or ContentPresenter or Decorator or Panel)
         {
-            if (instance is ContentControl or ContentPresenter or Decorator or Panel && // Skip other types
-                instance is FrameworkElement element && GetIsTracked(element))
+            UseTransparentizer(Action);
+        }
+
+        void Action(ElementTransparentizer transparentizer)
+        {
+            if (instance is FrameworkElement element && GetIsTracked(element))
             {
-                t.StyleElementTree(element);
+                transparentizer.StyleElementTree(element, TreeType.Visual);
             }
-        });
+        }
     }
 
     private void OnFrameIsOnScreenChanged(IVsWindowFrame frame, bool isOnScreen)
@@ -245,11 +234,18 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         }
     }
 
-    private void OnEventOccurred(WinEventHook sender, EventOccuredEventArgs e)
+    private void OnEventOccurred(object sender, EventOccuredEventArgs e)
     {
-        if (PInvoke.GetClassName(PInvoke.GetOwner(e.WindowHandle)) == DocOutlineWindowClassName)
+        try
         {
-            StyleHwnd(e.WindowHandle);
+            if (PInvoke.GetClassName(PInvoke.GetOwner(e.WindowHandle)) == DocOutlineWindowClassName)
+            {
+                StyleHwnd(e.WindowHandle);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Output(ex);
         }
     }
 
@@ -273,7 +269,10 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
 
     public void StyleWindow(Window window)
     {
-        StyleElementTree(window);
+        if (window.WindowType != WindowType.Main)
+        {
+            StyleElementTree(window, TreeType.Visual);
+        }
     }
 
     public void StyleAllWindowFrames()
@@ -310,9 +309,9 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
                 }
             });
         }
-        else if (host.FindAncestor<DependencyObject>(o => o.GetVisualOrLogicalParent(), IsDockTarget) is Border dock)
+        else if (host.FindAncestor<DependencyObject>(ExtensionMethods.GetVisualOrLogicalParent, IsDockTarget) is Border dock)
         {
-            StyleElementTree(dock);
+            StyleElementTree(dock, TreeType.Visual);
         }
         else if (!host.IsLoaded)
         {
@@ -320,63 +319,12 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
             {
                 UseTransparentizer(t =>
                 {
-                    if ((s as Border)?.FindAncestor<DependencyObject>(o => o.GetVisualOrLogicalParent(), t.IsDockTarget) is Border dock)
+                    if ((s as Border)?.FindAncestor<DependencyObject>(ExtensionMethods.GetVisualOrLogicalParent, t.IsDockTarget) is Border dock)
                     {
-                        t.StyleElementTree(dock);
+                        t.StyleElementTree(dock, TreeType.Visual);
                     }
                 });
             });
-        }
-    }
-
-    public void StyleElementTree(FrameworkElement element)
-    {
-        StyleTree(element.FindDescendants<FrameworkElement>().Append(element));
-    }
-
-    public void StyleTree(IEnumerable<FrameworkElement> tree)
-    {
-        foreach (var element in tree)
-        {
-            switch (element)
-            {
-                case ToolBar bar:
-                    StyleToolBar(bar);
-                    break;
-
-                case TabItem tab:
-                    StyleTabItem(tab);
-                    break;
-
-                case HwndHost host:
-                    StyleHwndHost(host);
-                    break;
-
-                case Control control:
-                    StyleControl(control);
-                    break;
-
-                case Panel panel:
-                    StylePanel(panel);
-                    break;
-
-                case Border border:
-                    if (IsDockTarget(border))
-                    {
-                        StyleDockTarget(border);
-                    }
-                    else
-                    {
-                        StyleBorder(border);
-                    }
-                    break;
-            }
-
-            if (element is ContentControl or ContentPresenter or Decorator or Panel)
-            {
-                // Track visual children
-                SetIsTracked(element, value: true);
-            }
         }
     }
 
@@ -384,7 +332,7 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
     {
         if (HwndSource.FromHwnd(handle) is { RootVisual: FrameworkElement element })
         {
-            StyleElementTree(element);
+            StyleElementTree(element, TreeType.Visual);
             return;
         }
 
@@ -394,12 +342,14 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
             return;
         }
 
-        var layer = true;
-        foreach (var child in children)
+        var layer = _layeredWindows;
+        for (int i = 0; i < children.Count; ++i)
         {
+            var child = children[i];
+
             if (HwndSource.FromHwnd(child) is { RootVisual: FrameworkElement childElement })
             {
-                StyleElementTree(childElement);
+                StyleElementTree(childElement, TreeType.Visual);
                 layer = false;
             }
             else if (PInvoke.GetClassName(child) is
@@ -416,502 +366,113 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
         }
     }
 
-    public void StyleDockTarget(Border dock)
+    public void StyleElementTree(FrameworkElement element, TreeType type)
     {
-        // DockTarget is used in multiple ways
-
-        // If name is ViewFrameTarget, it's the background behind a single floating tool window
-        if (dock.Name == "ViewFrameTarget")
+        if (type == TreeType.Visual)
         {
-            Layer(dock);
+            StyleProcedure(element);
+
+            var count = VisualTreeHelper.GetChildrenCount(element);
+            for (int i = 0; i < count; ++i)
+            {
+                if (VisualTreeHelper.GetChild(element, i) is FrameworkElement child)
+                {
+                    StyleElementTree(child, TreeType.Visual);
+                }
+            }
         }
-        // Otherwise, make it transparent to remove the smoke layer behind tabs
         else
         {
-            dock.Background = Brushes.Transparent;
-        }
-    }
-
-    public void StyleToolBar(ToolBar bar)
-    {
-        if (bar.GetVisualOrLogicalParent() is not ToolBarTray { Name: "TopDockTray" })
-        {
-            bar.Background = bar.BorderBrush = Brushes.Transparent;
-            (bar.Parent as ToolBarTray)?.Background = Brushes.Transparent;
-        }
-    }
-
-    public void StyleTabItem(TabItem tab)
-    {
-        if (tab.DataContext is not DependencyObject view ||
-            // Window frame, tab strip
-            tab.GetVisualOrLogicalParent() is not FrameworkElement { Name: "PART_TabPanel" })
-        {
-            return;
-        }
-
-        tab.Background = Brushes.Transparent;
-        tab.SetResourceReference(
-            Control.ForegroundProperty,
-            tab.IsSelected && (bool)view.GetValue(View_IsActiveProperty) ? TextOnAccentFillPrimaryKey : TextFillPrimaryKey);
-
-        if (GetIsTracked(tab))
-        {
-            return;
-        }
-
-        SetIsTracked(tab, value: true);
-        WeakReference<TabItem> weakTab = new(tab);
-
-        tab.AddWeakPropertyChangeHandler(TabItem.IsSelectedProperty, static (s, _) =>
-        {
-            if (s is TabItem tab)
+            foreach (var child in LogicalTreeHelper.GetChildren(element))
             {
-                UseTransparentizer(t => t.StyleTabItem(tab));
+                if (child is FrameworkElement childElement)
+                {
+                    StyleProcedure(childElement);
+                    StyleElementTree(childElement, TreeType.Logical);
+                }
             }
-        });
-        view.AddWeakPropertyChangeHandler(View_IsActiveProperty, (_, _) =>
-        {
-            if (weakTab.TryGetTarget(out TabItem tab))
-            {
-                UseTransparentizer(t => t.StyleTabItem(tab));
-            }
-        });
+        }
     }
 
-    public void StyleHwndHost(HwndHost host)
+    private void StyleProcedure(FrameworkElement element)
     {
-        if (!_layeredWindows)
+        switch (element)
         {
+            case Control control:
+                StyleControl(control);
+                break;
+
+            case Panel panel:
+                StylePanel(panel);
+                SetIsTracked(element, value: true);
+                return;
+
+            case Border border:
+                StyleBorder(border);
+                SetIsTracked(element, value: true);
+                return;
+
+            case HwndHost { Handle: nint handle }
+            when handle != IntPtr.Zero:
+                StyleHwnd(handle);
+                return;
+        }
+
+        if (element is ContentControl or ContentPresenter or Decorator)
+        {
+            // Track visual children
+            SetIsTracked(element, value: true);
+        }
+    }
+
+    private void StyleBackgroundElement<T>(
+        T element,
+        Dictionary<string, Action<ElementTransparentizer, T>> handlers,
+        ConcurrentDictionary<Type, Action<ElementTransparentizer, T>> typeHandlers)
+        where T : FrameworkElement
+    {
+        // Check for action using name...
+        if (handlers.TryGetValue(element.Name, out var nameAction))
+        {
+            nameAction(this, element);
             return;
         }
 
-        var handle = host.Handle;
-        if (handle != IntPtr.Zero)
+        // and fallback to type checking if none found
+        var type = element.GetType();
+
+        // Check type itself first...
+        if (typeHandlers.TryGetValue(type, out var typeAction))
         {
-            StyleHwnd(handle);
+            typeAction(this, element);
+        }
+        // but check using type name if necessary...
+        else if (handlers.TryGetValue(type.FullName, out var typeNameAction))
+        {
+            typeNameAction(this, element);
+            // and cache action for type to avoid using Type.FullName again
+            typeHandlers[type] = typeNameAction;
         }
     }
 
     public void StyleControl(Control control)
     {
-        switch (control.Name)
-        {
-            // Warning dialog, footer
-            case "OKButton"
-            when control is Button &&
-                Window.GetWindow(control) is DialogWindowBase &&
-                control.GetVisualOrLogicalParent()?
-                       .GetVisualOrLogicalParent() is Border footer:
-                Layer(footer);
-                return;
-
-            // Host of WpfTextView I guess
-            case "WpfTextViewHost":
-                control.Resources["outlining.chevron.expanded.background"] =
-                control.Resources["outlining.chevron.collapsed.background"] = Brushes.Transparent;
-
-                control.LogicalDescendant<Grid>()?.Background = Brushes.Transparent;
-                return;
-
-            // Editor, output, etc. text
-            case "WpfTextView" when control is ContentControl:
-                control.Background = Brushes.Transparent;
-                control.FindDescendant<Canvas>()?.Background = Brushes.Transparent;
-                return;
-
-            // Packaged app configurations list
-            case "PackageConfigurationsList" when control is DataGrid grid:
-                grid.Background = grid.RowBackground = Brushes.Transparent;
-                TransparentizeStyle(grid.CellStyle);
-                return;
-
-            // VSIX manifest editor
-            case "VsixEditorControl":
-                control.Background = Brushes.Transparent;
-                foreach (var tab in control.FindDescendants<TabItem>())
-                {
-                    tab.Background = Brushes.Transparent;
-                }
-                return;
-
-            // Window frame, title bar
-            case "PART_Header":
-                control.Background = Brushes.Transparent;
-                return;
-
-            // Copilot window, message box
-            case "ChatPrompt":
-                control.Background = Brushes.Transparent;
-                return;
-
-            // Editor window, map scroll bar buttons
-            case "UpButton" or "DownButton"
-            when control is RepeatButton && control.FindDescendant<Border>() is { Name: "Border" } border:
-                border.Background = Brushes.Transparent;
-                return;
-
-            // AppxManifest editor
-            case "MainTabControl"
-            when control.GetVisualOrLogicalParent()?
-                        .GetVisualOrLogicalParent() is Grid { Name: "LayoutRoot" } root:
-                control.Background = root.Background = Brushes.Transparent;
-                return;
-
-            // Resource editor
-            case "_resourceView"
-            when control is ContentControl { Content: DockPanel panel }:
-                panel.Background = Brushes.Transparent;
-                return;
-
-            // Code coverage, column headers
-            case "GridHeader" when control is DataGrid:
-                control.Background = Brushes.Transparent;
-                return;
-
-            // Pull Members Up, member list
-            case "MemberSelectionGrid"
-            when control is DataGrid { RowStyle: { } style } grid:
-                grid.RowStyle = SubclassStyle(style);
-                return;
-
-            // Document Outline, root
-            case "DocumentOutline"
-            when control.GetVisualOrLogicalParent() is Panel adapter:
-                Layer(adapter);
-
-                if (!GetIsTracked(adapter))
-                {
-                    adapter.SizeChanged += OnSizeChanged;
-                    SetIsTracked(adapter, value: true);
-                }
-
-                static void OnSizeChanged(object sender, RoutedEventArgs e)
-                {
-                    if (sender is Panel adapter)
-                    {
-                        UseTransparentizer(t => t.Layer(adapter));
-                    }
-                }
-                return;
-
-            // Document Outline, list view
-            case "SymbolTree"
-            when control is TreeView && control.FindDescendant<Rectangle>() is { } rectangle:
-                rectangle.Fill = Brushes.Transparent;
-                return;
-
-            // Document Outline, designer root
-            case "DocumentOutlinePaneHolder":
-                control.Background = Brushes.Transparent;
-                return;
-
-            #region Git Windows
-
-            case "gitWindowView" or // Git changes window
-                "focusedWindowView" or // Git repository window
-                "detailsView" or // Git commit details
-                "focusedDetailsContainer" or // Git commit details container
-                "teamExplorerFrame" or // Team explorer window
-                "createPullRequestView" or // New PR window
-                "pullRequestView": // Pull request window
-            GitWindow:
-                {
-                    control.Background = Brushes.Transparent;
-
-                    // Git command buttons
-                    if (control.TryFindResource("TESectionCommandButtonStyle") is Style style)
-                    {
-                        TransparentizeStyle(style);
-                    }
-
-                    StyleTree(control.LogicalDescendants<FrameworkElement>());
-                }
-                return;
-
-            // Commit history
-            case "historyView"
-            when control.GetVisualOrLogicalParent()?
-                        .GetVisualOrLogicalParent()?
-                        .GetVisualOrLogicalParent() is Border history:
-                history.Background = Brushes.Transparent;
-                goto GitWindow;
-
-            // Smth in a git window
-            case "thisPageControl":
-                control.Background = Brushes.Transparent;
-                return;
-
-            // Team explorer, project selector
-            case "navControl":
-                control.Background = Brushes.Transparent;
-                return;
-
-            // Git branch selector
-            case "branchesList"
-            when control.GetVisualOrLogicalParent()?
-                        .GetVisualOrLogicalParent()?
-                        .GetVisualOrLogicalParent()?
-                        .GetVisualOrLogicalParent() is Control branches:
-                branches.Background = Brushes.Transparent;
-                return;
-
-            // Commit history list
-            case "historyListView"
-            when control is ListView { View: GridView { ColumnHeaderContainerStyle: { } style } grid }:
-                grid.ColumnHeaderContainerStyle = SubclassStyle(style);
-
-                foreach (var c in grid.Columns.Select(c => c.Header).OfType<Control>())
-                {
-                    c.ApplyTemplate();
-                    c.FindDescendant<Border>(b => b.Name == "HeaderBorder")?.BorderBrush = Brushes.Transparent;
-                }
-                return;
-
-            // Commit diff info
-            case "pageContentViewer"
-            when control.GetVisualOrLogicalParent()?
-                        .GetVisualOrLogicalParent() is Border viewer:
-                viewer.Background = Brushes.Transparent;
-                return;
-
-            // Commit diff presenter dock buttons
-            case "dockToBottomButton" or
-                "dockToRightButton" or
-                "undockButton" or
-                "maximizeMinimizeButton" or
-                "closeButton"
-            when control is Button { Style: { } style } button:
-                button.Style = SubclassStyle(style);
-                return;
-
-            // Git push, pull etc. buttons
-            case "actionButton" or
-                "fetchButton" or
-                "pullButton" or
-                "pushButton" or
-                "syncButton" or
-                "additionalOperationsButton"
-            when control is Button { Style: { } style } button:
-                button.Style = SubclassStyle(style);
-                return;
-
-            // GitHub PR, overview
-            case "OverviewListBox" when control is ListBox { ItemContainerStyle: { } style } list:
-                list.Background = Brushes.Transparent;
-                list.ItemContainerStyle = SubclassStyle(style);
-                return;
-
-            // Git changes...
-            case "statusControl" or // Actions/toolbar
-                "inactiveRepoContent" or // Create repo
-                "sectionContainer": // Branches and tags
-                control.Background = Brushes.Transparent;
-                return;
-
-            #endregion
-        }
-
-        switch (control.GetType().FullName)
-        {
-            // AppxManifest editor
-            case "Microsoft.VisualStudio.AppxManifestDesigner.Designer.ManifestDesignerUserControlProxy":
-            case "Microsoft.VisualStudio.AppxManifestDesigner.Designer.ManifestDesignerUserControl":
-                control.Background = Brushes.Transparent;
-                break;
-
-            // Resource editor
-            case "Microsoft.VisualStudio.ResourceExplorer.UI.ResourceGroupEditorControl":
-                control.Background = Brushes.Transparent;
-                break;
-
-            // JSON editor, schema selector
-            case "Microsoft.WebTools.Languages.Json.VS.Schema.DropdownMargin.JsonSchemaDropdown"
-            when control.FindDescendant<Grid>() is { } grid:
-                grid.Background = Brushes.Transparent;
-                break;
-
-            // Memory layout
-            case "Microsoft.VisualStudio.VC.MemoryViewer.MemoryViewerControl":
-                control.Resources.MergedDictionaries.Clear();
-                break;
-        }
+        StyleBackgroundElement(control, s_controlHandlers, s_controlTypeHandlers);
     }
 
     public void StylePanel(Panel panel)
     {
-        switch (panel.Name)
-        {
-            // Commit diff
-            case "detailsViewMainGrid"
-            when panel.GetVisualOrLogicalParent()?
-                      .GetVisualOrLogicalParent() is Border details:
-                details.Background = Brushes.Transparent;
-                return;
-
-            // Status bar
-            case "StatusBarPanel":
-                return;
-
-            // Editor window, loading placeholder
-            case "StackPanel_LoadingDocumentUI":
-                panel.Background = Brushes.Transparent;
-                return;
-
-            // Commit history, toolbar container
-            case "toolbarGrid":
-                panel.Background = Brushes.Transparent;
-                return;
-
-            // Pull request window, toolbar
-            case "targetAndSourceBranchPickers":
-                panel.Background = Brushes.Transparent;
-                return;
-
-            // Full-screen title bar
-            case "MenuBarDockPanel":
-                panel.Background = Brushes.Transparent;
-                return;
-
-            // Document Outline, designer item container
-            case "SplitterGrid" when panel is Grid grid:
-                Layer(grid);
-
-                foreach (var border in grid.Children.OfType<Border>())
-                {
-                    border.Background = Brushes.Transparent;
-                }
-                return;
-
-            // Merge editor
-            case "mainLayoutPanel" when panel is Grid:
-                panel.Background = Brushes.Transparent;
-                return;
-        }
-
-        switch (panel.GetType().FullName)
-        {
-            // Editor window, root
-            case MultiViewHostTypeName:
-                panel.Resources[ScrollBarBackgroundKey] = Brushes.Transparent;
-                break;
-
-            // Editor window, bottom container
-            case "Microsoft.VisualStudio.Text.Utilities.ContainerMargin"
-            when !panel.FindDescendants<Panel>().Any(p => p.GetType().FullName == "Microsoft.VisualStudio.Text.Utilities.ContainerMargin"):
-                Layer(panel);
-                break;
-
-            // Editor window, left side icon container
-            case "Microsoft.VisualStudio.Text.Editor.Implementation.GlyphMarginGrid"
-            when panel.Background is SolidColorBrush solid && solid.Color != Brushes.Transparent.Color:
-                Layer(panel);
-                break;
-
-            // Scroll bar intersection
-            case "Microsoft.VisualStudio.Editor.Implementation.BottomRightCornerSpacerMargin":
-                panel.Background = Brushes.Transparent;
-                break;
-
-            // Editor window, collapsed item container
-            case "Microsoft.VisualStudio.Text.Editor.Implementation.AdornmentLayer":
-                foreach (var rectangle in panel.FindDescendants<Rectangle>())
-                {
-                    // Check for selected line highlight properties
-                    if (rectangle.RadiusX > 0 || rectangle.StrokeThickness <= 0)
-                    {
-                        rectangle.SetResourceReference(Shape.FillProperty, LayeredBrushKey);
-                    }
-                }
-                break;
-
-            // Editor window, map scroll bar
-            case "Microsoft.VisualStudio.Text.OverviewMargin.Implementation.OverviewElement":
-                panel.Background = Brushes.Transparent;
-                break;
-
-            // Commit diff view
-            case "Microsoft.VisualStudio.Differencing.Package.DiffControl":
-                panel.Background = Brushes.Transparent;
-                break;
-
-            // Memory layout, item list
-            case "Microsoft.VisualStudio.VC.MemoryViewer.MemoryLayoutCanvas"
-            when panel.FindDescendant<Line>() is null &&
-                panel.GetType().GetProperty("FontBrush", BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public) is { } property &&
-                panel.TryFindResource(SolidBackgroundFillTertiaryKey) is Brush brush:
-                property.SetValue(panel, brush);
-                break;
-        }
+        StyleBackgroundElement(panel, s_panelHandlers, s_panelTypeHandlers);
     }
 
     public void StyleBorder(Border border)
     {
-        switch (border.Name)
-        {
-            // Window frame, content area
-            case "PART_ContentPanel":
-                Layer(border);
-                return;
-
-            // Window frame, body
-            case "ToolWindowBorder":
-                border.Background = Brushes.Transparent;
-                return;
-
-            // Start window, footer
-            case "FooterBorder":
-                Layer(border);
-                return;
-
-            // Git window, section header
-            case "borderHeader" when border is { Style: { } style }:
-                border.Style = SubclassStyle(style);
-                return;
-        }
-
-        switch (border.GetType().FullName)
-        {
-            // Output window, root
-            case "Microsoft.VisualStudio.PlatformUI.OutputWindow":
-                border.Background = Brushes.Transparent;
-                break;
-
-            // Editor window, file errors container
-            case "Microsoft.VisualStudio.UI.Text.Wpf.FileHealthIndicator.Implementation.FileHealthIndicatorMargin":
-                border.Background = Brushes.Transparent;
-                break;
-
-            // Editor window, PR comment toolbar
-            case "Microsoft.VisualStudio.Commenting.Presentation.Comments.Margin.CommentToolbar":
-                border.Background = Brushes.Transparent;
-                break;
-
-            // Commit diff view, toolbar
-            case "Microsoft.VisualStudio.Differencing.Package.DiffControlToolbar":
-                border.Background = Brushes.Transparent;
-                break;
-
-            // List window, root
-            case "Microsoft.VisualStudio.ErrorListPkg.TableControlToolWindowPaneBase+ContentWrapper":
-                border.Resources.MergedDictionaries.Clear();
-                break;
-        }
+        StyleBackgroundElement(border, s_borderHandlers, s_borderTypeHandlers);
     }
 
-    public void Layer(Control control)
+    public void Layer(FrameworkElement element)
     {
-        control.SetResourceReference(Control.BackgroundProperty, LayeredBrushKey);
-    }
-
-    public void Layer(Panel panel)
-    {
-        panel.SetResourceReference(Panel.BackgroundProperty, LayeredBrushKey);
-    }
-
-    public void Layer(Border border)
-    {
-        border.SetResourceReference(Border.BackgroundProperty, LayeredBrushKey);
+        element.SetResourceReference(Panel.BackgroundProperty, LayeredBrushKey);
     }
 
     public void TransparentizeStyle(Style style)

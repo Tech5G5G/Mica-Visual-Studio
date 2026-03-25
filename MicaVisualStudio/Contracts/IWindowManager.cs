@@ -10,10 +10,10 @@ public interface IWindowManager
 {
     IReadOnlyDictionary<nint, Window> Windows { get; }
 
+    IReadOnlyList<IVsWindowFrame> WindowFrames { get; }
+
     event EventHandler<WindowActionEventArgs> WindowOpened;
     event EventHandler<WindowActionEventArgs> WindowClosed;
-
-    IReadOnlyList<IVsWindowFrame> WindowFrames { get; }
 
     event WindowFrameEventHandler<object> FrameCreated;
     event WindowFrameEventHandler<object> FrameDestroyed;

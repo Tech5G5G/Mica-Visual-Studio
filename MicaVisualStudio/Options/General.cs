@@ -29,7 +29,7 @@ internal sealed partial class OptionsProvider
     }
 }
 
-public class General : ObservableOptionModel<General>, IGeneral
+public sealed class General : ObservableOptionModel<General>, IGeneral
 {
     [OverrideDataType(SettingDataType.Int32)]
     public Theme Theme

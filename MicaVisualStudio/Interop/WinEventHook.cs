@@ -34,7 +34,7 @@ public sealed class WinEventHook : IDisposable
 
     #endregion
 
-    public event EventOccuredEventHandler EventOccurred;
+    public event EventHandler<EventOccuredEventArgs> EventOccurred;
 
     private readonly nint _hookId;
     private readonly WinEventDelegate _hook;
@@ -55,22 +55,29 @@ public sealed class WinEventHook : IDisposable
 
     ~WinEventHook()
     {
-        DisposeInternal(/* disposing: false */);
+        Dispose(disposing: false);
     }
 
     public void Dispose()
     {
-        DisposeInternal(/* disposing: true */);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
-    private void DisposeInternal(/* bool disposing */)
+    private void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
         {
-            UnhookWinEvent(_hookId);
-            _disposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            EventOccurred = null;
+        }
+
+        UnhookWinEvent(_hookId);
+        _disposed = true;
     }
 
     #endregion
@@ -108,5 +115,3 @@ public sealed class EventOccuredEventArgs(int eventConst, nint hWnd, int idObjec
 
     public int EventTime { get; } = dwmsEventTime;
 }
-
-public delegate void EventOccuredEventHandler(WinEventHook sender, EventOccuredEventArgs e);

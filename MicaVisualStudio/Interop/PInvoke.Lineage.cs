@@ -19,7 +19,7 @@ internal partial class PInvoke
         return GetParent(hWnd);
     }
 
-    public static IEnumerable<nint> GetChildren(nint hWnd)
+    public static IList<nint> GetChildren(nint hWnd)
     {
         List<nint> handles = [];
         EnumChildWindows(hWnd, Proc, IntPtr.Zero);

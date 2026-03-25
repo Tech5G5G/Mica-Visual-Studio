@@ -414,8 +414,9 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
                 SetIsTracked(element, value: true);
                 return;
 
-            case HwndHost host:
-                StyleHwndHost(host);
+            case HwndHost { Handle: nint handle }
+            when handle != IntPtr.Zero:
+                StyleHwnd(handle);
                 return;
         }
 

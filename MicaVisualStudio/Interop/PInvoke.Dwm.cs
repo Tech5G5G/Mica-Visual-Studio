@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
 using MicaVisualStudio.Options;
 
@@ -16,28 +15,31 @@ internal partial class PInvoke
     [DllImport("dwmapi.dll", EntryPoint = "DwmEnableBlurBehindWindow")]
     private static extern int EnableBlurBehindWindow(nint hWnd, ref DWM_BLURBEHIND pBlurBehind);
 
-    [DllImport("gdi32.dll")]
-    private static extern nint CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
-
     [DllImport("user32.dll")]
     private static extern bool SetWindowCompositionAttribute(nint hwnd, ref WINDOWCOMPOSITIONATTRIBDATA pwcad);
 
-    private const int DWMWA_SYSTEMBACKDROP_TYPE = 38,
-        DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
-        DWMWA_WINDOW_CORNER_PREFERENCE = 33,
-        DWMWA_BORDER_COLOR = 34;
+    [DllImport("gdi32.dll")]
+    private static extern nint CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+    [DllImport("gdi32.dll")]
+    private static extern bool DeleteObject(nint ho);
+
+    private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
+                      DWMWA_WINDOW_CORNER_PREFERENCE = 33,
+                      DWMWA_BORDER_COLOR = 34,
+                      DWMWA_SYSTEMBACKDROP_TYPE = 38;
 
     private const uint DWMWA_COLOR_NONE = 0xFFFFFFFE,
-        DWMWA_COLOR_DEFAULT = 0xFFFFFFFF;
+                       DWMWA_COLOR_DEFAULT = 0xFFFFFFFF;
 
     private const uint DWM_BB_ENABLE = 0x1,
-        DWM_BB_BLURREGION = 0x2,
-        DWM_BB_TRANSITIONONMAXIMIZED = 0x4;
+                       DWM_BB_BLURREGION = 0x2,
+                       DWM_BB_TRANSITIONONMAXIMIZED = 0x4;
 
     private const int WCA_ACCENT_POLICY = 19;
 
     private const int ACCENT_DISABLED = 0,
-        ACCENT_ENABLE_ACRYLICBLURBEHIND = 4;
+                      ACCENT_ENABLE_ACRYLICBLURBEHIND = 4;
 
     private struct MARGINS
     {
@@ -109,11 +111,20 @@ internal partial class PInvoke
         DWM_BLURBEHIND bb = new()
         {
             fEnable = enable,
-            hRgnBlur = enable ? CreateRectRgn(-2, -2, -1, -1) : IntPtr.Zero,
             fTransitionOnMaximized = true,
             dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION | DWM_BB_TRANSITIONONMAXIMIZED
         };
-        _ = EnableBlurBehindWindow(hWnd, ref bb);
+
+        if (enable)
+        {
+            var rgn = bb.hRgnBlur = CreateRectRgn(-2, -2, -1, -1);
+            EnableBlurBehindWindow(hWnd, ref bb);
+            DeleteObject(rgn);
+        }
+        else
+        {
+            EnableBlurBehindWindow(hWnd, ref bb);
+        }
     }
 
     public static void EnableWindowBlur(nint hWnd, Color fallback, bool enable)

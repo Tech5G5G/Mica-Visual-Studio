@@ -31,25 +31,26 @@ namespace MicaVisualStudio.Interop
         private static extern bool GetWindowAttribute(nint hwnd, uint dwAttribute, out RECT pvAttribute, uint cbAttribute);
 
         private const int WM_NULL = 0x0,
-            WM_DESTROY = 0x2,
-            WM_STYLECHANGING = 0x7C,
-            WM_NCRBUTTONUP = 0xA5,
-            WM_SYSKEYDOWN = 0x104,
-            WM_SYSCOMMAND = 0x112;
+                          WM_DESTROY = 0x2,
+                          WM_SETTINGCHANGE = 0x1A,
+                          WM_STYLECHANGING = 0x7C,
+                          WM_NCRBUTTONUP = 0xA5,
+                          WM_SYSKEYDOWN = 0x104,
+                          WM_SYSCOMMAND = 0x112;
 
         private const uint SC_RESTORE = 0xF120,
-            SC_MOVE = 0xF010,
-            SC_SIZE = 0xF000,
-            SC_MAXIMIZE = 0xF030,
-            SC_MINIMIZE = 0xF020,
-            SC_CLOSE = 0xF060;
+                           SC_MOVE = 0xF010,
+                           SC_SIZE = 0xF000,
+                           SC_MAXIMIZE = 0xF030,
+                           SC_MINIMIZE = 0xF020,
+                           SC_CLOSE = 0xF060;
 
         private const uint TPM_LEFTBUTTON = 0x0,
-            TPM_RIGHTBUTTON = 0x2,
-            TPM_RIGHTALIGN = 0x8,
-            TPM_NONOTIFY = 0x80,
-            TPM_RETURNCMD = 0x100,
-            TPM_NOANIMATION = 0x4000;
+                           TPM_RIGHTBUTTON = 0x2,
+                           TPM_RIGHTALIGN = 0x8,
+                           TPM_NONOTIFY = 0x80,
+                           TPM_RETURNCMD = 0x100,
+                           TPM_NOANIMATION = 0x4000;
 
         private const uint SW_NORMAL = 1, SW_MAXIMIZE = 3;
 
@@ -60,7 +61,7 @@ namespace MicaVisualStudio.Interop
         private const int VK_SPACE = 0x20;
 
         private const int DWMWA_CAPTION_BUTTON_BOUNDS = 5;
-        
+
         private const int MenuSpacing = 2;
 
         private struct WINDOWPLACEMENT
@@ -105,6 +106,13 @@ namespace MicaVisualStudio.Interop
                     case WM_DESTROY:
                         // Clean up hook
                         HwndSource.FromHwnd(hWnd)?.RemoveHook(Hook);
+                        break;
+
+                    case WM_SETTINGCHANGE:
+                        // Visual Studio does some weird stuff during WM_SETTINGCHANGE
+                        // which, in turn, causes a whiteout of the window 
+                        // Mark as handled and don't give it the chance to do so
+                        handled = true;
                         break;
 
                     case WM_STYLECHANGING when (int)wParam == GWL_STYLE:

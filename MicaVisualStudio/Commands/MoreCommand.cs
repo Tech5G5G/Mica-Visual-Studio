@@ -6,7 +6,7 @@ using Community.VisualStudio.Toolkit.DependencyInjection.Core;
 
 namespace MicaVisualStudio;
 
-[Command(PackageIds.MoreCommandId)]
+[Command(CommandTable.MVSPackage.MoreCommandId)]
 public sealed class MoreCommand(DIToolkitPackage package) : BaseDICommand(package)
 {
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)

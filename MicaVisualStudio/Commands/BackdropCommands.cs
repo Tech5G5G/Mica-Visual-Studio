@@ -25,31 +25,31 @@ public abstract class BackdropCommand(DIToolkitPackage package, IGeneral general
     }
 }
 
-[Command(PackageIds.NoneCommandId)]
+[Command(CommandTable.MVSPackage.NoneCommandId)]
 public sealed class NoneCommand(DIToolkitPackage package, IGeneral general) : BackdropCommand(package, general)
 {
     protected override BackdropType Backdrop => BackdropType.None;
 }
 
-[Command(PackageIds.MicaCommandId)]
+[Command(CommandTable.MVSPackage.MicaCommandId)]
 public sealed class MicaCommand(DIToolkitPackage package, IGeneral general) : BackdropCommand(package, general)
 {
     protected override BackdropType Backdrop => BackdropType.Mica;
 }
 
-[Command(PackageIds.TabbedCommandId)]
+[Command(CommandTable.MVSPackage.TabbedCommandId)]
 public sealed class TabbedCommand(DIToolkitPackage package, IGeneral general) : BackdropCommand(package, general)
 {
     protected override BackdropType Backdrop => BackdropType.Tabbed;
 }
 
-[Command(PackageIds.AcrylicCommandId)]
+[Command(CommandTable.MVSPackage.AcrylicCommandId)]
 public sealed class AcrylicCommand(DIToolkitPackage package, IGeneral general) : BackdropCommand(package, general)
 {
     protected override BackdropType Backdrop => BackdropType.Acrylic;
 }
 
-[Command(PackageIds.GlassCommandId)]
+[Command(CommandTable.MVSPackage.GlassCommandId)]
 public sealed class GlassCommand(DIToolkitPackage package, IGeneral general) : BackdropCommand(package, general)
 {
     protected override BackdropType Backdrop => BackdropType.Glass;

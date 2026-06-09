@@ -158,8 +158,16 @@ public sealed class MenuAcrylicizer : IMenuAcrylicizer, IDisposable
             {
                 if (name == "ContentBorder")
                 {
-                    border.Background = Brushes.Transparent;
-                    border.BorderBrush = Brushes.Transparent;
+                    border.Background = border.BorderBrush = Brushes.Transparent;
+
+                    if (border.Child is ContentPresenter presenter &&
+                        presenter.Content is UserControl toolTipControl &&
+                        toolTipControl.VisualChild<Border>() is { } backgroundBorder)
+                    {
+                        // Why is this border here?!?!
+                        // You literally have TWO others just like this one
+                        backgroundBorder.Background = backgroundBorder.BorderBrush = Brushes.Transparent;
+                    }
                 }
                 else if (name == "DropShadowBorder")
                 {

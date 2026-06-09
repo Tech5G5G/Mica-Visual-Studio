@@ -132,9 +132,26 @@ public sealed partial class ElementTransparentizer : IElementTransparentizer, ID
             FrameworkElement.LoadedEvent,
             new RoutedEventHandler(static (s, _) => UseTransparentizer(t => t.StyleElementTree(s as Border, TreeType.Visual))));
 
+        // All this to get rid of a 2px border btw
+        // wtf VS
+        if (Type.GetType("Microsoft.VisualStudio.PlatformUI.Shell.Controls.AutoHideRootControl, Microsoft.VisualStudio.Shell.ViewManager") is { } controlType)
+        {
+            EventManager.RegisterClassHandler(
+                controlType,
+                FrameworkElement.LoadedEvent,
+                new RoutedEventHandler(static (s, _) => UseTransparentizer(_ =>
+                {
+                    if (s is Control control && control.VisualChild()?
+                                                       .VisualChild<Border>() is { } border)
+                    {
+                        border.Background = border.BorderBrush = Brushes.Transparent;
+                    }
+                })));
+        }
+
         if (AppDomain.CurrentDomain.GetAssemblies()
                                    .FirstOrDefault(a => a.GetName().Name == "Microsoft.VisualStudio.Editor.Implementation")?
-                                   .GetType(MultiViewHostTypeName) is Type hostType)
+                                   .GetType(MultiViewHostTypeName) is { } hostType)
         {
             EventManager.RegisterClassHandler(
                 hostType,

@@ -70,7 +70,7 @@ public sealed partial class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<
             _resource.Configurations.AddRange(s_configs);
             _resource.ConfigureResources();
 
-            // So backdrop applies when it's actually visible
+            // so backdrop applies when it's actually visible
             TryGetService(out _transparentizer);
             TryGetService(out _acrylicizer);
             TryGetService(out _backdrop);
@@ -135,6 +135,7 @@ public sealed partial class MicaVisualStudioPackage : MicrosoftDIToolkitPackage<
             _logger = null;
             _backdrop = null;
             _resource = null;
+            _acrylicizer = null;
             _transparentizer = null;
 
             _provider = null;

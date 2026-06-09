@@ -193,7 +193,12 @@ public partial class ElementTransparentizer
         // GitHub PR, overview
         { "OverviewListBox", GitControlHandlers.HandlePROverview },
 
+        // Stash details, loading indicator
+        { "progressStrip", GitControlHandlers.HandleProgressStrip },
+
         // Git changes...
+        // View
+        { "Microsoft.TeamFoundation.Git.Provider.PendingChanges.ChangesSectionView", GitControlHandlers.HandleChangesView },
         // Actions toolbar
         { "statusControl", ElementHandlers.HandleElement },
         // Create repo
@@ -479,6 +484,29 @@ public partial class ElementTransparentizer
             {
                 list.Background = Brushes.Transparent;
                 list.ItemContainerStyle = transparentizer.SubclassStyle(style);
+            }
+        }
+
+        public static void HandleProgressStrip(Transparentizer transparentizer, Control control)
+        {
+            if (control is UserControl)
+            {
+                control.Background = Brushes.Transparent;
+            }
+
+            if (control.GetVisualOrLogicalParent() is Grid { Name: "teamExplorerMainGrid" } grid &&
+                grid.VisualChild<Border>() is { } border)
+            {
+                border.BorderBrush = default;
+            }
+        }
+
+        public static void HandleChangesView(Transparentizer transparentizer, Control control)
+        {
+            if (control is UserControl)
+            {
+                control.Background = Brushes.Transparent;
+                control.ClearValue(ImageThemingUtilities.ImageBackgroundColorProperty);
             }
         }
     }

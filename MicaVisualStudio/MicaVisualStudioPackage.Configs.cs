@@ -14,6 +14,8 @@ public partial class MicaVisualStudioPackage
         // { "SolidBackgroundFillTertiary", ColorConfig.Default },
         // { "EnvironmentLayeredBackground", new(transparentOnGray: true, translucent: true, opacity: 0x7F) },
 
+        { "EnvironmentBody", ResourceConfiguration.Default },
+        { "EnvironmentHeader", ResourceConfiguration.Default },
         { "EnvironmentBackground", new(translucent: true) },
         { "EnvironmentBackgroundGradient", ResourceConfiguration.Default },
 
